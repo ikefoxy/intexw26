@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback, type MouseEvent } from "react";
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -16,56 +18,14 @@ async function fetchImpactSnapshot(): Promise<PublicImpactSnapshot> {
   return { activeSafehouses: 34, residentsSupported: 412, totalDonationsBRL: 1_850_000 };
 }
 
-// ─── i18n ────────────────────────────────────────────────────────────────────
-
-const copy = {
-  nav: "Nova Path",
-  hero: {
-    eyebrow: "Protecting lives across Brazil",
-    headline: ["Guiding the", "Way Forward"],
-    sub: "Nova Path operates a nationwide network of safehouses, resident care programs, and home visitations - restoring dignity, one family at a time.",
-    cta: "Donate Now",
-    ctaSecondary: "Learn More",
-  },
-  impact: {
-    heading: "Our Impact, in Numbers",
-    stats: [
-      { label: "Active Safehouses", suffix: "" },
-      { label: "Residents Supported", suffix: "+" },
-      { label: "Total Donations (R$)", suffix: "", prefix: "R$" },
-    ],
-  },
-  pillars: [
-    {
-      icon: "🏡",
-      title: "Safehouse Network",
-      body: "Thirty-four secure locations across 12 states providing immediate shelter, counseling, and long-term housing pathways for families in crisis.",
-      tag: "Infrastructure",
-    },
-    {
-      icon: "🚗",
-      title: "Home Visitations",
-      body: "Trained specialists conduct proactive, compassionate visits to at-risk families - identifying needs before they become emergencies.",
-      tag: "Field Care",
-    },
-    {
-      icon: "📋",
-      title: "Process Recordings",
-      body: "End-to-end case documentation ensures continuity of care, legal compliance, and transparent reporting to stakeholders and donors.",
-      tag: "Governance",
-    },
-  ],
-  footer: "© 2025 Nova Path. All rights reserved.",
-};
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatStatValue(value: number, index: number): string {
+function formatStatValue(value: number, index: number, locale: string): string {
   if (index === 2) {
     if (value >= 1_000_000) return (value / 1_000_000).toFixed(1) + "M";
     if (value >= 1_000) return (value / 1_000).toFixed(0) + "K";
   }
-  return value.toLocaleString("en-US");
+  return value.toLocaleString(locale);
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -73,11 +33,13 @@ function formatStatValue(value: number, index: number): string {
 function AnimatedNumber({
   target,
   index,
+  locale,
   prefix = "",
   suffix = "",
 }: {
   target: number;
   index: number;
+  locale: string;
   prefix?: string;
   suffix?: string;
 }) {
@@ -104,7 +66,7 @@ function AnimatedNumber({
   return (
     <span ref={ref} aria-label={`${prefix}${target}${suffix}`}>
       {prefix}
-      {formatStatValue(displayed, index)}
+      {formatStatValue(displayed, index, locale)}
       {suffix}
     </span>
   );
@@ -206,8 +168,60 @@ function TiltCard({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const { t, i18n: i18nInstance } = useTranslation();
   const [snapshot, setSnapshot] = useState<PublicImpactSnapshot | null>(null);
-  const t = copy;
+  const currentLanguage = i18nInstance.resolvedLanguage ?? "en";
+  const nextLanguage = currentLanguage.toLowerCase().startsWith("pt") ? "en" : "pt";
+  const numberLocale = currentLanguage.toLowerCase().startsWith("pt") ? "pt-BR" : "en-US";
+
+  const content = {
+    nav: t("nav"),
+    hero: {
+      eyebrow: t("hero_eyebrow"),
+      headlineLine1: t("hero_title_line_1"),
+      headlineLine2: t("hero_title_line_2"),
+      sub: t("hero_subtitle"),
+      cta: t("donate_button"),
+      ctaSecondary: t("learn_more_button"),
+    },
+    impact: {
+      heading: t("impact_heading"),
+      stats: [
+        { label: t("impact_safehouses"), suffix: "" },
+        { label: t("impact_residents"), suffix: "+" },
+        { label: t("impact_donations"), suffix: "", prefix: "R$" },
+      ],
+    },
+    pillars: [
+      {
+        icon: "🏡",
+        title: t("pillar_safehouse_title"),
+        body: t("pillar_safehouse_body"),
+        tag: t("pillar_safehouse_tag"),
+      },
+      {
+        icon: "🚗",
+        title: t("pillar_visitation_title"),
+        body: t("pillar_visitation_body"),
+        tag: t("pillar_visitation_tag"),
+      },
+      {
+        icon: "📋",
+        title: t("pillar_process_title"),
+        body: t("pillar_process_body"),
+        tag: t("pillar_process_tag"),
+      },
+    ],
+    section: {
+      whatWeDo: t("section_what_we_do"),
+      threePillars: t("section_three_pillars"),
+      oneMission: t("section_one_mission"),
+      sectionSub: t("section_subtitle"),
+      footer: t("footer_copyright"),
+      systems: t("footer_systems"),
+      scroll: t("scroll_hint"),
+    },
+  };
 
   useEffect(() => {
     fetchImpactSnapshot().then(setSnapshot);
@@ -261,19 +275,22 @@ export default function HomePage() {
                 <path d="M7 1L13 7 7 13M1 7h12" stroke="#060e09" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            {t.nav}
+            {content.nav}
           </motion.a>
 
-          <motion.span
+          <motion.button
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm font-medium text-white/80"
-            aria-label="Language: English"
+            type="button"
+            onClick={() => void i18n.changeLanguage(nextLanguage)}
+            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-1.5 text-sm font-medium text-white/80 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            aria-label={`Switch language to ${nextLanguage.toUpperCase()}`}
+            title={`Switch language to ${nextLanguage.toUpperCase()}`}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-            EN
-          </motion.span>
+            <span aria-hidden="true">🌐</span>
+            {currentLanguage.toLowerCase().startsWith("pt") ? "PT" : "EN"}
+          </motion.button>
         </div>
       </header>
 
@@ -324,14 +341,14 @@ export default function HomePage() {
             className="text-emerald-400 text-sm font-semibold uppercase tracking-[0.2em] flex items-center gap-3"
           >
             <span aria-hidden="true" className="w-8 h-px bg-emerald-400/60 inline-block" />
-            {t.hero.eyebrow}
+            {content.hero.eyebrow}
             <span aria-hidden="true" className="w-8 h-px bg-emerald-400/60 inline-block" />
           </motion.p>
 
           {/* headline — staggered word reveal */}
-          <h1 className="font-display font-extrabold text-6xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight" aria-label={t.hero.headline.join(" ")}>
-            {t.hero.headline.map((line, li) => (
-              <span key={li} className="block overflow-hidden">
+          <h1 className="font-display font-extrabold text-6xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight" aria-label={`${content.hero.headlineLine1} ${content.hero.headlineLine2}`}>
+            {[content.hero.headlineLine1, content.hero.headlineLine2].map((line, li) => (
+              <span key={`${line}-${li}`} className="block overflow-hidden">
                 <motion.span
                   className="block"
                   initial={{ y: "110%" }}
@@ -365,7 +382,7 @@ export default function HomePage() {
             transition={{ delay: 0.75, duration: 0.6 }}
             className="max-w-xl text-slate-400 text-lg leading-relaxed"
           >
-            {t.hero.sub}
+            {content.hero.sub}
           </motion.p>
 
           {/* CTAs */}
@@ -392,7 +409,7 @@ export default function HomePage() {
                 className="absolute inset-0 rounded-full"
                 style={{ background: "linear-gradient(135deg,#34d399,#16a34a)", filter: "blur(12px)" }}
               />
-              <span className="relative">{t.hero.cta}</span>
+              <span className="relative">{content.hero.cta}</span>
               <svg className="relative" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -403,9 +420,9 @@ export default function HomePage() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-              aria-label={t.hero.ctaSecondary}
+              aria-label={content.hero.ctaSecondary}
             >
-              {t.hero.ctaSecondary}
+              {content.hero.ctaSecondary}
             </motion.a>
           </motion.div>
         </div>
@@ -418,7 +435,7 @@ export default function HomePage() {
           transition={{ delay: 1.4, duration: 0.8 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] uppercase tracking-widest text-white/25 font-medium">Scroll</span>
+          <span className="text-[10px] uppercase tracking-widest text-white/25 font-medium">{content.section.scroll}</span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
@@ -441,7 +458,7 @@ export default function HomePage() {
             transition={{ duration: 0.7 }}
             className="text-center mb-20"
           >
-            <h2 className="font-display font-bold text-4xl sm:text-5xl text-white">{t.impact.heading}</h2>
+            <h2 className="font-display font-bold text-4xl sm:text-5xl text-white">{content.impact.heading}</h2>
             <div aria-hidden="true" className="mt-4 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
           </motion.div>
 
@@ -449,7 +466,7 @@ export default function HomePage() {
             role="list"
             className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4"
           >
-            {t.impact.stats.map((stat, i) => (
+            {content.impact.stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 role="listitem"
@@ -468,6 +485,7 @@ export default function HomePage() {
                     <AnimatedNumber
                       target={statValues[i]}
                       index={i}
+                      locale={numberLocale}
                       prefix={stat.prefix}
                       suffix={stat.suffix}
                     />
@@ -496,19 +514,19 @@ export default function HomePage() {
             className="mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
           >
             <div>
-              <p className="text-emerald-400 text-xs font-semibold uppercase tracking-[0.2em] mb-3">What We Do</p>
+              <p className="text-emerald-400 text-xs font-semibold uppercase tracking-[0.2em] mb-3">{content.section.whatWeDo}</p>
               <h2 className="font-display font-bold text-4xl sm:text-5xl text-white leading-tight">
-                Three Pillars,<br />
+                {content.section.threePillars},<br />
                 <span
                   className="text-transparent bg-clip-text"
                   style={{ backgroundImage: "linear-gradient(90deg,#34d399,#60a5fa)" }}
                 >
-                  One Mission
+                  {content.section.oneMission}
                 </span>
               </h2>
             </div>
             <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
-              Every program is designed to create lasting change — not just immediate relief.
+              {content.section.sectionSub}
             </p>
           </motion.div>
 
@@ -516,7 +534,7 @@ export default function HomePage() {
             className="grid grid-cols-1 md:grid-cols-3 gap-5"
             style={{ perspective: "1200px" }}
           >
-            {t.pillars.map((pillar, i) => (
+            {content.pillars.map((pillar, i) => (
               <motion.div
                 key={pillar.title}
                 initial={{ opacity: 0, y: 40 }}
@@ -533,11 +551,11 @@ export default function HomePage() {
       {/* ══════════════════════════════ FOOTER ════════════════════════════════ */}
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-display font-bold text-sm text-white/60">{t.nav}</span>
-          <p className="text-white/25 text-xs">{t.footer}</p>
+          <span className="font-display font-bold text-sm text-white/60">{content.nav}</span>
+          <p className="text-white/25 text-xs">{content.section.footer}</p>
           <div className="flex items-center gap-1 text-xs text-white/25">
             <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>All systems operational</span>
+            <span>{content.section.systems}</span>
           </div>
         </div>
       </footer>

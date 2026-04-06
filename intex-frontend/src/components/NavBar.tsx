@@ -1,4 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
 import { useAuth } from '../state/AuthContext'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -7,7 +9,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   }`
 
 export function NavBar() {
+  const { i18n: i18nInstance } = useTranslation()
   const { user, logout } = useAuth()
+  const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
+  const nextLanguage = currentLanguage.toLowerCase().startsWith('pt') ? 'en' : 'pt'
 
   return (
     <header className="border-b bg-white">
@@ -36,6 +41,15 @@ export function NavBar() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => void i18n.changeLanguage(nextLanguage)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100"
+              aria-label={`Switch language to ${nextLanguage.toUpperCase()}`}
+              title={`Switch language to ${nextLanguage.toUpperCase()}`}
+            >
+              <span aria-hidden="true">🌐</span>
+            </button>
             <div className="hidden text-sm text-slate-600 sm:block">{user?.email}</div>
             <button
               onClick={logout}
