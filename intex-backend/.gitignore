@@ -1,0 +1,8 @@
+appsettings.json
+appsettings.*.json
+!.example.json
+
+bin/
+obj/
+.vs/
+
