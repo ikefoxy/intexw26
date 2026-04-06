@@ -1,9 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import CookieBanner from './components/CookieBanner'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import { ImpactDashboardPage } from './pages/ImpactDashboardPage'
 import { LoginPage } from './pages/LoginPage'
-import { PrivacyPage } from './pages/PrivacyPage'
+import PrivacyPage from './pages/PrivacyPage'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
 import { CaseloadPage } from './pages/admin/CaseloadPage'
 import { ResidentDetailPage } from './pages/admin/ResidentDetailPage'
@@ -39,6 +40,7 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <CookieBanner />
     </BrowserRouter>
   )
 }
