@@ -40,7 +40,7 @@ export default function CookieBanner({
             className="fixed inset-0 z-40 pointer-events-none"
             style={{
               background:
-                "linear-gradient(to top, rgba(6,14,9,0.7) 0%, transparent 45%)",
+                "linear-gradient(to top, rgba(241,245,249,0.85) 0%, transparent 45%)",
             }}
           />
 
@@ -61,10 +61,8 @@ export default function CookieBanner({
             className="fixed bottom-5 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-auto sm:w-full sm:max-w-2xl"
           >
             <div
-              className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+              className="relative rounded-2xl overflow-hidden border border-brand-100 shadow-2xl bg-surface"
               style={{
-                background:
-                  "linear-gradient(135deg, rgba(13,26,20,0.97) 0%, rgba(9,20,9,0.97) 100%)",
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
               }}
@@ -93,15 +91,15 @@ export default function CookieBanner({
                   </div>
 
                   <div className="min-w-0">
-                    <p className="font-semibold text-white text-sm leading-snug mb-1">
+                    <p className="font-semibold text-surface-dark text-sm leading-snug mb-1">
                       We use cookies
                     </p>
-                    <p className="text-slate-400 text-xs leading-relaxed">
+                    <p className="text-surface-text text-xs leading-relaxed">
                       Nova Path uses essential and analytical cookies to improve
                       your experience. We never sell your data. Read our{" "}
                       <a
                         href="/privacy"
-                        className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded"
+                        className="text-brand underline underline-offset-2 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand rounded"
                       >
                         Privacy Policy
                       </a>{" "}
@@ -115,7 +113,7 @@ export default function CookieBanner({
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => handleChoice("declined")}
-                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-white/10 hover:border-white/20 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-surface-text border border-brand-100 hover:border-brand hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
                     aria-label="Decline non-essential cookies"
                   >
                     Decline
@@ -125,10 +123,7 @@ export default function CookieBanner({
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => handleChoice("accepted")}
-                    className="relative px-5 py-2.5 rounded-xl text-sm font-semibold text-[#060e09] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1a14]"
-                    style={{
-                      background: "linear-gradient(135deg,#34d399,#16a34a)",
-                    }}
+                    className="relative px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50"
                     aria-label="Accept all cookies"
                   >
                     <span

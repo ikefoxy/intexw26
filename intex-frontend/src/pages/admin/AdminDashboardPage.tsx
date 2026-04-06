@@ -45,10 +45,10 @@ export function AdminDashboardPage() {
   )
 
   return (
-    <div className="min-h-full bg-[#060e09] text-white">
+    <div className="min-h-full bg-brand-50 text-surface-dark">
       <NavBar />
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold text-surface-dark">Admin Dashboard</h1>
 
         {error ? (
           <div className="mt-6">
@@ -72,8 +72,8 @@ export function AdminDashboardPage() {
             </section>
 
             <section className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-sm lg:col-span-2">
-                <div className="font-semibold text-white">Donations by month</div>
+              <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm lg:col-span-2">
+                <div className="font-semibold text-surface-dark">Donations by month</div>
                 <div className="mt-4 h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={donationChartData}>
@@ -87,13 +87,13 @@ export function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-sm">
-                <div className="font-semibold text-white">Recent activity</div>
+              <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+                <div className="font-semibold text-surface-dark">Recent activity</div>
                 <ul className="mt-3 space-y-3">
                   {summary.recentActivity.map((a, idx) => (
                     <li key={idx} className="text-sm">
-                      <div className="text-slate-100">{a.message}</div>
-                      <div className="text-slate-400">
+                      <div className="text-surface-dark">{a.message}</div>
+                      <div className="text-surface-text">
                         {a.type} · {new Date(a.timestamp).toLocaleString()}
                       </div>
                     </li>
@@ -102,9 +102,9 @@ export function AdminDashboardPage() {
               </div>
             </section>
 
-            <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-sm">
-              <div className="font-semibold text-white">Safehouse occupancy</div>
-              <div className="mt-2 text-sm text-slate-400">
+            <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+              <div className="font-semibold text-surface-dark">Safehouse occupancy</div>
+              <div className="mt-2 text-sm text-surface-text">
                 This table will populate from `GET /api/safehouses` once safehouses are seeded.
               </div>
             </section>

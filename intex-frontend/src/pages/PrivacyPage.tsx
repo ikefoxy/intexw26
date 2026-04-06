@@ -15,7 +15,7 @@ const ORG_ADDRESS =
 
 function P({ children }: { children: ReactNode }) {
   return (
-    <p className="text-slate-400 leading-relaxed text-[15px] mb-4 last:mb-0">
+    <p className="text-surface-text leading-relaxed text-[15px] mb-4 last:mb-0">
       {children}
     </p>
   );
@@ -23,7 +23,7 @@ function P({ children }: { children: ReactNode }) {
 
 function H3({ children }: { children: ReactNode }) {
   return (
-    <h3 className="font-semibold text-white text-base mt-8 mb-3 first:mt-0">
+    <h3 className="font-semibold text-surface-dark text-base mt-8 mb-3 first:mt-0">
       {children}
     </h3>
   );
@@ -33,10 +33,10 @@ function UL({ items }: { items: string[] }) {
   return (
     <ul className="space-y-2 mb-4" role="list">
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-3 text-slate-400 text-[15px]">
+        <li key={i} className="flex items-start gap-3 text-surface-text text-[15px]">
           <span
             aria-hidden="true"
-            className="mt-[6px] shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-400"
+            className="mt-[6px] shrink-0 w-1.5 h-1.5 rounded-full bg-accent"
           />
           <span>{item}</span>
         </li>
@@ -53,7 +53,7 @@ function Table({
   rows: string[][];
 }) {
   return (
-    <div className="overflow-x-auto mb-4 rounded-xl border border-white/8">
+    <div className="overflow-x-auto mb-4 rounded-xl border border-brand-100 bg-surface">
       <table className="w-full text-sm">
         <thead>
           <tr
@@ -65,7 +65,7 @@ function Table({
               <th
                 key={h}
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-emerald-400/80 border-b border-white/8"
+                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-accent border-b border-brand-100"
               >
                 {h}
               </th>
@@ -76,12 +76,12 @@ function Table({
           {rows.map((row, ri) => (
             <tr
               key={ri}
-              className="border-b border-white/5 last:border-0 hover:bg-white/2 transition-colors"
+              className="border-b border-brand-100 last:border-0 hover:bg-brand-50 transition-colors"
             >
               {row.map((cell, ci) => (
                 <td
                   key={ci}
-                  className="px-4 py-3 text-slate-400 text-[13px] leading-relaxed align-top"
+                  className="px-4 py-3 text-surface-text text-[13px] leading-relaxed align-top"
                 >
                   {cell}
                 </td>
@@ -112,7 +112,7 @@ function Callout({
       <span className="text-xl shrink-0" role="img" aria-hidden="true">
         {icon}
       </span>
-      <div className="text-[14px] text-slate-300 leading-relaxed">{children}</div>
+      <div className="text-[14px] text-surface-text leading-relaxed">{children}</div>
     </div>
   );
 }
@@ -129,7 +129,7 @@ const sections: Section[] = [
           whose safety may depend on strict data confidentiality.
         </Callout>
         <P>
-          This Privacy Policy ("Policy") describes how <strong className="text-white">Nova Path</strong> (
+          This Privacy Policy ("Policy") describes how <strong className="text-surface-dark">Nova Path</strong> (
           <em>Associacao Nova Path</em>), a non-profit organization registered in
           Brazil under CNPJ 00.000.000/0001-00, collects, uses, stores,
           discloses, and protects personal data in connection with our websites,
@@ -137,7 +137,7 @@ const sections: Section[] = [
           relations.
         </P>
         <P>
-          Nova Path is the <strong className="text-white">data controller</strong> for the purposes of:
+          Nova Path is the <strong className="text-surface-dark">data controller</strong> for the purposes of:
         </P>
         <UL
           items={[
@@ -147,7 +147,7 @@ const sections: Section[] = [
           ]}
         />
         <P>
-          <strong className="text-white">Data Controller contact:</strong>{" "}
+          <strong className="text-surface-dark">Data Controller contact:</strong>{" "}
           <a
             href={`mailto:${CONTROLLER_EMAIL}`}
             className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
@@ -155,7 +155,7 @@ const sections: Section[] = [
             {CONTROLLER_EMAIL}
           </a>
           <br />
-          <strong className="text-white">Registered address:</strong> {ORG_ADDRESS}
+          <strong className="text-surface-dark">Registered address:</strong> {ORG_ADDRESS}
         </P>
       </>
     ),
@@ -171,9 +171,9 @@ const sections: Section[] = [
           may contact our DPO at any time:
         </P>
         <div className="rounded-xl border border-white/8 bg-white/2 px-5 py-4 mb-4 space-y-1 text-[14px]">
-          <p className="text-white font-medium">Data Protection Officer</p>
-          <p className="text-slate-400">Nova Path - Associacao Nova Path</p>
-          <p className="text-slate-400">{ORG_ADDRESS}</p>
+          <p className="text-surface-dark font-medium">Data Protection Officer</p>
+          <p className="text-surface-text">Nova Path - Associacao Nova Path</p>
+          <p className="text-surface-text">{ORG_ADDRESS}</p>
           <a
             href={`mailto:${DPO_EMAIL}`}
             className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300 block"
@@ -184,7 +184,7 @@ const sections: Section[] = [
         <P>
           Complaints may also be directed to Brazil's national data protection
           authority, the{" "}
-          <strong className="text-white">
+          <strong className="text-surface-dark">
             Autoridade Nacional de Protecao de Dados (ANPD)
           </strong>
           , or, for EU residents, to the relevant supervisory authority in your
@@ -336,7 +336,7 @@ const sections: Section[] = [
         <H3>Retention</H3>
         <P>
           Resident case records are retained for a minimum of{" "}
-          <strong className="text-white">5 years</strong> following case closure,
+          <strong className="text-surface-dark">5 years</strong> following case closure,
           as required by Brazilian social-care regulations (Lei Organica da
           Assistencia Social - LOAS), and securely deleted thereafter unless
           ongoing legal proceedings require extended retention.
@@ -364,8 +364,8 @@ const sections: Section[] = [
         <P>
           All financial transactions are processed by PCI-DSS Level 1 certified
           third-party payment processors (currently{" "}
-          <strong className="text-white">Stripe</strong> and{" "}
-          <strong className="text-white">PagSeguro</strong>). Nova Path does not
+          <strong className="text-surface-dark">Stripe</strong> and{" "}
+          <strong className="text-surface-dark">PagSeguro</strong>). Nova Path does not
           receive, store, or transmit raw card numbers, CVVs, or bank account
           credentials. Tokenised payment references used for recurring donations
           are stored by the processor, not by Nova Path.
@@ -491,8 +491,8 @@ const sections: Section[] = [
           Essential cookies are set without consent as they are strictly
           necessary for the website to function. All non-essential cookies
           (analytical, marketing) are loaded only after you click{" "}
-          <strong className="text-white">Accept</strong> in the cookie banner.
-          Clicking <strong className="text-white">Decline</strong> will prevent
+          <strong className="text-surface-dark">Accept</strong> in the cookie banner.
+          Clicking <strong className="text-surface-dark">Decline</strong> will prevent
           any non-essential cookies from being set during your session.
         </P>
         <P>
@@ -516,7 +516,7 @@ const sections: Section[] = [
       <>
         <P>
           Nova Path stores all primary data in AWS infrastructure located in the{" "}
-          <strong className="text-white">Sao Paulo (sa-east-1)</strong> region,
+          <strong className="text-surface-dark">Sao Paulo (sa-east-1)</strong> region,
           ensuring data residency within Brazil. Where data is processed by
           third-party services headquartered outside Brazil (e.g., payment
           processors, email platforms), we ensure transfers are protected by:
@@ -610,7 +610,7 @@ const sections: Section[] = [
         />
         <P>
           We will respond to all legitimate requests within{" "}
-          <strong className="text-white">15 business days</strong>. We may ask
+          <strong className="text-surface-dark">15 business days</strong>. We may ask
           you to verify your identity before fulfilling a request. There is no
           charge for exercising these rights, although we may charge a reasonable
           administrative fee for manifestly unfounded or excessive requests.
@@ -679,12 +679,12 @@ const sections: Section[] = [
           We may update this Privacy Policy from time to time to reflect changes
           in our practices, technology, legal requirements, or other factors. We
           will post the updated Policy on this page with a revised{" "}
-          <strong className="text-white">Last Updated</strong> date.
+          <strong className="text-surface-dark">Last Updated</strong> date.
         </P>
         <P>
           For material changes, we will notify registered donors by email and
           display a prominent notice on our website at least{" "}
-          <strong className="text-white">30 days</strong> before the change takes
+          <strong className="text-surface-dark">30 days</strong> before the change takes
           effect. Continued use of our services after that date constitutes
           acceptance of the revised Policy.
         </P>
@@ -701,15 +701,15 @@ const sections: Section[] = [
           Policy or the processing of your personal data, please contact us:
         </P>
         <div className="rounded-xl border border-white/8 bg-white/2 px-5 py-4 space-y-2 text-[14px]">
-          <p className="text-white font-semibold">Nova Path - Associacao Nova Path</p>
-          <p className="text-slate-400">{ORG_ADDRESS}</p>
+          <p className="text-surface-dark font-semibold">Nova Path - Associacao Nova Path</p>
+          <p className="text-surface-text">{ORG_ADDRESS}</p>
           <a
             href={`mailto:${CONTROLLER_EMAIL}`}
             className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300 block"
           >
             {CONTROLLER_EMAIL}
           </a>
-          <p className="text-slate-400">
+          <p className="text-surface-text">
             DPO direct line:{" "}
             <a
               href={`mailto:${DPO_EMAIL}`}
@@ -744,13 +744,13 @@ function NavDot({
         <span
           className={`shrink-0 rounded-full transition-all duration-300 ${
             active
-              ? "w-2.5 h-2.5 bg-emerald-400"
-              : "w-1.5 h-1.5 bg-white/20 group-hover:bg-white/40"
+              ? "w-2.5 h-2.5 bg-accent"
+              : "w-1.5 h-1.5 bg-brand-100 group-hover:bg-brand"
           }`}
         />
         <span
           className={`text-[12px] leading-snug transition-colors duration-200 hidden xl:block ${
-            active ? "text-emerald-400 font-medium" : "text-slate-500 group-hover:text-slate-300"
+            active ? "text-accent font-medium" : "text-surface-text group-hover:text-surface-dark"
           }`}
         >
           {section.title.replace(/^\d+\.\s/, "")}
@@ -776,7 +776,7 @@ function SectionBlock({ section }: { section: Section }) {
     >
       <h2
         id={`heading-${section.id}`}
-        className="font-display font-bold text-2xl text-white mb-6 pb-4 border-b border-white/8 flex items-center gap-3"
+        className="font-display font-bold text-2xl text-surface-dark mb-6 pb-4 border-b border-brand-100 flex items-center gap-3"
       >
         <span
           aria-hidden="true"
@@ -814,18 +814,18 @@ export default function PrivacyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060e09] text-white">
+    <div className="min-h-screen bg-brand-50 text-surface-dark">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Sora', sans-serif; }
       `}</style>
 
-      <header className="border-b border-white/8 bg-[#060e09]/90 backdrop-blur sticky top-0 z-30">
+      <header className="border-b border-brand-100 bg-brand-50 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a
             href="/"
-            className="flex items-center gap-2 font-display font-bold text-base text-white/80 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded"
+            className="flex items-center gap-2 font-display font-bold text-base text-surface-text hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
             aria-label="Back to Nova Path home"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -833,7 +833,7 @@ export default function PrivacyPage() {
             </svg>
             Nova Path
           </a>
-          <span className="text-slate-500 text-xs">
+          <span className="text-surface-text text-xs">
             Last updated: {LAST_UPDATED}
           </span>
         </div>
@@ -844,7 +844,7 @@ export default function PrivacyPage() {
           aria-label="Privacy policy sections"
           className="hidden lg:flex flex-col gap-1 w-56 xl:w-64 shrink-0 self-start sticky top-28"
         >
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-semibold mb-3 px-1">
+          <p className="text-[10px] uppercase tracking-widest text-surface-text font-semibold mb-3 px-1">
             Contents
           </p>
           <ul className="space-y-2.5" role="list">
@@ -866,11 +866,11 @@ export default function PrivacyPage() {
             transition={{ duration: 0.6 }}
             className="mb-16"
           >
-            <p className="text-emerald-400 text-xs uppercase tracking-[0.2em] font-semibold mb-4 flex items-center gap-2">
-              <span aria-hidden="true" className="w-6 h-px bg-emerald-400/60" />
+            <p className="text-accent text-xs uppercase tracking-[0.2em] font-semibold mb-4 flex items-center gap-2">
+              <span aria-hidden="true" className="w-6 h-px bg-accent/60" />
               Legal Document
             </p>
-            <h1 className="font-display font-extrabold text-5xl sm:text-6xl text-white leading-tight mb-5">
+            <h1 className="font-display font-extrabold text-5xl sm:text-6xl text-surface-dark leading-tight mb-5">
               Privacy{" "}
               <span
                 className="text-transparent bg-clip-text"
@@ -881,7 +881,7 @@ export default function PrivacyPage() {
                 Policy
               </span>
             </h1>
-            <p className="text-slate-400 text-base leading-relaxed max-w-2xl">
+            <p className="text-surface-text text-base leading-relaxed max-w-2xl">
               Nova Path is committed to handling all personal data with
               transparency, care, and legal precision - especially the data of
               those who depend on us most. This policy explains what we collect,
@@ -896,7 +896,7 @@ export default function PrivacyPage() {
                     style={{
                       background: "rgba(52,211,153,0.06)",
                       borderColor: "rgba(52,211,153,0.2)",
-                      color: "#6ee7b7",
+                      color: "#d97706",
                     }}
                   >
                     {badge}
@@ -912,12 +912,12 @@ export default function PrivacyPage() {
             ))}
           </div>
 
-          <div className="mt-20 pt-10 border-t border-white/8 text-center">
-            <p className="text-slate-600 text-xs">
+          <div className="mt-20 pt-10 border-t border-brand-100 text-center">
+            <p className="text-surface-text text-xs">
               Nova Path - Associacao Nova Path · CNPJ 00.000.000/0001-00 ·{" "}
               {ORG_ADDRESS}
             </p>
-            <p className="text-slate-700 text-xs mt-1">
+            <p className="text-surface-text text-xs mt-1">
               This document was last updated on {LAST_UPDATED}.
             </p>
           </div>
