@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../state/AuthContext";
@@ -17,28 +17,6 @@ const QUOTES = [
     author: "Nova Path Founding Principle",
   },
 ];
-
-function Orb({
-  className,
-  style,
-  duration,
-  delay,
-}: {
-  className: string;
-  style: CSSProperties;
-  duration: number;
-  delay: number;
-}) {
-  return (
-    <motion.div
-      aria-hidden="true"
-      animate={{ scale: [1, 1.18, 1], opacity: [0.6, 1, 0.6] }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut", delay }}
-      className={`absolute rounded-full pointer-events-none ${className}`}
-      style={style}
-    />
-  );
-}
 
 function Field({
   id,
@@ -91,7 +69,7 @@ function Field({
             disabled:opacity-50 disabled:cursor-not-allowed
             ${
               error
-                ? "border-red-500/60 focus:border-red-400"
+                ? "border-accent/60 focus:border-accent"
                 : focused
                   ? "border-brand"
                   : "border-brand-100 hover:border-brand"
@@ -99,7 +77,7 @@ function Field({
           `}
           style={
             focused && !error
-              ? { boxShadow: "0 0 0 3px rgba(52,211,153,0.12)" }
+              ? { boxShadow: "0 0 0 3px color-mix(in srgb, var(--color-brand) 12%, transparent)" }
               : error
                 ? { boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" }
                 : {}
@@ -115,7 +93,7 @@ function Field({
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-[12px] text-red-400 flex items-center gap-1.5"
+            className="text-[12px] text-accent-dark flex items-center gap-1.5"
           >
             <svg
               width="12"
@@ -195,7 +173,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-brand-50 overflow-hidden">
+    <div className="min-h-screen flex overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         .font-display { font-family: 'Sora', sans-serif; }
@@ -207,61 +185,12 @@ export function LoginPage() {
         initial={{ opacity: 0, x: -32 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="hidden lg:flex relative flex-col justify-between w-[52%] xl:w-[55%] p-12 overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(145deg, #f8fafc 0%, #f1f5f9 40%, #ffffff 100%)",
-        }}
+        className="relative hidden w-[52%] flex-col justify-between overflow-hidden p-12 lg:flex xl:w-[55%]"
       >
-        <Orb
-          className="w-[500px] h-[500px] -top-32 -left-32"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)",
-          }}
-          duration={9}
-          delay={0}
-        />
-        <Orb
-          className="w-[380px] h-[380px] bottom-0 right-0"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(250,204,21,0.12) 0%, transparent 70%)",
-          }}
-          duration={12}
-          delay={3}
-        />
-        <Orb
-          className="w-[260px] h-[260px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
-          }}
-          duration={7}
-          delay={1.5}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(-45deg,#34d399 0px,#34d399 1px,transparent 1px,transparent 70px)",
-          }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, #fff 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
-
         <div className="relative z-10 flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: "linear-gradient(135deg,#34d399,#facc15)" }}
+            style={{ background: "linear-gradient(135deg,var(--color-brand),var(--color-accent))" }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
@@ -278,7 +207,7 @@ export function LoginPage() {
           </span>
         </div>
 
-        <div className="relative z-10 flex-1 flex items-center justify-center py-16">
+        <div className="relative z-10 flex flex-1 items-center justify-center py-10">
           <svg
             viewBox="0 0 340 340"
             className="w-64 xl:w-72 opacity-90"
@@ -382,7 +311,7 @@ export function LoginPage() {
           <div
             className="w-8 h-px mb-4"
             style={{
-              background: "linear-gradient(90deg,#34d399,transparent)",
+              background: "linear-gradient(90deg,var(--color-brand),transparent)",
             }}
           />
           <blockquote>
@@ -396,22 +325,7 @@ export function LoginPage() {
         </motion.div>
       </motion.aside>
 
-      <main
-        className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 py-12 relative"
-        style={{
-          background:
-            "linear-gradient(160deg,#f8fafc 0%,#f1f5f9 60%,#ffffff 100%)",
-        }}
-      >
-        <div
-          aria-hidden="true"
-          className="absolute top-0 right-0 w-64 h-64 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle at top right, rgba(52,211,153,0.06), transparent 70%)",
-          }}
-        />
-
+      <main className="relative flex flex-1 flex-col items-center justify-center px-6 py-8 sm:px-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -421,7 +335,7 @@ export function LoginPage() {
           <div className="flex lg:hidden items-center gap-2.5 mb-10">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg,#34d399,#facc15)" }}
+              style={{ background: "linear-gradient(135deg,var(--color-brand),var(--color-accent))" }}
               aria-hidden="true"
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -507,7 +421,7 @@ export function LoginPage() {
                     animate={{ opacity: 1, y: 0, height: "auto" }}
                     exit={{ opacity: 0, y: -6, height: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="rounded-xl px-4 py-3 text-[13px] text-red-300 flex items-start gap-3 border"
+                    className="rounded-xl px-4 py-3 text-[13px] text-accent-dark flex items-start gap-3 border"
                     style={{
                       background: "rgba(239,68,68,0.07)",
                       borderColor: "rgba(239,68,68,0.2)",
@@ -547,7 +461,7 @@ export function LoginPage() {
                 whileTap={loading ? {} : { scale: 0.97 }}
                 aria-label={loading ? "Signing in, please wait" : "Sign in"}
                 aria-busy={loading}
-                className="relative mt-1 w-full py-3.5 rounded-xl font-semibold text-white text-sm overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50 disabled:cursor-not-allowed disabled:opacity-80 transition-opacity bg-brand hover:bg-brand-dark"
+                className="relative mt-1 w-full py-3.5 rounded-xl font-semibold text-surface text-sm overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50 disabled:cursor-not-allowed disabled:opacity-80 transition-opacity bg-brand hover:bg-brand-dark"
               >
                 <AnimatePresence>
                   {loading && (
@@ -563,7 +477,7 @@ export function LoginPage() {
                       className="absolute inset-0 w-full"
                       style={{
                         background:
-                          "linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)",
+                          "linear-gradient(90deg,transparent,color-mix(in srgb, var(--color-surface) 25%, transparent),transparent)",
                       }}
                     />
                   )}
@@ -621,10 +535,10 @@ export function LoginPage() {
             </div>
           </form>
 
-          <p className="mt-8 text-center text-[12px] text-slate-600">
+          <p className="mt-8 text-center text-[12px] text-surface-text">
             Access is restricted to authorised Nova Path personnel.
             <br />
-            Demo login: <span className="text-slate-400">admin@novapath.org / demo123</span>
+            Demo login: <span className="text-surface-text">admin@novapath.org / demo123</span>
             <br />
             Contact{" "}
             <a

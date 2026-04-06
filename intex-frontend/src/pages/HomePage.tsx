@@ -124,19 +124,19 @@ function TiltCard({
         className="absolute inset-0 rounded-2xl"
         style={{
           background:
-            "linear-gradient(135deg, rgba(52,211,153,0.7), rgba(250,204,21,0.5), rgba(59,130,246,0.5))",
+            "linear-gradient(135deg, color-mix(in srgb, var(--color-brand) 70%, transparent), color-mix(in srgb, var(--color-accent) 50%, transparent), rgba(59,130,246,0.5))",
           filter: "blur(1px)",
         }}
       />
       {/* card body */}
-      <div className="relative rounded-2xl bg-surface border border-brand-100 p-8 h-full flex flex-col gap-5 overflow-hidden">
+      <div className="relative rounded-2xl bg-surface border border-brand-100 p-6 h-full flex flex-col gap-4 overflow-hidden">
         {/* subtle grid texture */}
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px), repeating-linear-gradient(90deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px)",
+              "repeating-linear-gradient(0deg,var(--color-surface) 0px,var(--color-surface) 1px,transparent 1px,transparent 40px), repeating-linear-gradient(90deg,var(--color-surface) 0px,var(--color-surface) 1px,transparent 1px,transparent 40px)",
           }}
         />
         <div className="flex items-start justify-between">
@@ -187,10 +187,14 @@ function TiltCard({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+const heroSlides: { src: string; objectPosition: string }[] = [
+  { src: brazil2, objectPosition: "center 28%" },
+  { src: brazil2, objectPosition: "center 72%" },
+];
+
 export default function HomePage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const [snapshot, setSnapshot] = useState<PublicImpactSnapshot | null>(null);
-  const heroSlides = [brazil2];
   const [activeSlide, setActiveSlide] = useState(0);
   const currentLanguage = i18nInstance.resolvedLanguage ?? "en";
   const nextLanguage = currentLanguage.toLowerCase().startsWith("pt") ? "en" : "pt";
@@ -259,9 +263,8 @@ export default function HomePage() {
     const timer = setInterval(() => {
       setActiveSlide((current) => (current + 1) % heroSlides.length);
     }, 4500);
-
     return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  }, []);
 
   // Refs for scroll sections
   const impactRef = useRef<HTMLElement>(null);
@@ -274,25 +277,17 @@ export default function HomePage() {
     : [0, 0, 0];
 
   return (
-    <div className="min-h-screen bg-brand-50 text-surface-dark overflow-x-hidden font-sans">
+    <div className="min-h-screen text-surface-dark overflow-x-hidden font-sans">
       {/* ── Google Fonts ── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Sora', sans-serif; }
-        .noise-bg::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-          pointer-events: none;
-          z-index: 0;
-        }
       `}</style>
 
       {/* ════════════════════════════════ NAV ════════════════════════════════ */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-brand-50/98 border-b border-brand-100 shadow-sm backdrop-blur-[1px]">
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
+      <header className="fixed top-0 inset-x-0 z-50 border-b border-brand-100/40 bg-white/20 backdrop-blur-md shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between">
           {/* logo */}
           <motion.a
             href="#"
@@ -305,7 +300,7 @@ export default function HomePage() {
             <span
               aria-hidden="true"
               className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg,#34d399,#facc15)" }}
+              style={{ background: "linear-gradient(135deg,var(--color-brand),var(--color-accent))" }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M7 1L13 7 7 13M1 7h12" stroke="#060e09" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -339,7 +334,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               type="button"
               onClick={() => void i18n.changeLanguage(nextLanguage)}
-              className="inline-flex items-center gap-2 bg-surface hover:bg-brand-50 border border-brand-100 rounded-full px-4 py-1.5 text-sm font-medium text-surface-text transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+              className="inline-flex items-center gap-2 bg-brand-100/40 hover:bg-brand-100/70 border border-brand-100 rounded-full px-4 py-1.5 text-sm font-medium text-surface-text transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
               aria-label={languageToggleLabel}
               title={languageToggleLabel}
             >
@@ -356,42 +351,36 @@ export default function HomePage() {
       {/* ══════════════════════════════ HERO ══════════════════════════════════ */}
       <section
         aria-label="Hero"
-        className="relative noise-bg min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20 overflow-hidden"
+        className="relative flex min-h-[82vh] flex-col items-center justify-center overflow-hidden px-4 pb-12 pt-20 sm:px-6 sm:pb-16"
       >
-        {/* animated gradient orbs */}
-        <motion.div
-          aria-hidden="true"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)" }}
-        />
-        <motion.div
-          aria-hidden="true"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.28, 0.15] }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute top-1/3 -right-40 w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(250,204,21,0.14) 0%, transparent 70%)" }}
-        />
-        <motion.div
-          aria-hidden="true"
-          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-          className="absolute bottom-0 left-1/3 w-[400px] h-[400px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)" }}
-        />
-
-        {/* thin diagonal rule */}
+        <div className="absolute inset-0 z-[1]" aria-hidden="true">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={activeSlide}
+              src={heroSlides[activeSlide].src}
+              alt=""
+              initial={{ opacity: 0, scale: 1.035 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                opacity: { duration: 1, ease: "easeInOut" },
+                scale: { duration: 4.5, ease: "easeOut" },
+              }}
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: heroSlides[activeSlide].objectPosition }}
+            />
+          </AnimatePresence>
+        </div>
         <div
           aria-hidden="true"
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 z-[2]"
           style={{
-            backgroundImage:
-              "repeating-linear-gradient(-45deg,#34d399 0px,#34d399 1px,transparent 1px,transparent 80px)",
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.74) 32%, rgba(255,255,255,0.68) 58%, rgba(255,255,255,0.82) 100%)",
           }}
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center gap-8">
+        <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-6 text-center">
           {/* eyebrow */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -399,9 +388,9 @@ export default function HomePage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-accent text-sm font-semibold uppercase tracking-[0.2em] flex items-center gap-3"
           >
-            <span aria-hidden="true" className="w-8 h-px bg-emerald-400/60 inline-block" />
+            <span aria-hidden="true" className="w-8 h-px bg-brand/60 inline-block" />
             {content.hero.eyebrow}
-            <span aria-hidden="true" className="w-8 h-px bg-emerald-400/60 inline-block" />
+            <span aria-hidden="true" className="w-8 h-px bg-brand/60 inline-block" />
           </motion.p>
 
           {/* headline — staggered word reveal */}
@@ -422,7 +411,7 @@ export default function HomePage() {
                         aria-hidden="true"
                         className="text-transparent bg-clip-text"
                         style={{
-                          backgroundImage: "linear-gradient(90deg,#34d399,#facc15,#60a5fa)",
+                          backgroundImage: "linear-gradient(90deg,var(--color-brand),var(--color-accent),#60a5fa)",
                         }}
                       >
                         {line}
@@ -456,7 +445,7 @@ export default function HomePage() {
               href="#donate"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-brand-100 text-surface-text hover:text-surface-dark hover:border-brand text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-brand-100 text-surface-text hover:text-surface-dark hover:border-brand text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               aria-label="Donate Now to Nova Path"
             >
               <span>{content.hero.cta}</span>
@@ -469,7 +458,7 @@ export default function HomePage() {
               href="#about"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-brand-100 text-surface-text hover:text-surface-dark hover:border-brand text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-brand-100 text-surface-text hover:text-surface-dark hover:border-brand text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               aria-label={content.hero.ctaSecondary}
             >
               {content.hero.ctaSecondary}
@@ -481,43 +470,24 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.05, duration: 0.65 }}
             className="flex items-center gap-2"
+            role="tablist"
+            aria-label="Hero image slides"
           >
             {heroSlides.map((_, index) => (
               <button
                 key={`slide-dot-${index}`}
                 type="button"
+                role="tab"
+                aria-selected={activeSlide === index}
                 onClick={() => setActiveSlide(index)}
                 className={`h-2.5 rounded-full transition-all ${
                   activeSlide === index ? "w-8 bg-accent" : "w-2.5 bg-surface-text/40 hover:bg-surface-text/70"
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={`Slide ${index + 1}`}
               />
             ))}
           </motion.div>
         </div>
-
-        <div className="absolute inset-0 z-[1]">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={heroSlides[activeSlide]}
-              src={heroSlides[activeSlide]}
-              alt={`Nova Path highlight ${activeSlide + 1}`}
-              initial={{ opacity: 0, scale: 1.035 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ opacity: { duration: 1.0, ease: "easeInOut" }, scale: { duration: 4.5, ease: "easeOut" } }}
-              className="absolute inset-0 w-full h-full object-cover object-center"
-            />
-          </AnimatePresence>
-        </div>
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-[2]"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.84) 0%, rgba(255,255,255,0.72) 26%, rgba(255,255,255,0.66) 56%, rgba(255,255,255,0.78) 100%)",
-          }}
-        />
 
       </section>
 
@@ -526,14 +496,14 @@ export default function HomePage() {
         id="donate"
         ref={impactRef}
         aria-label="Impact Statistics"
-        className="relative py-28 px-6 border-y border-brand-100 bg-surface"
+        className="relative border-y border-brand/15 px-4 py-16 sm:px-6 sm:py-20"
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="relative z-10 mx-auto max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={impactInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7 }}
-            className="text-center mb-20"
+            className="mb-12 text-center"
           >
             <h2 className="font-display font-bold text-4xl sm:text-5xl text-surface-dark">{content.impact.heading}</h2>
             <div aria-hidden="true" className="mt-4 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
@@ -541,7 +511,7 @@ export default function HomePage() {
 
           <div
             role="list"
-            className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4"
+            className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-4"
           >
             {content.impact.stats.map((stat, i) => (
               <motion.div
@@ -555,7 +525,7 @@ export default function HomePage() {
                 <div
                   aria-hidden="true"
                   className="w-12 h-px mb-2"
-                  style={{ background: "linear-gradient(90deg,transparent,#34d399,transparent)" }}
+                  style={{ background: "linear-gradient(90deg,transparent,var(--color-brand),transparent)" }}
                 />
                 <div className="font-display font-extrabold text-5xl sm:text-6xl tracking-tight text-accent tabular-nums">
                   {snapshot ? (
@@ -582,34 +552,34 @@ export default function HomePage() {
         id="about"
         ref={pillarsRef}
         aria-label="Core Pillars"
-        className="py-28 px-6"
+        className="relative px-4 py-16 sm:px-6 sm:py-20"
       >
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={pillarsInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7 }}
-            className="mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
+            className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
           >
             <div>
-              <p className="text-emerald-400 text-xs font-semibold uppercase tracking-[0.2em] mb-3">{content.section.whatWeDo}</p>
-              <h2 className="font-display font-bold text-4xl sm:text-5xl text-white leading-tight">
+              <p className="text-brand mb-2 text-xs font-semibold uppercase tracking-[0.2em]">{content.section.whatWeDo}</p>
+              <h2 className="font-display font-bold text-4xl sm:text-5xl text-surface-dark leading-tight">
                 {content.section.threePillars},<br />
                 <span
                   className="text-transparent bg-clip-text"
-                  style={{ backgroundImage: "linear-gradient(90deg,#34d399,#60a5fa)" }}
+                  style={{ backgroundImage: "linear-gradient(90deg,var(--color-brand),#60a5fa)" }}
                 >
                   {content.section.oneMission}
                 </span>
               </h2>
             </div>
-            <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
+            <p className="text-surface-text text-sm max-w-xs leading-relaxed">
               {content.section.sectionSub}
             </p>
           </motion.div>
 
           <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-5"
+            className="grid grid-cols-1 gap-4 md:grid-cols-3"
             style={{ perspective: "1200px" }}
           >
             {content.pillars.map((pillar, i) => (
@@ -628,7 +598,7 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════ FOOTER ════════════════════════════════ */}
-      <footer className="border-t border-brand-100 py-10 px-6 bg-surface">
+      <footer className="border-t border-brand-100/40 bg-white/15 px-4 py-6 backdrop-blur-sm sm:px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-display font-bold text-sm text-surface-dark">{content.nav}</span>
           <p className="text-surface-text text-xs">{content.section.footer}</p>
