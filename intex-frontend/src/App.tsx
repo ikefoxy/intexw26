@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
-import { HomePage } from './pages/HomePage'
+import HomePage from './pages/HomePage'
 import { ImpactDashboardPage } from './pages/ImpactDashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { PrivacyPage } from './pages/PrivacyPage'
