@@ -4,13 +4,13 @@ import { NavBar } from '../../components/NavBar'
 export function ProcessRecordingPage() {
   const { residentId } = useParams()
   return (
-    <div className="min-h-full bg-slate-50">
+    <div className="min-h-full bg-brand-50 text-surface-dark">
       <NavBar />
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-slate-900">Process Recordings</h1>
-        <div className="mt-2 text-sm text-slate-600">ResidentId: {residentId}</div>
-        <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="text-sm text-slate-600">
+        <h1 className="text-2xl font-bold text-surface-dark">Process Recordings</h1>
+        <div className="mt-2 text-sm text-surface-text">ResidentId: {residentId}</div>
+        <div className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+          <div className="text-sm text-surface-text">
             History + entry form will be wired to `GET /api/process-recordings/resident/{residentId}` and `POST /api/process-recordings` next.
           </div>
         </div>

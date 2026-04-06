@@ -76,10 +76,10 @@ export function ImpactDashboardPage() {
   const headline = useMemo(() => snapshot?.headline || 'Our Impact', [snapshot])
 
   return (
-    <div className="min-h-full bg-slate-50">
+    <div className="min-h-full bg-brand-50 text-surface-dark">
       <main className="mx-auto max-w-6xl px-4 py-10">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{headline}</h1>
-        {snapshot?.summaryText && <p className="mt-2 max-w-3xl text-slate-700">{snapshot.summaryText}</p>}
+        <h1 className="text-3xl font-bold tracking-tight text-surface-dark">{headline}</h1>
+        {snapshot?.summaryText && <p className="mt-2 max-w-3xl text-surface-text">{snapshot.summaryText}</p>}
 
         {error ? (
           <div className="mt-6">
@@ -97,7 +97,7 @@ export function ImpactDashboardPage() {
         )}
 
         <section className="mt-10">
-          <h2 className="text-xl font-semibold text-slate-900">Success stories</h2>
+          <h2 className="text-xl font-semibold text-surface-dark">Success stories</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {[
               {
@@ -113,22 +113,22 @@ export function ImpactDashboardPage() {
                 text: 'With coordinated follow-ups and family engagement, a case progressed toward reintegration with ongoing monitoring.',
               },
             ].map((s) => (
-              <div key={s.title} className="rounded-2xl border bg-white p-5 shadow-sm">
-                <div className="font-semibold text-slate-900">{s.title}</div>
-                <div className="mt-2 text-sm text-slate-700">{s.text}</div>
+              <div key={s.title} className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+                <div className="font-semibold text-surface-dark">{s.title}</div>
+                <div className="mt-2 text-sm text-surface-text">{s.text}</div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mt-10 rounded-2xl bg-slate-900 p-6 text-white md:p-8">
+        <section className="mt-10 rounded-2xl border border-brand-100 bg-surface p-6 text-surface-dark md:p-8">
           <h2 className="text-xl font-semibold">Support recovery</h2>
-          <p className="mt-2 max-w-2xl text-slate-100">
+          <p className="mt-2 max-w-2xl text-surface-text">
             Donations fund safe housing, clinical support, education planning, and reintegration services. All public reporting is anonymized.
           </p>
           <div className="mt-5">
             <a
-              className="inline-flex rounded-md bg-white px-4 py-2 font-semibold text-slate-900 hover:bg-slate-100"
+              className="inline-flex rounded-md bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark"
               href="mailto:donations@novapath.org"
             >
               Contact to Donate

@@ -1,19 +1,27 @@
 import { Link, NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
 import { useAuth } from '../state/AuthContext'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `px-3 py-2 rounded-md text-sm font-medium ${
-    isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
+    isActive ? 'bg-brand-100 text-brand' : 'text-surface-text hover:bg-brand-50 hover:text-surface-dark'
   }`
 
 export function NavBar() {
+  const { i18n: i18nInstance } = useTranslation()
   const { user, logout } = useAuth()
+  const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
+  const nextLanguage = currentLanguage.toLowerCase().startsWith('pt') ? 'en' : 'pt'
+  const languageToggleLabel = currentLanguage.toLowerCase().startsWith('pt')
+    ? 'Switch to English'
+    : 'Mudar para portugues'
 
   return (
-    <header className="border-b bg-white">
+    <header className="border-b border-brand-100 bg-brand-50">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link to="/admin" className="font-semibold tracking-tight text-slate-900">
+          <Link to="/admin" className="font-semibold tracking-tight text-surface-dark">
             Nova Path
           </Link>
 
@@ -36,10 +44,19 @@ export function NavBar() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="hidden text-sm text-slate-600 sm:block">{user?.email}</div>
+            <button
+              type="button"
+              onClick={() => void i18n.changeLanguage(nextLanguage)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-100 hover:text-surface-dark"
+              aria-label={languageToggleLabel}
+              title={languageToggleLabel}
+            >
+              <span aria-hidden="true">🌐</span>
+            </button>
+            <div className="hidden text-sm text-surface-text sm:block">{user?.email}</div>
             <button
               onClick={logout}
-              className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
             >
               Logout
             </button>
