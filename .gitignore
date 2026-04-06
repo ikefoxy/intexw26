@@ -25,6 +25,3 @@ yarn-error.log*
 **/appsettings.Development.json
 **/appsettings.Local.json
 
-# Local seeding utility not for commit
-**/CsvSeeder.cs
-
