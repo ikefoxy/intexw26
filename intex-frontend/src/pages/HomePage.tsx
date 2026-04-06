@@ -12,6 +12,8 @@ interface PublicImpactSnapshot {
   totalDonationsBRL: number;
 }
 
+type PillarIcon = "safehouse" | "visitation" | "process";
+
 // ─── Mock API ────────────────────────────────────────────────────────────────
 
 async function fetchImpactSnapshot(): Promise<PublicImpactSnapshot> {
@@ -76,7 +78,7 @@ function AnimatedNumber({
 function TiltCard({
   pillar,
 }: {
-  pillar: { icon: string; title: string; body: string; tag: string };
+  pillar: { icon: PillarIcon; title: string; body: string; tag: string };
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -111,7 +113,7 @@ function TiltCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 800 }}
-      className="relative rounded-2xl p-px cursor-default select-none"
+      className="relative rounded-2xl p-px cursor-default select-none h-full"
     >
       {/* glow border */}
       <motion.div
@@ -126,7 +128,7 @@ function TiltCard({
         }}
       />
       {/* card body */}
-      <div className="relative rounded-2xl bg-[#0d1a14] border border-white/5 p-8 h-full flex flex-col gap-5 overflow-hidden">
+      <div className="relative rounded-2xl bg-surface border border-brand-100 p-8 h-full flex flex-col gap-5 overflow-hidden">
         {/* subtle grid texture */}
         <div
           aria-hidden="true"
@@ -138,22 +140,38 @@ function TiltCard({
         />
         <div className="flex items-start justify-between">
           <span
-            className="text-4xl"
-            role="img"
-            aria-label={pillar.icon === "🏡" ? "House" : pillar.icon === "🚗" ? "Car" : "Clipboard"}
+            className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-accent"
+            aria-hidden="true"
           >
-            {pillar.icon}
+            {pillar.icon === "safehouse" ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 9.5L10 4l7 5.5V16H3V9.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                <path d="M8 16v-4h4v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            ) : pillar.icon === "visitation" ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 12.5h14M5.5 15.5h2a1 1 0 0 0 1-1v-2h3v2a1 1 0 0 0 1 1h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="6.5" cy="12.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <circle cx="13.5" cy="12.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M6 9.5h8l-1-2H7l-1 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="5" y="3.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M7.5 7h5M7.5 10h5M7.5 13h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            )}
           </span>
-          <span className="text-[10px] uppercase tracking-widest font-semibold text-emerald-400/80 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">
+          <span className="text-[10px] uppercase tracking-widest font-semibold text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
             {pillar.tag}
           </span>
         </div>
-        <h3 className="font-bold text-xl text-white leading-snug">{pillar.title}</h3>
-        <p className="text-sm text-slate-400 leading-relaxed flex-1">{pillar.body}</p>
+        <h3 className="font-bold text-xl text-surface-dark leading-snug">{pillar.title}</h3>
+        <p className="text-sm text-surface-text leading-relaxed flex-1">{pillar.body}</p>
         <motion.div
           animate={{ x: hovered ? 4 : 0 }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="flex items-center gap-2 text-emerald-400 text-sm font-medium mt-2"
+          className="flex items-center gap-2 text-accent text-sm font-medium mt-2"
           aria-hidden="true"
         >
           <span>Explore</span>
@@ -173,6 +191,9 @@ export default function HomePage() {
   const [snapshot, setSnapshot] = useState<PublicImpactSnapshot | null>(null);
   const currentLanguage = i18nInstance.resolvedLanguage ?? "en";
   const nextLanguage = currentLanguage.toLowerCase().startsWith("pt") ? "en" : "pt";
+  const languageToggleLabel = currentLanguage.toLowerCase().startsWith("pt")
+    ? "Switch to English"
+    : "Mudar para portugues";
   const numberLocale = currentLanguage.toLowerCase().startsWith("pt") ? "pt-BR" : "en-US";
 
   const content = {
@@ -190,29 +211,29 @@ export default function HomePage() {
       stats: [
         { label: t("impact_safehouses"), suffix: "" },
         { label: t("impact_residents"), suffix: "+" },
-        { label: t("impact_donations"), suffix: "", prefix: "R$" },
+        { label: t("impact_donations"), suffix: "", prefix: "$" },
       ],
     },
     pillars: [
       {
-        icon: "🏡",
+        icon: "safehouse",
         title: t("pillar_safehouse_title"),
         body: t("pillar_safehouse_body"),
         tag: t("pillar_safehouse_tag"),
       },
       {
-        icon: "🚗",
+        icon: "visitation",
         title: t("pillar_visitation_title"),
         body: t("pillar_visitation_body"),
         tag: t("pillar_visitation_tag"),
       },
       {
-        icon: "📋",
+        icon: "process",
         title: t("pillar_process_title"),
         body: t("pillar_process_body"),
         tag: t("pillar_process_tag"),
       },
-    ],
+    ] as Array<{ icon: PillarIcon; title: string; body: string; tag: string }>,
     section: {
       navLogin: t("nav_login"),
       navImpact: t("nav_impact"),
@@ -242,7 +263,7 @@ export default function HomePage() {
     : [0, 0, 0];
 
   return (
-    <div className="min-h-screen bg-[#060e09] text-white overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-brand-50 text-surface-dark overflow-x-hidden font-sans">
       {/* ── Google Fonts ── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
@@ -259,7 +280,7 @@ export default function HomePage() {
       `}</style>
 
       {/* ════════════════════════════════ NAV ════════════════════════════════ */}
-      <header className="fixed top-0 inset-x-0 z-50">
+      <header className="fixed top-0 inset-x-0 z-50 bg-brand-50/95 border-b border-brand-100">
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* logo */}
           <motion.a
@@ -267,7 +288,7 @@ export default function HomePage() {
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight"
+            className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight text-surface-dark"
             aria-label="Nova Path — go to homepage"
           >
             <span
@@ -285,19 +306,19 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Link
               to="/impact"
-              className="hidden sm:inline-flex items-center rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="hidden sm:inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
             >
               {content.section.navImpact}
             </Link>
             <Link
               to="/privacy"
-              className="hidden sm:inline-flex items-center rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="hidden sm:inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
             >
               {content.section.navPrivacy}
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-[#060e09] hover:bg-emerald-400 transition-colors"
+              className="inline-flex items-center rounded-full bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark transition-colors"
             >
               {content.section.navLogin}
             </Link>
@@ -307,12 +328,15 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               type="button"
               onClick={() => void i18n.changeLanguage(nextLanguage)}
-              className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-1.5 text-sm font-medium text-white/80 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
-              aria-label={`Switch language to ${nextLanguage.toUpperCase()}`}
-              title={`Switch language to ${nextLanguage.toUpperCase()}`}
+              className="inline-flex items-center gap-2 bg-surface hover:bg-brand-50 border border-brand-100 rounded-full px-4 py-1.5 text-sm font-medium text-surface-text transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+              aria-label={languageToggleLabel}
+              title={languageToggleLabel}
             >
-              <span aria-hidden="true">🌐</span>
-              {currentLanguage.toLowerCase().startsWith("pt") ? "PT" : "EN"}
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" />
+                <path d="M1.8 7h10.4M7 1.5c1.6 1.5 1.6 9.5 0 11M7 1.5c-1.6 1.5-1.6 9.5 0 11" stroke="currentColor" strokeLinecap="round" />
+              </svg>
+              {languageToggleLabel}
             </motion.button>
           </div>
         </div>
@@ -362,7 +386,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-emerald-400 text-sm font-semibold uppercase tracking-[0.2em] flex items-center gap-3"
+            className="text-accent text-sm font-semibold uppercase tracking-[0.2em] flex items-center gap-3"
           >
             <span aria-hidden="true" className="w-8 h-px bg-emerald-400/60 inline-block" />
             {content.hero.eyebrow}
@@ -370,7 +394,7 @@ export default function HomePage() {
           </motion.p>
 
           {/* headline — staggered word reveal */}
-          <h1 className="font-display font-extrabold text-6xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight" aria-label={`${content.hero.headlineLine1} ${content.hero.headlineLine2}`}>
+          <h1 className="font-display font-extrabold text-6xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-surface-dark" aria-label={`${content.hero.headlineLine1} ${content.hero.headlineLine2}`}>
             {[content.hero.headlineLine1, content.hero.headlineLine2].map((line, li) => (
               <span key={`${line}-${li}`} className="block overflow-hidden">
                 <motion.span
@@ -404,7 +428,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75, duration: 0.6 }}
-            className="max-w-xl text-slate-400 text-lg leading-relaxed"
+            className="max-w-xl text-surface-text text-lg leading-relaxed"
           >
             {content.hero.sub}
           </motion.p>
@@ -416,25 +440,16 @@ export default function HomePage() {
             transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            {/* glowing donate button */}
+            {/* donate button */}
             <motion.a
               href="#donate"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              className="relative group inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-[#060e09] text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060e09]"
-              style={{ background: "linear-gradient(135deg,#34d399,#16a34a)" }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-lg font-semibold text-white text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50 bg-brand hover:bg-brand-dark transition-colors"
               aria-label="Donate Now to Nova Path"
             >
-              {/* glow pulse */}
-              <motion.span
-                aria-hidden="true"
-                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2.4, repeat: Infinity }}
-                className="absolute inset-0 rounded-full"
-                style={{ background: "linear-gradient(135deg,#34d399,#16a34a)", filter: "blur(12px)" }}
-              />
-              <span className="relative">{content.hero.cta}</span>
-              <svg className="relative" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <span>{content.hero.cta}</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </motion.a>
@@ -443,7 +458,7 @@ export default function HomePage() {
               href="#about"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-brand-100 text-surface-text hover:text-surface-dark hover:border-brand text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               aria-label={content.hero.ctaSecondary}
             >
               {content.hero.ctaSecondary}
@@ -451,21 +466,6 @@ export default function HomePage() {
           </motion.div>
         </div>
 
-        {/* scroll hint */}
-        <motion.div
-          aria-hidden="true"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="text-[10px] uppercase tracking-widest text-white/25 font-medium">{content.section.scroll}</span>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-px h-8 bg-gradient-to-b from-emerald-400/40 to-transparent"
-          />
-        </motion.div>
       </section>
 
       {/* ══════════════════════════════ IMPACT ════════════════════════════════ */}
@@ -473,8 +473,7 @@ export default function HomePage() {
         id="donate"
         ref={impactRef}
         aria-label="Impact Statistics"
-        className="relative py-28 px-6 border-y border-white/5"
-        style={{ background: "linear-gradient(180deg,#060e09 0%,#091409 50%,#060e09 100%)" }}
+        className="relative py-28 px-6 border-y border-brand-100 bg-surface"
       >
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -483,8 +482,8 @@ export default function HomePage() {
             transition={{ duration: 0.7 }}
             className="text-center mb-20"
           >
-            <h2 className="font-display font-bold text-4xl sm:text-5xl text-white">{content.impact.heading}</h2>
-            <div aria-hidden="true" className="mt-4 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
+            <h2 className="font-display font-bold text-4xl sm:text-5xl text-surface-dark">{content.impact.heading}</h2>
+            <div aria-hidden="true" className="mt-4 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
           </motion.div>
 
           <div
@@ -505,7 +504,7 @@ export default function HomePage() {
                   className="w-12 h-px mb-2"
                   style={{ background: "linear-gradient(90deg,transparent,#34d399,transparent)" }}
                 />
-                <div className="font-display font-extrabold text-5xl sm:text-6xl tracking-tight text-white tabular-nums">
+                <div className="font-display font-extrabold text-5xl sm:text-6xl tracking-tight text-accent tabular-nums">
                   {snapshot ? (
                     <AnimatedNumber
                       target={statValues[i]}
@@ -515,10 +514,10 @@ export default function HomePage() {
                       suffix={stat.suffix}
                     />
                   ) : (
-                    <span className="animate-pulse text-white/20">—</span>
+                    <span className="animate-pulse text-surface-text">—</span>
                   )}
                 </div>
-                <p className="text-slate-400 text-sm font-medium uppercase tracking-widest">{stat.label}</p>
+                <p className="text-surface-text text-sm font-medium uppercase tracking-widest">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -566,6 +565,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={pillarsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.12 * i + 0.15, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                className="h-full"
               >
                 <TiltCard pillar={pillar} />
               </motion.div>

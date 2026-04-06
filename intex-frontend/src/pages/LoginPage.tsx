@@ -68,7 +68,7 @@ function Field({
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={id}
-        className="text-[13px] font-medium text-slate-300 tracking-wide"
+        className="text-[13px] font-medium text-surface-text tracking-wide"
       >
         {label}
       </label>
@@ -86,15 +86,15 @@ function Field({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           className={`
-            w-full rounded-xl px-4 py-3 text-sm bg-white/5 border text-white
-            placeholder:text-slate-600 outline-none transition-all duration-200
+            w-full rounded-xl px-4 py-3 text-sm bg-surface border text-surface-dark
+            placeholder:text-surface-text outline-none transition-all duration-200
             disabled:opacity-50 disabled:cursor-not-allowed
             ${
               error
                 ? "border-red-500/60 focus:border-red-400"
                 : focused
-                  ? "border-emerald-400/60"
-                  : "border-white/10 hover:border-white/20"
+                  ? "border-brand"
+                  : "border-brand-100 hover:border-brand"
             }
           `}
           style={
@@ -195,7 +195,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#060e09] overflow-hidden">
+    <div className="min-h-screen flex bg-brand-50 overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         .font-display { font-family: 'Sora', sans-serif; }
@@ -210,7 +210,7 @@ export function LoginPage() {
         className="hidden lg:flex relative flex-col justify-between w-[52%] xl:w-[55%] p-12 overflow-hidden"
         style={{
           background:
-            "linear-gradient(145deg, #071a0e 0%, #0a2010 40%, #061409 100%)",
+            "linear-gradient(145deg, #f8fafc 0%, #f1f5f9 40%, #ffffff 100%)",
         }}
       >
         <Orb
@@ -273,7 +273,7 @@ export function LoginPage() {
               />
             </svg>
           </div>
-          <span className="font-display font-bold text-white text-lg tracking-tight">
+            <span className="font-display font-bold text-surface-dark text-lg tracking-tight">
             Nova Path
           </span>
         </div>
@@ -386,10 +386,10 @@ export function LoginPage() {
             }}
           />
           <blockquote>
-            <p className="font-display text-xl xl:text-2xl font-semibold text-white leading-snug mb-3">
+            <p className="font-display text-xl xl:text-2xl font-semibold text-surface-dark leading-snug mb-3">
               "{quote.text}"
             </p>
-            <cite className="not-italic text-[13px] text-emerald-400/70 font-medium tracking-wide uppercase">
+            <cite className="not-italic text-[13px] text-accent font-medium tracking-wide uppercase">
               - {quote.author}
             </cite>
           </blockquote>
@@ -400,7 +400,7 @@ export function LoginPage() {
         className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 py-12 relative"
         style={{
           background:
-            "linear-gradient(160deg,#070f0a 0%,#060e09 60%,#050c07 100%)",
+            "linear-gradient(160deg,#f8fafc 0%,#f1f5f9 60%,#ffffff 100%)",
         }}
       >
         <div
@@ -434,16 +434,16 @@ export function LoginPage() {
                 />
               </svg>
             </div>
-            <span className="font-display font-bold text-white text-base">
+            <span className="font-display font-bold text-surface-dark text-base">
               Nova Path
             </span>
           </div>
 
           <div className="mb-9">
-            <h1 className="font-display font-bold text-3xl text-white mb-2 tracking-tight">
+            <h1 className="font-display font-bold text-3xl text-surface-dark mb-2 tracking-tight">
               Welcome back
             </h1>
-            <p className="text-slate-500 text-sm">
+            <p className="text-surface-text text-sm">
               Sign in to access the Nova Path admin portal.
             </p>
           </div>
@@ -491,7 +491,7 @@ export function LoginPage() {
               <div className="flex justify-end -mt-2">
                 <a
                   href="/forgot-password"
-                  className="text-[12px] text-slate-500 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded"
+                  className="text-[12px] text-surface-text hover:text-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand rounded"
                 >
                   Forgot password?
                 </a>
@@ -547,8 +547,7 @@ export function LoginPage() {
                 whileTap={loading ? {} : { scale: 0.97 }}
                 aria-label={loading ? "Signing in, please wait" : "Sign in"}
                 aria-busy={loading}
-                className="relative mt-1 w-full py-3.5 rounded-xl font-semibold text-[#060e09] text-sm overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060e09] disabled:cursor-not-allowed disabled:opacity-80 transition-opacity"
-                style={{ background: "linear-gradient(135deg,#34d399,#16a34a)" }}
+                className="relative mt-1 w-full py-3.5 rounded-xl font-semibold text-white text-sm overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50 disabled:cursor-not-allowed disabled:opacity-80 transition-opacity bg-brand hover:bg-brand-dark"
               >
                 <AnimatePresence>
                   {loading && (
@@ -630,7 +629,7 @@ export function LoginPage() {
             Contact{" "}
             <a
               href="mailto:admin@novapath.org.br"
-              className="text-slate-500 hover:text-emerald-400 transition-colors underline underline-offset-2"
+            className="text-surface-text hover:text-brand transition-colors underline underline-offset-2"
             >
               admin@novapath.org.br
             </a>{" "}

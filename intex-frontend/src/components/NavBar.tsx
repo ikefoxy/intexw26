@@ -5,7 +5,7 @@ import { useAuth } from '../state/AuthContext'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `px-3 py-2 rounded-md text-sm font-medium ${
-    isActive ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-300 hover:bg-white/10 hover:text-white'
+    isActive ? 'bg-brand-100 text-brand' : 'text-surface-text hover:bg-brand-50 hover:text-surface-dark'
   }`
 
 export function NavBar() {
@@ -13,12 +13,15 @@ export function NavBar() {
   const { user, logout } = useAuth()
   const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
   const nextLanguage = currentLanguage.toLowerCase().startsWith('pt') ? 'en' : 'pt'
+  const languageToggleLabel = currentLanguage.toLowerCase().startsWith('pt')
+    ? 'Switch to English'
+    : 'Mudar para portugues'
 
   return (
-    <header className="border-b border-white/10 bg-[#060e09]/90 backdrop-blur">
+    <header className="border-b border-brand-100 bg-brand-50">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link to="/admin" className="font-semibold tracking-tight text-white">
+          <Link to="/admin" className="font-semibold tracking-tight text-surface-dark">
             Nova Path
           </Link>
 
@@ -44,16 +47,16 @@ export function NavBar() {
             <button
               type="button"
               onClick={() => void i18n.changeLanguage(nextLanguage)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 text-slate-300 hover:bg-white/10 hover:text-white"
-              aria-label={`Switch language to ${nextLanguage.toUpperCase()}`}
-              title={`Switch language to ${nextLanguage.toUpperCase()}`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-100 hover:text-surface-dark"
+              aria-label={languageToggleLabel}
+              title={languageToggleLabel}
             >
               <span aria-hidden="true">🌐</span>
             </button>
-            <div className="hidden text-sm text-slate-300 sm:block">{user?.email}</div>
+            <div className="hidden text-sm text-surface-text sm:block">{user?.email}</div>
             <button
               onClick={logout}
-              className="rounded-md bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#060e09] hover:bg-emerald-400"
+              className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
             >
               Logout
             </button>
