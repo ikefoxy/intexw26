@@ -721,9 +721,6 @@ export function LoginPage() {
           </p>
 
           <p className="mt-6 text-center text-[12px] text-slate-600">
-            Admin access: use seeded admin or demo shortcut{" "}
-            <span className="text-slate-400">admin@novapath.org / demo123</span>
-            <br />
             Contact{" "}
             <a
               href="mailto:admin@novapath.org.br"

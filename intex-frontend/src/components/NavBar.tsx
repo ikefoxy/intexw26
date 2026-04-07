@@ -11,6 +11,9 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export function NavBar() {
   const { i18n: i18nInstance } = useTranslation()
   const { user, logout } = useAuth()
+  const isAdmin = user?.roles?.includes('Admin') ?? false
+  const isDonor = user?.roles?.includes('Donor') ?? false
+  const homePath = isDonor && !isAdmin ? '/donor/dashboard' : '/admin'
   const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
   const nextLanguage = currentLanguage.toLowerCase().startsWith('pt') ? 'en' : 'pt'
   const languageToggleLabel = currentLanguage.toLowerCase().startsWith('pt')
@@ -21,26 +24,34 @@ export function NavBar() {
     <header className="border-b border-brand-100/40 bg-white/20 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-14 items-center justify-between gap-4">
-          <Link to="/admin" className="font-semibold tracking-tight text-surface-dark">
+          <Link to={homePath} className="font-semibold tracking-tight text-surface-dark">
             Nova Path
           </Link>
 
           <nav className="hidden items-center gap-2 md:flex">
-            <NavLink to="/admin" end className={navLinkClass}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/admin/residents" className={navLinkClass}>
-              Residents
-            </NavLink>
-            <NavLink to="/admin/donors" className={navLinkClass}>
-              Donors
-            </NavLink>
-            <NavLink to="/admin/reports" className={navLinkClass}>
-              Reports
-            </NavLink>
-            <NavLink to="/admin/social-media" className={navLinkClass}>
-              Social Media
-            </NavLink>
+            {isDonor && !isAdmin ? (
+              <NavLink to="/donor/dashboard" end className={navLinkClass}>
+                My Dashboard
+              </NavLink>
+            ) : (
+              <>
+                <NavLink to="/admin" end className={navLinkClass}>
+                  Dashboard
+                </NavLink>
+                <NavLink to="/admin/residents" className={navLinkClass}>
+                  Residents
+                </NavLink>
+                <NavLink to="/admin/donors" className={navLinkClass}>
+                  Donors
+                </NavLink>
+                <NavLink to="/admin/reports" className={navLinkClass}>
+                  Reports
+                </NavLink>
+                <NavLink to="/admin/social-media" className={navLinkClass}>
+                  Social Media
+                </NavLink>
+              </>
+            )}
           </nav>
 
           <div className="flex items-center gap-3">

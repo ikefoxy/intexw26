@@ -1,11 +1,21 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace Intex.Backend.Data;
 
 public static class IdentitySeeder
 {
-    public static async Task SeedAsync(IServiceProvider services)
+    public static async Task SeedAsync(IServiceProvider services, IConfiguration config)
     {
+        var adminPassword = config["Seed:AdminPassword"];
+        var donorPassword = config["Seed:DonorPassword"];
+        if (string.IsNullOrWhiteSpace(adminPassword) || string.IsNullOrWhiteSpace(donorPassword))
+        {
+            throw new InvalidOperationException(
+                "Seed passwords are required. Configure Seed:AdminPassword and Seed:DonorPassword."
+            );
+        }
+
         using var scope = services.CreateScope();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -17,7 +27,7 @@ public static class IdentitySeeder
         await EnsureUserAsync(
             userManager,
             email: "admin@test.com",
-            password: "Admin@12345678!",
+            password: adminPassword,
             role: "Admin"
         );
 
@@ -25,7 +35,7 @@ public static class IdentitySeeder
         await EnsureUserAsync(
             userManager,
             email: "donor@test.com",
-            password: "Donor@12345678!",
+            password: donorPassword,
             role: "Donor"
         );
 
@@ -33,7 +43,7 @@ public static class IdentitySeeder
         await EnsureUserAsync(
             userManager,
             email: "mfa_admin@test.com",
-            password: "MfaAdmin@12345678!",
+            password: adminPassword,
             role: "Admin",
             requireMfa: true
         );

@@ -115,6 +115,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await IdentitySeeder.SeedAsync(app.Services);
+await IdentitySeeder.SeedAsync(app.Services, builder.Configuration);
 
 app.Run();

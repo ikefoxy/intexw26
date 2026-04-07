@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage'
 import { MfaSetupPage } from './pages/MfaSetupPage'
 import { MfaVerifyPage } from './pages/MfaVerifyPage'
 import PrivacyPage from './pages/PrivacyPage'
+import { DonorDashboard } from './pages/DonorDashboard'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
 import { CaseloadPage } from './pages/admin/CaseloadPage'
 import { ResidentDetailPage } from './pages/admin/ResidentDetailPage'
@@ -20,6 +21,7 @@ import { VisitationPage } from './pages/admin/VisitationPage'
 import { ReportsPage } from './pages/admin/ReportsPage'
 import { SocialMediaPage } from './pages/admin/SocialMediaPage'
 import { AdminDonationsPage } from './pages/admin/AdminDonationsPage'
+
 
 export default function App() {
   return (
@@ -47,6 +49,16 @@ export default function App() {
           <Route path="/admin/social-media" element={<SocialMediaPage />} />
           <Route path="/admin/mfa-setup" element={<MfaSetupPage />} />
         </Route>
+
+        {/* Donor-Only Routes */}
+        <Route
+          path="/donor/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['Donor']}>
+              <DonorDashboard />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

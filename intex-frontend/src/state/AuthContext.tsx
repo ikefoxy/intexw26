@@ -28,12 +28,6 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-/** UI convenience: still uses the real API and a valid JWT (IdentitySeeder admin user). */
-const DEMO_EMAIL = 'admin@novapath.org'
-const DEMO_PASSWORD = 'demo123'
-const SEEDED_ADMIN_EMAIL = 'admin@test.com'
-const SEEDED_ADMIN_PASSWORD = 'Admin@12345678!'
-
 function readInitial(): { token: string | null; user: AuthUser | null } {
   const token = localStorage.getItem('np_token')
   if (!token) return { token: null, user: null }
@@ -72,17 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function login(email: string, password: string) {
-    let loginEmail = email
-    let loginPassword = password
-    if (email.toLowerCase() === DEMO_EMAIL && password === DEMO_PASSWORD) {
-      loginEmail = SEEDED_ADMIN_EMAIL
-      loginPassword = SEEDED_ADMIN_PASSWORD
-    }
-
     try {
-      const res = await loginRequest(loginEmail, loginPassword)
+      const res = await loginRequest(email, password)
       if ('mfaRequired' in res && res.mfaRequired) {
-        const nextPendingMfa = { mfaToken: res.mfaToken, email: res.email ?? loginEmail }
+        const nextPendingMfa = { mfaToken: res.mfaToken, email: res.email ?? email }
         setPendingMfa(nextPendingMfa)
         localStorage.setItem('np_mfa_pending', JSON.stringify(nextPendingMfa))
         // Keep redirect logic in context per requested flow.

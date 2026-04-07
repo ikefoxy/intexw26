@@ -72,8 +72,13 @@ public class DonationsController : ControllerBase
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(int id, [FromQuery] bool confirm = false)
     {
+        if (!confirm)
+        {
+            return BadRequest(new { message = "Confirmation required. Pass ?confirm=true." });
+        }
+
         var existing = await _db.Donations.FirstOrDefaultAsync(d => d.DonationId == id);
         if (existing is null) return NotFound();
 

@@ -1,17 +1,28 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
+import type { ReactNode } from 'react'
 
-export function ProtectedRoute({ requiredRole }: { requiredRole?: string }) {
+type ProtectedRouteProps = {
+  requiredRole?: string
+  allowedRoles?: string[]
+  children?: ReactNode
+}
+
+export function ProtectedRoute({ requiredRole, allowedRoles, children }: ProtectedRouteProps) {
   const { token, hasRole } = useAuth()
 
   if (!token) {
     return <Navigate to="/login" replace />
   }
 
-  if (requiredRole && !hasRole(requiredRole)) {
+  const roleAllowed =
+    (requiredRole ? hasRole(requiredRole) : true) &&
+    (allowedRoles?.length ? allowedRoles.some((r) => hasRole(r)) : true)
+
+  if (!roleAllowed) {
     return <Navigate to="/impact" replace />
   }
 
-  return <Outlet />
+  return children ? <>{children}</> : <Outlet />
 }
 

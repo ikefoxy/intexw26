@@ -54,8 +54,13 @@ public class ProcessRecordingsController : ControllerBase
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(int id, [FromQuery] bool confirm = false)
     {
+        if (!confirm)
+        {
+            return BadRequest(new { message = "Confirmation required. Pass ?confirm=true." });
+        }
+
         var existing = await _db.ProcessRecordings.FirstOrDefaultAsync(r => r.RecordingId == id);
         if (existing is null) return NotFound();
 
