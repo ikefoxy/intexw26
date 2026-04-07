@@ -8,13 +8,11 @@ name: Deploy backend (Azure App Service)
 on:
   push:
     branches: [main]
-    paths:
-      - 'intex-backend/**'
-      - '.github/workflows/azure-backend-app-service.yml'
   workflow_dispatch:
 
 jobs:
   build_and_deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -9,13 +9,11 @@ name: Deploy frontend (Azure App Service)
 on:
   push:
     branches: [main]
-    paths:
-      - 'intex-frontend/**'
-      - '.github/workflows/azure-frontend-static-web-app.yml'
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Build frontend
     steps:
@@ -45,6 +43,7 @@ jobs:
           path: intex-frontend/dist
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build
     name: Deploy frontend
