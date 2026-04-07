@@ -7,10 +7,7 @@ name: Deploy backend (Azure App Service)
 
 on:
   push:
-    branches: [main, isaac2]
-    paths:
-      - 'intex-backend/**'
-      - '.github/workflows/azure-backend-app-service.yml'
+    branches: ['**']
   workflow_dispatch:
 
 jobs:

@@ -8,10 +8,7 @@ name: Deploy frontend (Azure App Service)
 
 on:
   push:
-    branches: [main, isaac2]
-    paths:
-      - 'intex-frontend/**'
-      - '.github/workflows/azure-frontend-static-web-app.yml'
+    branches: ['**']
   workflow_dispatch:
 
 jobs:
