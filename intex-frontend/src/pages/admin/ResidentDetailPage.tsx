@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getResidentRecommendations } from '../../lib/api'
+import { getResidentRecommendations, type ResidentMlRecommendations } from '../../lib/api'
 import { NavBar } from '../../components/NavBar'
 
 export function ResidentDetailPage() {
   const { id } = useParams()
   const residentId = Number(id)
-  const [recommendations, setRecommendations] = useState<number[] | null>(null)
+  const [recommendations, setRecommendations] = useState<ResidentMlRecommendations | null>(null)
   const [recommendationsLoading, setRecommendationsLoading] = useState(false)
   const [recommendationsError, setRecommendationsError] = useState<string | null>(null)
 
@@ -47,8 +47,20 @@ export function ResidentDetailPage() {
         <div className="mt-2 text-sm text-surface-text">ResidentId: {id}</div>
 
         <div className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
-          <div className="text-sm text-surface-text">
-            Detail layout + tabs (Process Recordings / Home Visitations) will be wired to `GET /api/residents/{id}`.
+          <div className="text-sm text-surface-text">Resident workflow actions</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              to={`/admin/process-recordings/${id}`}
+              className="inline-flex items-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-dark"
+            >
+              Open Process Recordings
+            </Link>
+            <Link
+              to={`/admin/visitations/${id}`}
+              className="inline-flex items-center rounded-md border border-brand-100 px-3 py-2 text-xs font-semibold text-surface-dark hover:bg-brand-50"
+            >
+              Open Visitations
+            </Link>
           </div>
         </div>
 
@@ -57,6 +69,9 @@ export function ResidentDetailPage() {
           <p className="mt-1 text-sm text-surface-text">
             Suggested peer connections based on the latest recommendation model output.
           </p>
+          {recommendations?.modelUsed && (
+            <p className="mt-1 text-xs text-surface-text">Model: {recommendations.modelUsed}</p>
+          )}
 
           {recommendationsLoading ? (
             <p className="mt-4 text-sm text-surface-text">Loading recommendations...</p>
@@ -66,16 +81,49 @@ export function ResidentDetailPage() {
             <p className="mt-4 text-sm text-surface-text">
               No recommendation data is available yet for this resident.
             </p>
-          ) : recommendations.length === 0 ? (
+          ) : recommendations.peerMatches.length === 0 ? (
             <p className="mt-4 text-sm text-surface-text">No peer matches were found for this resident.</p>
           ) : (
+            <div className="mt-4 space-y-2">
+              {recommendations.peerMatches.map((match) => (
+                <div
+                  key={match.matchId}
+                  className="rounded-lg border border-brand-100 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
+                >
+                  <div className="font-medium">Resident #{match.matchId}</div>
+                  <div className="text-xs text-surface-text mt-0.5">
+                    Similarity: {match.similarityScore.toFixed(2)} · {match.matchReason}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mt-6 rounded-2xl bg-surface border border-slate-200 p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-surface-dark">Intervention Recommendations</h2>
+          <p className="mt-1 text-sm text-surface-text">
+            Data-driven intervention themes based on similar resident trajectories in the database.
+          </p>
+
+          {recommendationsLoading ? (
+            <p className="mt-4 text-sm text-surface-text">Loading intervention recommendations...</p>
+          ) : recommendationsError ? (
+            <p className="mt-4 text-sm text-red-500">{recommendationsError}</p>
+          ) : recommendations === null ? (
+            <p className="mt-4 text-sm text-surface-text">
+              No intervention recommendation data is available yet for this resident.
+            </p>
+          ) : recommendations.suggestedInterventions.length === 0 ? (
+            <p className="mt-4 text-sm text-surface-text">No intervention recommendations were found.</p>
+          ) : (
             <div className="mt-4 flex flex-wrap gap-2">
-              {recommendations.map((recommendedId) => (
+              {recommendations.suggestedInterventions.map((intervention) => (
                 <span
-                  key={recommendedId}
+                  key={intervention}
                   className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-surface-dark"
                 >
-                  Resident #{recommendedId}
+                  {intervention}
                 </span>
               ))}
             </div>

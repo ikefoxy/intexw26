@@ -9,27 +9,9 @@ namespace Intex.Backend.Controllers;
 
 [ApiController]
 [Route("api/residents")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class ResidentsController : ControllerBase
 {
-    public sealed class ResidentListItemDto
-    {
-        public int ResidentId { get; set; }
-        public string CaseControlNo { get; set; } = "";
-        public string InternalCode { get; set; } = "";
-        public int SafehouseId { get; set; }
-        public string CaseCategory { get; set; } = "";
-        public string CurrentRiskLevel { get; set; } = "";
-        public string CaseStatus { get; set; } = "";
-        public string AssignedSocialWorker { get; set; } = "";
-        public SafehouseNameDto? Safehouse { get; set; }
-    }
-
-    public sealed class SafehouseNameDto
-    {
-        public string Name { get; set; } = "";
-    }
-
     private readonly ApplicationDbContext _db;
 
     public ResidentsController(ApplicationDbContext db)
@@ -38,7 +20,7 @@ public class ResidentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResult<ResidentListItemDto>>> GetResidents(
+    public async Task<ActionResult<PagedResult<Resident>>> GetResidents(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 25,
         [FromQuery] string? caseStatus = null,
@@ -51,7 +33,7 @@ public class ResidentsController : ControllerBase
         page = page < 1 ? 1 : page;
         pageSize = pageSize is < 1 or > 100 ? 25 : pageSize;
 
-        var q = _db.Residents.AsNoTracking().AsQueryable();
+        var q = _db.Residents.AsNoTracking().Include(r => r.Safehouse).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(caseStatus))
             q = q.Where(r => r.CaseStatus == caseStatus);
@@ -78,23 +60,9 @@ public class ResidentsController : ControllerBase
         var items = await q.OrderByDescending(r => r.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(r => new ResidentListItemDto
-            {
-                ResidentId = r.ResidentId,
-                CaseControlNo = r.CaseControlNo,
-                InternalCode = r.InternalCode,
-                SafehouseId = r.SafehouseId,
-                CaseCategory = r.CaseCategory,
-                CurrentRiskLevel = r.CurrentRiskLevel,
-                CaseStatus = r.CaseStatus,
-                AssignedSocialWorker = r.AssignedSocialWorker,
-                Safehouse = r.Safehouse == null
-                    ? null
-                    : new SafehouseNameDto { Name = r.Safehouse.Name }
-            })
             .ToListAsync();
 
-        return Ok(new PagedResult<ResidentListItemDto>(items, page, pageSize, total));
+        return Ok(new PagedResult<Resident>(items, page, pageSize, total));
     }
 
     [HttpGet("{id:int}")]
@@ -157,6 +125,106 @@ public class ResidentsController : ControllerBase
         _db.Residents.Remove(resident);
         await _db.SaveChangesAsync();
         return NoContent();
+    }
+    // GET: api/residents/{id}/recommendations
+    [HttpGet("{id:int}/recommendations")]
+    public async Task<ActionResult> GetRecommendations(int id)
+    {
+        var resident = await _db.Residents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.ResidentId == id);
+        if (resident is null)
+        {
+            return NotFound(new { message = "Resident not found." });
+        }
+
+        var peerCandidates = await _db.Residents
+            .AsNoTracking()
+            .Where(r => r.ResidentId != id)
+            .Select(r => new
+            {
+                r.ResidentId,
+                r.SafehouseId,
+                r.CaseCategory,
+                r.CurrentRiskLevel,
+                r.InitialRiskLevel,
+                r.CreatedAt,
+            })
+            .ToListAsync();
+
+        var peerMatches = peerCandidates
+            .Select(candidate =>
+            {
+                decimal score = 0m;
+                var reasons = new List<string>();
+
+                if (candidate.SafehouseId == resident.SafehouseId)
+                {
+                    score += 0.45m;
+                    reasons.Add("Same safehouse");
+                }
+
+                if (string.Equals(candidate.CaseCategory, resident.CaseCategory, StringComparison.OrdinalIgnoreCase))
+                {
+                    score += 0.30m;
+                    reasons.Add("Same case category");
+                }
+
+                if (string.Equals(candidate.CurrentRiskLevel, resident.CurrentRiskLevel, StringComparison.OrdinalIgnoreCase))
+                {
+                    score += 0.15m;
+                    reasons.Add("Same current risk level");
+                }
+
+                if (string.Equals(candidate.InitialRiskLevel, resident.InitialRiskLevel, StringComparison.OrdinalIgnoreCase))
+                {
+                    score += 0.10m;
+                    reasons.Add("Similar initial risk profile");
+                }
+
+                return new
+                {
+                    matchId = candidate.ResidentId,
+                    similarityScore = Math.Round(score, 2),
+                    matchReason = reasons.Count > 0 ? string.Join(", ", reasons) : "Closest profile from available records",
+                    createdAt = candidate.CreatedAt,
+                };
+            })
+            .Where(x => x.similarityScore > 0m)
+            .OrderByDescending(x => x.similarityScore)
+            .ThenByDescending(x => x.createdAt)
+            .Take(5)
+            .Select(x => new { x.matchId, x.similarityScore, x.matchReason })
+            .ToList();
+
+        var residentAndPeerIds = peerMatches
+            .Select(x => x.matchId)
+            .Append(id)
+            .Distinct()
+            .ToList();
+
+        var suggestedInterventions = await _db.InterventionPlans
+            .AsNoTracking()
+            .Where(p => residentAndPeerIds.Contains(p.ResidentId))
+            .GroupBy(p => p.PlanCategory)
+            .Select(g => new
+            {
+                intervention = g.Key,
+                usageCount = g.Count(),
+            })
+            .OrderByDescending(x => x.usageCount)
+            .ThenBy(x => x.intervention)
+            .Take(5)
+            .Select(x => x.intervention)
+            .ToListAsync();
+
+        return Ok(new
+        {
+            residentId = id,
+            modelUsed = "Database similarity scoring (safehouse, case category, risk profile)",
+            peerMatches,
+            suggestedInterventions,
+        });
     }
 }
 

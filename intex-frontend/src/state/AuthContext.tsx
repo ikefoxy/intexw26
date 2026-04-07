@@ -81,8 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setPendingMfa(nextPendingMfa)
         localStorage.setItem('np_mfa_pending', JSON.stringify(nextPendingMfa))
-        // Keep redirect logic in context per requested flow.
-        window.location.assign('/mfa-verify')
+        window.location.assign(nextPendingMfa.requiresMfaSetup ? '/mfa-setup' : '/mfa-verify')
         return null
       }
       setPendingMfa(null)

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeartIcon, TrendingUpIcon, CalendarIcon } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
-import { getDonations, getPublicImpactSnapshot, type Donation } from '../lib/api';
+import { getMyDonations, getPublicImpactSnapshot, type Donation } from '../lib/api';
 
 export function DonorDashboard() {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ export function DonorDashboard() {
       setError('');
       try {
         const [donationRows, snapshot] = await Promise.all([
-          getDonations(1, 100),
+          getMyDonations(),
           getPublicImpactSnapshot(),
         ]);
         if (!active) return;
