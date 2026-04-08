@@ -20,6 +20,9 @@ export function ProtectedRoute({ requiredRole, allowedRoles, children }: Protect
     (allowedRoles?.length ? allowedRoles.some((r) => hasRole(r)) : true)
 
   if (!roleAllowed) {
+    if (hasRole('Donor')) {
+      return <Navigate to="/donor/dashboard" replace />
+    }
     return <Navigate to="/impact" replace />
   }
 

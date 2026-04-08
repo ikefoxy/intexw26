@@ -4,6 +4,7 @@ using Intex.Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Intex.Backend.Controllers;
 
@@ -20,6 +21,7 @@ public class DonationsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<PagedResult<Donation>>> GetDonations(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 25
@@ -37,10 +39,39 @@ public class DonationsController : ControllerBase
     }
 
     [HttpGet("supporter/{supporterId:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IReadOnlyList<Donation>>> GetForSupporter(int supporterId)
     {
         var items = await _db.Donations.AsNoTracking()
             .Where(d => d.SupporterId == supporterId)
+            .OrderByDescending(d => d.DonationDate)
+            .ToListAsync();
+
+        return Ok(items);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<IReadOnlyList<Donation>>> GetMyDonations()
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new { message = "Could not resolve current user email." });
+        }
+
+        var supporterId = await _db.Supporters.AsNoTracking()
+            .Where(s => s.Email == email)
+            .Select(s => (int?)s.SupporterId)
+            .FirstOrDefaultAsync();
+
+        if (!supporterId.HasValue)
+        {
+            return Ok(Array.Empty<Donation>());
+        }
+
+        var items = await _db.Donations.AsNoTracking()
+            .Where(d => d.SupporterId == supporterId.Value)
             .OrderByDescending(d => d.DonationDate)
             .ToListAsync();
 

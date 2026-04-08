@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { useAuth } from '../state/AuthContext'
 
 export function MfaSetupPage() {
-  const { user, hasRole, getMfaSetup, enableMfa } = useAuth()
+  const { user, pendingMfa, hasRole, getMfaSetup, enableMfa, verifyMfa } = useAuth()
+  const navigate = useNavigate()
   const [uri, setUri] = useState('')
   const [sharedKey, setSharedKey] = useState('')
   const [code, setCode] = useState('')
@@ -17,6 +18,13 @@ export function MfaSetupPage() {
     let active = true
     async function load() {
       setError('')
+      if (!user) {
+        if (!active) return
+        setUri(pendingMfa?.authenticatorUri ?? '')
+        setSharedKey(pendingMfa?.sharedKey ?? '')
+        setLoading(false)
+        return
+      }
       try {
         const data = await getMfaSetup()
         if (!active) return
@@ -33,7 +41,7 @@ export function MfaSetupPage() {
     return () => {
       active = false
     }
-  }, [getMfaSetup])
+  }, [getMfaSetup, pendingMfa, user])
 
   async function onVerify(e: FormEvent) {
     e.preventDefault()
@@ -45,8 +53,15 @@ export function MfaSetupPage() {
     }
     setSaving(true)
     try {
-      await enableMfa(code.trim())
-      setSuccess('MFA is now enabled for your account.')
+      if (user) {
+        await enableMfa(code.trim())
+        setSuccess('MFA is now enabled for your account.')
+      } else {
+        const loggedInUser = await verifyMfa(code.trim())
+        setSuccess('MFA setup complete. Signing you in...')
+        if (loggedInUser.roles.includes('Admin')) navigate('/admin', { replace: true })
+        else navigate('/impact', { replace: true })
+      }
       setCode('')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unable to enable MFA.')
@@ -55,16 +70,23 @@ export function MfaSetupPage() {
     }
   }
 
-  if (!user) return <Navigate to="/login" replace />
-  if (!hasRole('Admin')) return <Navigate to="/impact" replace />
+  if (!user && !pendingMfa) return <Navigate to="/login" replace />
+  if (user && !hasRole('Admin')) return <Navigate to="/impact" replace />
 
   return (
     <div className="min-h-screen bg-brand-50 px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-2xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Admin Security</p>
+        <div className="mb-4">
+          <Link to={user ? '/admin' : '/login'} className="text-sm font-medium text-brand hover:text-brand-dark">
+            {user ? '← Back to dashboard' : '← Back to login'}
+          </Link>
+        </div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+          {user ? 'Admin Security' : 'First-Time MFA Setup'}
+        </p>
         <h1 className="mt-2 font-display text-3xl font-bold text-surface-dark">Set up authenticator MFA</h1>
         <p className="mt-2 text-sm text-surface-text">
-          Scan the QR code with your authenticator app, then confirm with your first 6-digit code.
+          Scan the QR code with your authenticator app, then enter your first 6-digit code to continue.
         </p>
 
         {loading ? (
@@ -109,7 +131,7 @@ export function MfaSetupPage() {
                   disabled={saving}
                   className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-70"
                 >
-                  {saving ? 'Verifying...' : 'Enable MFA'}
+                  {saving ? 'Verifying...' : user ? 'Enable MFA' : 'Verify and continue'}
                 </button>
               </form>
             </div>

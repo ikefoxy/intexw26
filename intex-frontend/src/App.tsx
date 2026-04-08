@@ -9,7 +9,7 @@ import { MfaSetupPage } from './pages/MfaSetupPage'
 import { MfaVerifyPage } from './pages/MfaVerifyPage'
 import PrivacyPage from './pages/PrivacyPage'
 import { DonorDashboard } from './pages/DonorDashboard'
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import { CaseloadPage } from './pages/admin/CaseloadPage'
 import { ResidentDetailPage } from './pages/admin/ResidentDetailPage'
 import { NewResidentPage } from './pages/admin/NewResidentPage'
@@ -29,6 +29,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/mfa-setup" element={<MfaSetupPage />} />
         <Route path="/mfa-verify" element={<MfaVerifyPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

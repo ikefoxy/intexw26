@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Intex.Backend.Data;
 using Intex.Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,19 +13,23 @@ EnvConnectionLoader.ApplyDatabaseConnectionFromEnvFile();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddOpenApi();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(defaultConnection))
+{
+    throw new InvalidOperationException(
+        "Missing required connection string 'DefaultConnection'. Configure SQL Server before starting the application."
+    );
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (!string.IsNullOrWhiteSpace(defaultConnection))
-    {
-        options.UseSqlServer(defaultConnection);
-        return;
-    }
-
-    options.UseInMemoryDatabase("IntexFallback");
+    options.UseSqlServer(defaultConnection);
 });
 
 builder.Services
@@ -97,6 +102,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+else
+{
+    app.UseHsts();
+}
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
@@ -115,6 +124,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await IdentitySeeder.SeedAsync(app.Services, builder.Configuration);
+try
+{
+    await IdentitySeeder.SeedAsync(app.Services, builder.Configuration);
+}
+catch (Exception ex) when (app.Environment.IsDevelopment())
+{
+    app.Logger.LogWarning(ex, "Identity seed failed during startup in Development; continuing without seed.");
+}
 
 app.Run();

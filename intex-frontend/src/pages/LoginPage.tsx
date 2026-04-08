@@ -1,6 +1,6 @@
 import { useId, useState, type CSSProperties, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../state/AuthContext";
 
 const QUOTES = [
@@ -433,6 +433,11 @@ export function LoginPage() {
             "linear-gradient(160deg,#f8fafc 0%,#f1f5f9 60%,#ffffff 100%)",
         }}
       >
+        <div className="absolute left-6 top-6 sm:left-10 sm:top-8">
+          <Link to="/" className="text-sm font-medium text-brand hover:text-brand-dark">
+            ← Back to home
+          </Link>
+        </div>
         <div
           aria-hidden="true"
           className="absolute top-0 right-0 w-64 h-64 pointer-events-none"

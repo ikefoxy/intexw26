@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
+import { ConfirmDeleteModal } from '../../components/ConfirmDeleteModal'
 import { NavBar } from '../../components/NavBar'
-import { createProcessRecording, getProcessRecordings, type ProcessRecording } from '../../lib/api'
+import {
+  createProcessRecording,
+  deleteProcessRecording,
+  getProcessRecordings,
+  type ProcessRecording,
+} from '../../lib/api'
 
 export function ProcessRecordingPage() {
   const { residentId } = useParams()
@@ -11,6 +17,8 @@ export function ProcessRecordingPage() {
   const [items, setItems] = useState<ProcessRecording[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function loadHistory() {
@@ -45,17 +53,33 @@ export function ProcessRecordingPage() {
     setSubmitting(true)
     setError(null)
     try {
-      await createProcessRecording({
+      const created = await createProcessRecording({
         residentId: parsedResidentId,
         date,
         notes: notes.trim(),
       })
+      setItems((prev) => [created, ...prev].sort((a, b) => +new Date(b.sessionDate) - +new Date(a.sessionDate)))
+      setDate('')
       setNotes('')
-      await loadHistory()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create process recording.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function onConfirmDelete() {
+    if (!confirmDeleteId) return
+    setDeletingId(confirmDeleteId)
+    setError(null)
+    try {
+      await deleteProcessRecording(confirmDeleteId)
+      setItems((prev) => prev.filter((row) => row.recordingId !== confirmDeleteId))
+      setConfirmDeleteId(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete process recording.')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -122,6 +146,7 @@ export function ProcessRecordingPage() {
                   <tr className="border-b border-slate-200 text-left text-surface-text">
                     <th className="px-3 py-2 font-medium">Date</th>
                     <th className="px-3 py-2 font-medium">Notes</th>
+                    <th className="px-3 py-2 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -129,6 +154,16 @@ export function ProcessRecordingPage() {
                     <tr key={row.recordingId} className="border-b border-slate-100 align-top">
                       <td className="px-3 py-2 text-surface-dark">{new Date(row.sessionDate).toLocaleDateString()}</td>
                       <td className="px-3 py-2 text-surface-text">{row.sessionNarrative}</td>
+                      <td className="px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeleteId(row.recordingId)}
+                          disabled={deletingId === row.recordingId}
+                          className="rounded-md border border-brand-100 px-2.5 py-1.5 text-xs font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-60"
+                        >
+                          {deletingId === row.recordingId ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -142,6 +177,12 @@ export function ProcessRecordingPage() {
           )}
         </section>
       </main>
+      <ConfirmDeleteModal
+        open={confirmDeleteId !== null}
+        title="Delete this process recording?"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={() => void onConfirmDelete()}
+      />
     </div>
   )
 }

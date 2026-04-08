@@ -11,6 +11,9 @@ type AuthUser = {
 type MfaPendingState = {
   mfaToken: string
   email?: string
+  requiresMfaSetup?: boolean
+  sharedKey?: string
+  authenticatorUri?: string
 }
 
 type AuthContextValue = {
@@ -69,11 +72,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await loginRequest(email, password)
       if ('mfaRequired' in res && res.mfaRequired) {
-        const nextPendingMfa = { mfaToken: res.mfaToken, email: res.email ?? email }
+        const nextPendingMfa = {
+          mfaToken: res.mfaToken,
+          email: res.email ?? email,
+          requiresMfaSetup: res.requiresMfaSetup ?? false,
+          sharedKey: res.sharedKey,
+          authenticatorUri: res.authenticatorUri,
+        }
         setPendingMfa(nextPendingMfa)
         localStorage.setItem('np_mfa_pending', JSON.stringify(nextPendingMfa))
-        // Keep redirect logic in context per requested flow.
-        window.location.assign('/mfa-verify')
+        window.location.assign(nextPendingMfa.requiresMfaSetup ? '/mfa-setup' : '/mfa-verify')
         return null
       }
       setPendingMfa(null)

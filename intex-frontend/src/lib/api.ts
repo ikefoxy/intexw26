@@ -29,7 +29,14 @@ api.interceptors.request.use((config) => {
 
 export type LoginApiResponse =
   | { token: string; mfaRequired?: false }
-  | { mfaRequired: true; mfaToken: string; email?: string }
+  | {
+      mfaRequired: true
+      mfaToken: string
+      email?: string
+      requiresMfaSetup?: boolean
+      sharedKey?: string
+      authenticatorUri?: string
+    }
 
 export type MfaSetupResponse = {
   sharedKey?: string
@@ -56,19 +63,47 @@ export async function enableMfaRequest(code: string): Promise<{ success?: boolea
   return res.data
 }
 
-export async function getResidentRecommendations(id: number): Promise<number[] | null> {
+export type ResidentRecommendation = {
+  matchId: number
+  similarityScore: number
+  matchReason: string
+}
+
+export type ResidentMlRecommendations = {
+  residentId: number
+  modelUsed?: string
+  peerMatches: ResidentRecommendation[]
+  suggestedInterventions: string[]
+}
+
+export async function getResidentRecommendations(id: number): Promise<ResidentMlRecommendations | null> {
   try {
     const res = await api.get<{
+      residentId?: number
+      modelUsed?: string
+      peerMatches?: ResidentRecommendation[]
+      suggestedInterventions?: string[]
       recommendedResidentIds?: number[]
       recommendations?: number[]
       ids?: number[]
     }>(`/api/residents/${id}/recommendations`)
-    const ids =
-      res.data.recommendedResidentIds ??
-      res.data.recommendations ??
-      res.data.ids ??
-      []
-    return Array.isArray(ids) ? ids : []
+    const peerMatches = Array.isArray(res.data.peerMatches)
+      ? res.data.peerMatches
+      : (res.data.recommendedResidentIds ?? res.data.recommendations ?? res.data.ids ?? []).map((matchId) => ({
+          matchId,
+          similarityScore: 0,
+          matchReason: 'Recommended by model output',
+        }))
+    const suggestedInterventions = Array.isArray(res.data.suggestedInterventions)
+      ? res.data.suggestedInterventions
+      : []
+
+    return {
+      residentId: res.data.residentId ?? id,
+      modelUsed: res.data.modelUsed,
+      peerMatches,
+      suggestedInterventions,
+    }
   } catch {
     // Graceful fallback when ML output is not yet available.
     return null
@@ -138,8 +173,23 @@ export async function createProcessRecording(payload: {
   return res.data
 }
 
+export async function deleteProcessRecording(recordingId: number): Promise<void> {
+  await api.delete(`/api/process-recordings/${recordingId}`, {
+    params: { confirm: true },
+    headers: getHeaders(),
+  })
+}
+
 export async function getHomeVisitations(residentId: number): Promise<HomeVisitation[]> {
   const res = await api.get<HomeVisitation[]>(`/api/home-visitations/resident/${residentId}`)
+  return res.data
+}
+
+export async function getCaseConferences(residentId: number): Promise<HomeVisitation[]> {
+  const res = await api.get<HomeVisitation[]>('/api/home-visitations/case-conferences', {
+    params: { residentId },
+    headers: getHeaders(),
+  })
   return res.data
 }
 
@@ -164,5 +214,47 @@ export async function createHomeVisitation(payload: {
     visitOutcome: 'Pending review',
   }
   const res = await api.post<HomeVisitation>('/api/home-visitations', body, { headers: getHeaders() })
+  return res.data
+}
+
+export type Donation = {
+  donationId: number
+  supporterId: number
+  donationDate: string
+  amount: number
+  currencyCode?: string
+  designation?: string
+  paymentMethod?: string
+  sourceChannel?: string
+  donorSegment?: string
+  campaignTag?: string
+  fiscalYear?: number
+  isRecurring?: boolean
+}
+
+export type PublicImpactSnapshot = {
+  activeSafehouses?: number
+  residentsSupported?: number
+  totalDonationsBRL?: number
+  totalDonationsUsd?: number
+  totalDonors?: number
+}
+
+export async function getDonations(page = 1, pageSize = 100): Promise<Donation[]> {
+  const res = await api.get<{ items?: Donation[]; data?: Donation[] } | Donation[]>('/api/donations', {
+    params: { page, pageSize },
+    headers: getHeaders(),
+  })
+  if (Array.isArray(res.data)) return res.data
+  return res.data.items ?? res.data.data ?? []
+}
+
+export async function getMyDonations(): Promise<Donation[]> {
+  const res = await api.get<Donation[]>('/api/donations/me', { headers: getHeaders() })
+  return Array.isArray(res.data) ? res.data : []
+}
+
+export async function getPublicImpactSnapshot(): Promise<PublicImpactSnapshot> {
+  const res = await api.get<PublicImpactSnapshot>('/api/public/stats')
   return res.data
 }
