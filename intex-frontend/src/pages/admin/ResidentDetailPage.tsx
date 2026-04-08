@@ -46,7 +46,7 @@ export function ResidentDetailPage() {
         <h1 className="mt-3 text-2xl font-bold text-surface-dark">Resident Detail</h1>
         <div className="mt-2 text-sm text-surface-text">ResidentId: {id}</div>
 
-        <div className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+        <div className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
           <div className="text-sm text-surface-text">Resident workflow actions</div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Link
@@ -57,14 +57,14 @@ export function ResidentDetailPage() {
             </Link>
             <Link
               to={`/admin/visitations/${id}`}
-              className="inline-flex items-center rounded-md border border-brand-100 px-3 py-2 text-xs font-semibold text-surface-dark hover:bg-brand-50"
+              className="inline-flex items-center rounded-md border border-brand-125 px-3 py-2 text-xs font-semibold text-surface-dark hover:bg-brand-50"
             >
               Open Visitations
             </Link>
           </div>
         </div>
 
-        <section className="mt-6 rounded-2xl bg-surface border border-slate-200 p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl bg-surface border border-slate-300 p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-surface-dark">AI-Assisted Peer Matches</h2>
           <p className="mt-1 text-sm text-surface-text">
             Suggested peer connections based on the latest recommendation model output.
@@ -88,7 +88,7 @@ export function ResidentDetailPage() {
               {recommendations.peerMatches.map((match) => (
                 <div
                   key={match.matchId}
-                  className="rounded-lg border border-brand-100 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
+                  className="rounded-lg border border-brand-125 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
                 >
                   <div className="font-medium">Resident #{match.matchId}</div>
                   <div className="text-xs text-surface-text mt-0.5">
@@ -100,7 +100,7 @@ export function ResidentDetailPage() {
           )}
         </section>
 
-        <section className="mt-6 rounded-2xl bg-surface border border-slate-200 p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl bg-surface border border-slate-300 p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-surface-dark">Intervention Recommendations</h2>
           <p className="mt-1 text-sm text-surface-text">
             Data-driven intervention themes based on similar resident trajectories in the database.

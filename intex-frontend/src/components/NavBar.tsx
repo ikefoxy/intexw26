@@ -21,14 +21,14 @@ export function NavBar() {
     : 'Mudar para portugues'
 
   return (
-    <header className="border-b border-brand-100/40 bg-white/20 backdrop-blur-md">
+    <header className="border-b border-brand-125/50 bg-white/20 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-14 items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-50 hover:text-surface-dark"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-brand-125 text-surface-text hover:bg-brand-50 hover:text-surface-dark"
               aria-label="Go back"
               title="Go back"
             >
@@ -77,7 +77,7 @@ export function NavBar() {
             <button
               type="button"
               onClick={() => void i18nInstance.changeLanguage(nextLanguage)}
-              className="inline-flex h-9 items-center gap-2 rounded-md border border-brand-100 px-2.5 text-surface-text hover:bg-brand-100 hover:text-surface-dark"
+              className="inline-flex h-9 items-center gap-2 rounded-md border border-brand-125 px-2.5 text-surface-text hover:bg-brand-100 hover:text-surface-dark"
               aria-label={languageToggleLabel}
               title={languageToggleLabel}
             >

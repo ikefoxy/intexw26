@@ -157,7 +157,7 @@ function TiltCard({
         }}
       />
       {/* card body */}
-      <div className="relative rounded-2xl bg-surface border border-brand-100 p-8 h-full flex flex-col gap-5 overflow-hidden">
+      <div className="relative rounded-2xl bg-surface border border-brand-125 p-8 h-full flex flex-col gap-5 overflow-hidden">
         {/* subtle grid texture */}
         <div
           aria-hidden="true"
@@ -169,7 +169,7 @@ function TiltCard({
         />
         <div className="flex items-start justify-between">
           <span
-            className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-accent"
+            className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-125 flex items-center justify-center text-accent"
             aria-hidden="true"
           >
             {pillar.icon === "safehouse" ? (
@@ -306,7 +306,7 @@ export default function HomePage() {
       `}</style>
 
       {/* ════════════════════════════════ NAV ════════════════════════════════ */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-brand-50/95 border-b border-slate-200/80 backdrop-blur-sm">
+      <header className="fixed top-0 inset-x-0 z-50 bg-brand-50/95 border-b border-slate-300/80 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* logo */}
           <motion.div
@@ -336,13 +336,13 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Link
               to="/impact"
-              className="hidden sm:inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+              className="hidden sm:inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
             >
               {content.section.navImpact}
             </Link>
             <Link
               to="/privacy"
-              className="hidden sm:inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+              className="hidden sm:inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
             >
               {content.section.navPrivacy}
             </Link>
@@ -350,20 +350,20 @@ export default function HomePage() {
               <>
                 <Link
                   to={dashboardPath}
-                  className="inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+                  className="inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/donate"
-                  className="inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+                  className="inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
                 >
                   Donate
                 </Link>
                 <button
                   type="button"
                   onClick={logout}
-                  className="inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+                  className="inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
                 >
                   Logout
                 </button>
@@ -371,7 +371,7 @@ export default function HomePage() {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center rounded-full border border-brand-100 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
+                className="inline-flex items-center rounded-full border border-brand-125 px-3 py-1.5 text-xs font-medium text-surface-text hover:bg-brand-50 hover:text-surface-dark transition-colors"
               >
                 {content.section.navLogin}
               </Link>
@@ -382,7 +382,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               type="button"
               onClick={() => void i18n.changeLanguage(nextLanguage)}
-              className="inline-flex items-center gap-2 bg-surface hover:bg-brand-50 border border-brand-100 rounded-full px-4 py-1.5 text-sm font-medium text-surface-text transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+              className="inline-flex items-center gap-2 bg-surface hover:bg-brand-50 border border-brand-125 rounded-full px-4 py-1.5 text-sm font-medium text-surface-text transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
               aria-label={languageToggleLabel}
               title={languageToggleLabel}
             >
@@ -474,7 +474,7 @@ export default function HomePage() {
             <motion.div
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-base font-medium text-surface-dark shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-7 py-3.5 text-base font-medium text-surface-dark shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               aria-label="Donate Now to Nova Path"
             >
               <Link to={donatePath} className="inline-flex items-center gap-2">
@@ -508,7 +508,7 @@ export default function HomePage() {
                 role="region"
                 aria-roledescription="carousel"
                 aria-label="Brazil outreach"
-                className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-lg shadow-slate-900/5"
+                className="relative overflow-hidden rounded-2xl border border-slate-300/90 bg-white shadow-lg shadow-slate-900/5"
               >
                 <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-brand-50">
                   <AnimatePresence mode="wait">
@@ -649,7 +649,7 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════ FOOTER ════════════════════════════════ */}
-      <footer className="border-t border-slate-200/80 bg-brand-50 px-6 py-10">
+      <footer className="border-t border-slate-300/80 bg-brand-50 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <span className="font-display text-sm font-semibold text-surface-dark">{content.nav}</span>
           <p className="text-xs text-surface-text">{content.section.footer}</p>

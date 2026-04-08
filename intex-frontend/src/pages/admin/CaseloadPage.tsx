@@ -224,14 +224,14 @@ export function CaseloadPage() {
           </Link>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-4 shadow-sm">
+        <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-4 shadow-sm">
           <div className="grid gap-3 md:grid-cols-5">
             <select
               value={safehouseId}
               onChange={(e) => {
                 setSafehouseId(e.target.value)
               }}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text"
             >
               <option value="">All safehouses</option>
               {safehouses.map((s) => (
@@ -247,7 +247,7 @@ export function CaseloadPage() {
                 setCaseStatus(e.target.value)
               }}
               placeholder="Case Status"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
             />
             <input
               value={caseCategory}
@@ -255,7 +255,7 @@ export function CaseloadPage() {
                 setCaseCategory(e.target.value)
               }}
               placeholder="Case Category"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
             />
             <input
               value={riskLevel}
@@ -263,7 +263,7 @@ export function CaseloadPage() {
                 setRiskLevel(e.target.value)
               }}
               placeholder="Risk Level"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
             />
             <input
               value={search}
@@ -271,7 +271,7 @@ export function CaseloadPage() {
                 setSearch(e.target.value)
               }}
               placeholder="Search"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
             />
           </div>
         </section>

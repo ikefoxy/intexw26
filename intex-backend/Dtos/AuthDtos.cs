@@ -21,7 +21,7 @@ public record EnableMfaRequest(string Code);
 
 public record ForgotPasswordRequest(string Email);
 
-public record ForgotPasswordResponse(bool Success, string? ResetToken = null);
+public record ForgotPasswordResponse(bool Success);
 
 public record ResetPasswordRequest(string Email, string? Token, string NewPassword);
 

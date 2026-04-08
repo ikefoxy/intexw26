@@ -1,25 +1,20 @@
-import { useMemo, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { requestPasswordReset, resetPasswordRequest } from '../lib/api'
 
 function meetsPasswordPolicy(password: string): boolean {
-  return (
-    password.length >= 12 &&
-    /[A-Z]/.test(password) &&
-    /[a-z]/.test(password) &&
-    /[0-9]/.test(password) &&
-    /[^A-Za-z0-9]/.test(password)
-  )
+  return password.length >= 14
 }
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState('')
   const [resetToken, setResetToken] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [step, setStep] = useState<'request' | 'reset' | 'done'>('request')
+  const [step, setStep] = useState<'request' | 'email_sent' | 'reset' | 'done'>('request')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
@@ -28,6 +23,21 @@ export function ForgotPasswordPage() {
     () => t('reset_password_policy_hint'),
     [t]
   )
+
+  useEffect(() => {
+    const tokenParam = searchParams.get('token')
+    const emailParam = searchParams.get('email')
+    if (!tokenParam || !emailParam) return
+
+    try {
+      setEmail(decodeURIComponent(emailParam))
+      setResetToken(decodeURIComponent(tokenParam))
+      setStep('reset')
+    } catch {
+      setError(t('reset_invalid_link'))
+      setStep('request')
+    }
+  }, [searchParams, t])
 
   async function onRequestReset(e: FormEvent) {
     e.preventDefault()
@@ -41,10 +51,9 @@ export function ForgotPasswordPage() {
 
     setLoading(true)
     try {
-      const res = await requestPasswordReset(email.trim())
-      setResetToken(res.resetToken ?? '')
-      setInfo(t('reset_continue_info'))
-      setStep('reset')
+      await requestPasswordReset(email.trim())
+      setInfo(t('reset_check_email'))
+      setStep('email_sent')
     } catch (err) {
       setError(err instanceof Error ? err.message : t('reset_request_error'))
     } finally {
@@ -62,6 +71,11 @@ export function ForgotPasswordPage() {
       return
     }
 
+    if (!resetToken) {
+      setError(t('reset_missing_token'))
+      return
+    }
+
     if (!meetsPasswordPolicy(newPassword)) {
       setError(passwordPolicyHint)
       return
@@ -74,7 +88,7 @@ export function ForgotPasswordPage() {
 
     setLoading(true)
     try {
-      await resetPasswordRequest(email.trim(), newPassword, resetToken || undefined)
+      await resetPasswordRequest(email.trim(), newPassword, resetToken)
       setStep('done')
       setInfo(t('reset_success'))
     } catch (err) {
@@ -84,9 +98,29 @@ export function ForgotPasswordPage() {
     }
   }
 
+  function goBackToRequest() {
+    setStep('request')
+    setInfo('')
+    setError('')
+    setResetToken('')
+    setNewPassword('')
+    setConfirmPassword('')
+  }
+
   return (
     <div className="min-h-screen bg-brand-50 text-surface-dark flex items-center justify-center px-6 py-8">
-      <div className="w-full max-w-xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
+      <div className="w-full max-w-xl rounded-2xl border border-brand-125 bg-surface p-8 shadow-sm">
+        <p className="mb-4">
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-surface-text hover:text-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand rounded"
+          >
+            <span aria-hidden className="select-none">
+              ←
+            </span>
+            {t('reset_back_to_login')}
+          </Link>
+        </p>
         <h1 className="text-2xl font-bold">{t('reset_title')}</h1>
         <p className="mt-2 text-sm text-surface-text">
           {t('reset_subtitle')}
@@ -107,7 +141,7 @@ export function ForgotPasswordPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+                className="w-full rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
                 placeholder={t('reset_email_placeholder')}
                 required
               />
@@ -118,9 +152,22 @@ export function ForgotPasswordPage() {
               disabled={loading}
               className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark disabled:opacity-60"
             >
-              {loading ? t('reset_continuing') : t('reset_continue')}
+              {loading ? t('reset_continuing') : t('reset_send_link')}
             </button>
           </form>
+        )}
+
+        {step === 'email_sent' && (
+          <div className="mt-5 space-y-4">
+            <p className="text-sm text-surface-text">{t('reset_check_email_detail')}</p>
+            <button
+              type="button"
+              onClick={goBackToRequest}
+              className="rounded-md border border-brand-125 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
+            >
+              {t('reset_use_different_email')}
+            </button>
+          </div>
         )}
 
         {step === 'reset' && (
@@ -133,7 +180,7 @@ export function ForgotPasswordPage() {
                 autoComplete="email"
                 value={email}
                 readOnly
-                className="w-full rounded-md border border-brand-100 bg-slate-50 px-3 py-2 text-sm text-surface-text"
+                className="w-full rounded-md border border-brand-125 bg-slate-50 px-3 py-2 text-sm text-surface-text"
                 required
               />
             </div>
@@ -148,7 +195,7 @@ export function ForgotPasswordPage() {
                 autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+                className="w-full rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
                 required
               />
               <p className="mt-1 text-xs text-surface-text">{passwordPolicyHint}</p>
@@ -164,7 +211,7 @@ export function ForgotPasswordPage() {
                 autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+                className="w-full rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -179,8 +226,8 @@ export function ForgotPasswordPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setStep('request')}
-                className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
+                onClick={goBackToRequest}
+                className="rounded-md border border-brand-125 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
               >
                 {t('reset_start_over')}
               </button>
@@ -188,16 +235,6 @@ export function ForgotPasswordPage() {
           </form>
         )}
 
-        {step === 'done' && (
-          <div className="mt-5">
-            <Link
-              to="/login"
-              className="inline-flex rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark"
-            >
-              {t('reset_back_to_login')}
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   )

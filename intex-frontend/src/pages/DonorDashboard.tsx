@@ -77,7 +77,7 @@ export function DonorDashboard() {
         </h1>
       </div>
 
-      <section id="donate-form" className="bg-surface border border-slate-200 rounded-xl shadow-sm p-6">
+      <section id="donate-form" className="bg-surface border border-slate-300 rounded-xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-surface-dark">{t('donate_title')}</h2>
         <form className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3" onSubmit={onSubmitDonation}>
           <input
@@ -87,14 +87,14 @@ export function DonorDashboard() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder={t('donate_amount_placeholder')}
-            className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+            className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             required
           />
           <input
             value={campaignName}
             onChange={(e) => setCampaignName(e.target.value)}
             placeholder={t('donate_campaign_placeholder')}
-            className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+            className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
           />
           <button
             type="submit"
@@ -107,7 +107,7 @@ export function DonorDashboard() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder={t('donate_notes_placeholder')}
-            className="md:col-span-3 rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+            className="md:col-span-3 rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             rows={2}
           />
         </form>
@@ -115,7 +115,7 @@ export function DonorDashboard() {
       </section>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
+        <div className="bg-surface border border-slate-300 p-6 rounded-xl shadow-sm flex items-center space-x-4">
           <div className="p-3 bg-brand-50 text-brand rounded-lg">
             <HeartIcon className="w-8 h-8" />
           </div>
@@ -124,7 +124,7 @@ export function DonorDashboard() {
             <p className="text-2xl font-bold text-surface-dark">${lifetimeGiving.toFixed(2)}</p>
           </div>
         </div>
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
+        <div className="bg-surface border border-slate-300 p-6 rounded-xl shadow-sm flex items-center space-x-4">
           <div className="p-3 bg-accent/10 text-accent rounded-lg">
             <TrendingUpIcon className="w-8 h-8" />
           </div>
@@ -133,7 +133,7 @@ export function DonorDashboard() {
             <p className="text-2xl font-bold text-surface-dark">{activeSafehouses}</p>
           </div>
         </div>
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
+        <div className="bg-surface border border-slate-300 p-6 rounded-xl shadow-sm flex items-center space-x-4">
           <div className="p-3 bg-brand-50 text-brand rounded-lg">
             <HeartIcon className="w-8 h-8" />
           </div>
@@ -144,8 +144,8 @@ export function DonorDashboard() {
         </div>
       </div>
 
-      <div className="bg-surface border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+      <div className="bg-surface border border-slate-300 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-300 bg-slate-50 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-surface-dark flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-brand" />
             {t('donate_history_title')}
@@ -157,7 +157,7 @@ export function DonorDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white border-b border-slate-200 text-sm text-surface-text">
+              <tr className="bg-white border-b border-slate-300 text-sm text-surface-text">
                 <th className="px-6 py-3 font-medium">{t('table_date')}</th>
                 <th className="px-6 py-3 font-medium">{t('donor_fund_designation')}</th>
                 <th className="px-6 py-3 font-medium">{t('table_amount')}</th>

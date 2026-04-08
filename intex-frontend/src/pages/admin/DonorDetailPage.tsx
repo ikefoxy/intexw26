@@ -80,7 +80,7 @@ export function DonorDetailPage() {
           </div>
         ) : (
           <>
-            <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+            <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
               <div className="grid gap-4 md:grid-cols-4">
                 <div>
                   <div className="text-xs uppercase tracking-wide text-surface-text">Name</div>
@@ -123,7 +123,7 @@ export function DonorDetailPage() {
               </div>
             </section>
 
-            <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+            <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
               <h2 className="text-lg font-semibold text-surface-dark">Donation History</h2>
               {donations.length === 0 ? (
                 <p className="mt-3 text-sm text-surface-text">No donations recorded for this supporter.</p>
@@ -131,7 +131,7 @@ export function DonorDetailPage() {
                 <div className="mt-4 overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-surface-text">
+                      <tr className="border-b border-slate-300 text-xs uppercase tracking-wide text-surface-text">
                         <th className="px-3 py-2 font-medium">Date</th>
                         <th className="px-3 py-2 font-medium">Campaign</th>
                         <th className="px-3 py-2 font-medium">Amount</th>

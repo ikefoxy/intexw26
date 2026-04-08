@@ -171,13 +171,13 @@ export function DonorsPage() {
           <h1 className="text-2xl font-bold text-surface-dark">Donors &amp; Contributions</h1>
           <button
             onClick={() => navigate('/admin/donors/new')}
-            className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
+            className="rounded-md border border-brand-125 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
           >
             Add Supporter
           </button>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-4 shadow-sm">
+        <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-4 shadow-sm">
           <div className="grid gap-3 md:grid-cols-3">
             <select
               value={supporterType}
@@ -185,7 +185,7 @@ export function DonorsPage() {
                 setPage(1)
                 setSupporterType(e.target.value)
               }}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text"
             >
               <option value="">All supporter types</option>
               {SUPPORTER_TYPE_OPTIONS.map((opt) => (
@@ -200,7 +200,7 @@ export function DonorsPage() {
                 setPage(1)
                 setStatus(e.target.value)
               }}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text"
             >
               <option value="">All statuses</option>
               {STATUS_OPTIONS.map((opt) => (
@@ -216,7 +216,7 @@ export function DonorsPage() {
                 setSearch(e.target.value)
               }}
               placeholder="Search"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm text-surface-text placeholder:text-surface-text"
             />
           </div>
         </section>

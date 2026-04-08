@@ -55,7 +55,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+    <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-surface-dark">{title}</h2>
       {hint ? <p className="mt-1 text-sm text-surface-text">{hint}</p> : null}
       <div className="mt-4 h-72 w-full">{children}</div>
@@ -125,23 +125,23 @@ export function SocialMediaPage() {
         ) : (
           <>
             <div className="mt-6 grid gap-3 text-sm text-surface-text sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl border border-brand-100 bg-white/80 px-4 py-3">
+              <div className="rounded-xl border border-brand-125 bg-white/80 px-4 py-3">
                 <div className="text-xs uppercase tracking-wide text-surface-text">Posts in database</div>
                 <div className="text-xl font-semibold text-surface-dark">{data.meta.nPosts}</div>
               </div>
-              <div className="rounded-xl border border-brand-100 bg-white/80 px-4 py-3">
+              <div className="rounded-xl border border-brand-125 bg-white/80 px-4 py-3">
                 <div className="text-xs uppercase tracking-wide text-surface-text">Mean posts / week</div>
                 <div className="text-xl font-semibold text-surface-dark">
                   {data.meta.weeklyMean.toFixed(1)}
                 </div>
               </div>
-              <div className="rounded-xl border border-brand-100 bg-white/80 px-4 py-3">
+              <div className="rounded-xl border border-brand-125 bg-white/80 px-4 py-3">
                 <div className="text-xs uppercase tracking-wide text-surface-text">Median posts / week</div>
                 <div className="text-xl font-semibold text-surface-dark">
                   {data.meta.weeklyMedian.toFixed(0)}
                 </div>
               </div>
-              <div className="rounded-xl border border-brand-100 bg-white/80 px-4 py-3">
+              <div className="rounded-xl border border-brand-125 bg-white/80 px-4 py-3">
                 <div className="text-xs uppercase tracking-wide text-surface-text">Cadence volatility (std)</div>
                 <div className="text-xl font-semibold text-surface-dark">
                   {data.meta.weeklyStd.toFixed(1)}

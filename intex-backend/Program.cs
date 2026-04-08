@@ -35,11 +35,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
-        options.Password.RequiredLength = 12;
-        options.Password.RequireUppercase = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireDigit = true;
-        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 14;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireNonAlphanumeric = false;
 
         options.Lockout.MaxFailedAccessAttempts = 5;
     })
@@ -50,6 +50,7 @@ builder.Services
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddSingleton<IPasswordResetNotifier, PasswordResetNotifier>();
 
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 var hasIssuer = !string.IsNullOrWhiteSpace(jwt.Issuer);

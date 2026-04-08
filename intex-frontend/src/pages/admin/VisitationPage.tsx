@@ -82,7 +82,7 @@ export function VisitationPage() {
         <h1 className="text-2xl font-bold text-surface-dark">Visitations &amp; Case Conferences</h1>
         <div className="mt-2 text-sm text-surface-text">ResidentId: {residentId}</div>
 
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl border border-slate-300 bg-surface p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-surface-dark">New Visitation Entry</h2>
           <form className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={onSubmit}>
             <div>
@@ -90,7 +90,7 @@ export function VisitationPage() {
               <input
                 value={Number.isFinite(parsedResidentId) ? parsedResidentId : ''}
                 disabled
-                className="w-full rounded-md border border-slate-200 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
+                className="w-full rounded-md border border-slate-300 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
               />
             </div>
             <div>
@@ -99,7 +99,7 @@ export function VisitationPage() {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-surface-dark"
               />
             </div>
             <div className="md:col-span-2">
@@ -108,7 +108,7 @@ export function VisitationPage() {
                 value={assessment}
                 onChange={(e) => setAssessment(e.target.value)}
                 rows={4}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-surface-dark"
                 placeholder="Home visitation assessment details"
               />
             </div>
@@ -125,8 +125,8 @@ export function VisitationPage() {
           {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
         </section>
 
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
-          <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <section className="mt-6 rounded-2xl border border-slate-300 bg-surface p-5 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-slate-300 pb-3">
             <button
               type="button"
               onClick={() => setActiveTab('visitations')}
@@ -162,7 +162,7 @@ export function VisitationPage() {
                 <div className="mt-4 overflow-x-auto">
                   <table className="min-w-full border-collapse text-sm">
                     <thead>
-                      <tr className="border-b border-slate-200 text-left text-surface-text">
+                      <tr className="border-b border-slate-300 text-left text-surface-text">
                         <th className="px-3 py-2 font-medium">Date</th>
                         <th className="px-3 py-2 font-medium">Assessment</th>
                         <th className="px-3 py-2 font-medium">Outcome</th>
@@ -170,7 +170,7 @@ export function VisitationPage() {
                     </thead>
                     <tbody>
                       {items.map((row) => (
-                        <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                        <tr key={row.visitationId} className="border-b border-slate-200 align-top">
                           <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
                           <td className="px-3 py-2 text-surface-text">{row.observations}</td>
                           <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>
@@ -195,7 +195,7 @@ export function VisitationPage() {
                 <div className="mt-4 overflow-x-auto">
                   <table className="min-w-full border-collapse text-sm">
                     <thead>
-                      <tr className="border-b border-slate-200 text-left text-surface-text">
+                      <tr className="border-b border-slate-300 text-left text-surface-text">
                         <th className="px-3 py-2 font-medium">Date</th>
                         <th className="px-3 py-2 font-medium">Conference Notes</th>
                         <th className="px-3 py-2 font-medium">Outcome</th>
@@ -203,7 +203,7 @@ export function VisitationPage() {
                     </thead>
                     <tbody>
                       {conferenceItems.map((row) => (
-                        <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                        <tr key={row.visitationId} className="border-b border-slate-200 align-top">
                           <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
                           <td className="px-3 py-2 text-surface-text">{row.observations}</td>
                           <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>

@@ -48,6 +48,7 @@ function Field({
   onChange,
   autoComplete,
   placeholder,
+  hint,
   error,
   disabled,
 }: {
@@ -58,6 +59,7 @@ function Field({
   onChange: (v: string) => void;
   autoComplete?: string;
   placeholder?: string;
+  hint?: string;
   error?: string;
   disabled?: boolean;
 }) {
@@ -84,7 +86,10 @@ function Field({
           placeholder={placeholder}
           disabled={disabled}
           aria-invalid={!!error}
-          aria-describedby={error ? errorId : undefined}
+          aria-describedby={
+            [hint ? `${id}-hint` : "", error ? errorId : ""].filter(Boolean).join(" ") ||
+            undefined
+          }
           className={`
             w-full rounded-xl px-4 py-3 text-sm bg-surface border text-surface-dark
             placeholder:text-surface-text outline-none transition-all duration-200
@@ -94,7 +99,7 @@ function Field({
                 ? "border-red-500/60 focus:border-red-400"
                 : focused
                   ? "border-brand"
-                  : "border-brand-100 hover:border-brand"
+                  : "border-brand-125 hover:border-brand"
             }
           `}
           style={
@@ -106,6 +111,11 @@ function Field({
           }
         />
       </div>
+      {hint ? (
+        <p id={`${id}-hint`} className="text-[12px] text-surface-text leading-snug">
+          {hint}
+        </p>
+      ) : null}
       <AnimatePresence>
         {error && (
           <motion.p
@@ -141,12 +151,7 @@ function Field({
 }
 
 function meetsPasswordPolicy(p: string): boolean {
-  if (p.length < 12) return false;
-  if (!/[A-Z]/.test(p)) return false;
-  if (!/[a-z]/.test(p)) return false;
-  if (!/[0-9]/.test(p)) return false;
-  if (!/[^A-Za-z0-9]/.test(p)) return false;
-  return true;
+  return p.length >= 14;
 }
 
 export function LoginPage() {
@@ -203,8 +208,7 @@ export function LoginPage() {
       errors.password = "Password is required.";
     } else if (mode === "signup") {
       if (!meetsPasswordPolicy(password)) {
-        errors.password =
-          "Use at least 12 characters with uppercase, lowercase, a number, and a symbol.";
+        errors.password = "Use at least 14 characters.";
       }
     }
     if (mode === "signup") {
@@ -548,7 +552,11 @@ export function LoginPage() {
                   setServerError("");
                 }}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                placeholder="••••••••"
+                hint={
+                  mode === "signup"
+                    ? "At least 14 characters required."
+                    : undefined
+                }
                 error={fieldErrors.password}
                 disabled={loading}
               />
@@ -566,7 +574,6 @@ export function LoginPage() {
                     setServerError("");
                   }}
                   autoComplete="new-password"
-                  placeholder="••••••••"
                   error={fieldErrors.confirmPassword}
                   disabled={loading}
                 />

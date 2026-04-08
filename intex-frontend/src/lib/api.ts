@@ -65,7 +65,6 @@ export async function enableMfaRequest(code: string): Promise<{ success?: boolea
 
 export type ForgotPasswordApiResponse = {
   success: boolean
-  resetToken?: string | null
 }
 
 export async function requestPasswordReset(email: string): Promise<ForgotPasswordApiResponse> {

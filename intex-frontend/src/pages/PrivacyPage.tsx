@@ -53,7 +53,7 @@ function Table({
   rows: string[][];
 }) {
   return (
-    <div className="overflow-x-auto mb-4 rounded-xl border border-brand-100 bg-surface">
+    <div className="overflow-x-auto mb-4 rounded-xl border border-brand-125 bg-surface">
       <table className="w-full text-sm">
         <thead>
           <tr
@@ -65,7 +65,7 @@ function Table({
               <th
                 key={h}
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-accent border-b border-brand-100"
+                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-accent border-b border-brand-125"
               >
                 {h}
               </th>
@@ -76,7 +76,7 @@ function Table({
           {rows.map((row, ri) => (
             <tr
               key={ri}
-              className="border-b border-brand-100 last:border-0 hover:bg-brand-50 transition-colors"
+              className="border-b border-brand-125 last:border-0 hover:bg-brand-50 transition-colors"
             >
               {row.map((cell, ci) => (
                 <td
@@ -170,7 +170,7 @@ const sections: Section[] = [
           compliance with this Policy and applicable data protection law. You
           may contact our DPO at any time:
         </P>
-        <div className="rounded-xl border border-brand-100 bg-brand-50 px-5 py-4 mb-4 space-y-1 text-[14px]">
+        <div className="rounded-xl border border-brand-125 bg-brand-50 px-5 py-4 mb-4 space-y-1 text-[14px]">
           <p className="text-surface-dark font-medium">Data Protection Officer</p>
           <p className="text-surface-text">Nova Path - Associacao Nova Path</p>
           <p className="text-surface-text">{ORG_ADDRESS}</p>
@@ -700,7 +700,7 @@ const sections: Section[] = [
           For any questions, concerns, or requests relating to this Privacy
           Policy or the processing of your personal data, please contact us:
         </P>
-        <div className="rounded-xl border border-brand-100 bg-brand-50 px-5 py-4 space-y-2 text-[14px]">
+        <div className="rounded-xl border border-brand-125 bg-brand-50 px-5 py-4 space-y-2 text-[14px]">
           <p className="text-surface-dark font-semibold">Nova Path - Associacao Nova Path</p>
           <p className="text-surface-text">{ORG_ADDRESS}</p>
           <a
@@ -776,7 +776,7 @@ function SectionBlock({ section }: { section: Section }) {
     >
       <h2
         id={`heading-${section.id}`}
-        className="font-display font-bold text-2xl text-surface-dark mb-6 pb-4 border-b border-brand-100 flex items-center gap-3"
+        className="font-display font-bold text-2xl text-surface-dark mb-6 pb-4 border-b border-brand-125 flex items-center gap-3"
       >
         <span
           aria-hidden="true"
@@ -821,7 +821,7 @@ export default function PrivacyPage() {
         .font-display { font-family: 'Sora', sans-serif; }
       `}</style>
 
-      <header className="sticky top-0 z-30 border-b border-brand-100/40 bg-white/20 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-brand-125/50 bg-white/20 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a
             href="/"
@@ -912,7 +912,7 @@ export default function PrivacyPage() {
             ))}
           </div>
 
-          <div className="mt-20 pt-10 border-t border-brand-100 text-center">
+          <div className="mt-20 pt-10 border-t border-brand-125 text-center">
             <p className="text-surface-text text-xs">
               Nova Path - Associacao Nova Path · CNPJ 00.000.000/0001-00 ·{" "}
               {ORG_ADDRESS}

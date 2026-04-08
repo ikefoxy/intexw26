@@ -10,6 +10,8 @@ export default {
         brand: {
           50: '#ecfdf5',
           100: '#d1fae5',
+          /** Default mint UI border (inputs, cards); darker than 100 for visibility */
+          125: '#a7f3d0',
           DEFAULT: '#059669',
           dark: '#047857',
         },

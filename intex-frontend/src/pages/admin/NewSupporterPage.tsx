@@ -91,7 +91,7 @@ export function NewSupporterPage() {
       <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-bold text-surface-dark">Add Supporter</h1>
 
-        <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+        <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
           {error && <ErrorMessage message={error} />}
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -100,12 +100,12 @@ export function NewSupporterPage() {
               onChange={(e) => update('displayName', e.target.value)}
               placeholder="Display Name"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <select
               value={form.supporterType}
               onChange={(e) => update('supporterType', e.target.value)}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             >
               {SUPPORTER_TYPES.map((opt) => (
                 <option key={opt} value={opt}>
@@ -120,39 +120,39 @@ export function NewSupporterPage() {
               placeholder="Email"
               type="email"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.phone}
               onChange={(e) => update('phone', e.target.value)}
               placeholder="Phone"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
               value={form.firstName ?? ''}
               onChange={(e) => update('firstName', e.target.value || null)}
               placeholder="First Name (optional)"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.lastName ?? ''}
               onChange={(e) => update('lastName', e.target.value || null)}
               placeholder="Last Name (optional)"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
               value={form.organizationName ?? ''}
               onChange={(e) => update('organizationName', e.target.value || null)}
               placeholder="Organization (optional)"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <select
               value={form.relationshipType}
               onChange={(e) => update('relationshipType', e.target.value)}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             >
               {RELATIONSHIP_TYPES.map((opt) => (
                 <option key={opt} value={opt}>
@@ -166,20 +166,20 @@ export function NewSupporterPage() {
               onChange={(e) => update('region', e.target.value)}
               placeholder="Region"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.country}
               onChange={(e) => update('country', e.target.value)}
               placeholder="Country"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <select
               value={form.status}
               onChange={(e) => update('status', e.target.value)}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             >
               {STATUSES.map((opt) => (
                 <option key={opt} value={opt}>
@@ -190,7 +190,7 @@ export function NewSupporterPage() {
             <select
               value={form.acquisitionChannel}
               onChange={(e) => update('acquisitionChannel', e.target.value)}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             >
               {ACQUISITION_CHANNELS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -203,7 +203,7 @@ export function NewSupporterPage() {
               value={form.firstDonationDate ?? ''}
               onChange={(e) => update('firstDonationDate', e.target.value || null)}
               type="date"
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
           </div>
 
@@ -218,7 +218,7 @@ export function NewSupporterPage() {
             <button
               type="button"
               onClick={() => navigate('/admin/donors')}
-              className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold hover:bg-brand-50"
+              className="rounded-md border border-brand-125 px-4 py-2 text-sm font-semibold hover:bg-brand-50"
             >
               Cancel
             </button>

@@ -17,15 +17,24 @@ public class AuthController : ControllerBase
     private const string MfaIssuer = "NovaPath";
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly JwtTokenService _jwtTokenService;
+    private readonly IPasswordResetNotifier _passwordResetNotifier;
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<ApplicationUser> userManager,
         JwtTokenService jwtTokenService,
+        IPasswordResetNotifier passwordResetNotifier,
+        IConfiguration configuration,
+        IWebHostEnvironment environment,
         ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
+        _passwordResetNotifier = passwordResetNotifier;
+        _configuration = configuration;
+        _environment = environment;
         _logger = logger;
     }
 
@@ -181,7 +190,9 @@ public class AuthController : ControllerBase
     /// <summary>Public self-registration. New accounts receive the Donor role only.</summary>
     [HttpPost("forgot-password")]
     [AllowAnonymous]
-    public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword([FromBody] ForgotPasswordRequest req)
+    public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(
+        [FromBody] ForgotPasswordRequest req,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(req.Email))
         {
@@ -191,16 +202,49 @@ public class AuthController : ControllerBase
         var normalizedEmail = req.Email.Trim();
         var user = await _userManager.FindByEmailAsync(normalizedEmail);
 
-        string? resetToken = null;
         if (user is not null)
         {
-            resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             _logger.LogInformation("Password reset requested for {Email}.", normalizedEmail);
+
+            var frontendBase = GetPasswordResetFrontendBaseUrl();
+            if (!string.IsNullOrWhiteSpace(frontendBase))
+            {
+                var link = BuildPasswordResetLink(frontendBase, normalizedEmail, resetToken);
+                try
+                {
+                    await _passwordResetNotifier.SendResetLinkAsync(normalizedEmail, link, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send password reset email to {Email}.", normalizedEmail);
+                }
+            }
+            else
+            {
+                _logger.LogError(
+                    "PasswordReset:FrontendBaseUrl is not configured; cannot deliver reset link for {Email}.",
+                    normalizedEmail);
+            }
         }
 
-        return Ok(new ForgotPasswordResponse(
-            Success: true,
-            ResetToken: resetToken));
+        // Same response whether or not the account exists (avoid email enumeration).
+        return Ok(new ForgotPasswordResponse(true));
+    }
+
+    private string? GetPasswordResetFrontendBaseUrl()
+    {
+        var u = _configuration["PasswordReset:FrontendBaseUrl"];
+        if (!string.IsNullOrWhiteSpace(u))
+            return u.TrimEnd('/');
+        if (_environment.IsDevelopment())
+            return "http://localhost:5173";
+        return null;
+    }
+
+    private static string BuildPasswordResetLink(string frontendBase, string email, string token)
+    {
+        return $"{frontendBase}/forgot-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
     }
 
     [HttpPost("reset-password")]

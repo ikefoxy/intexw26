@@ -127,7 +127,7 @@ export function ImpactDashboardPage() {
                 text: t('impact_story_3_text'),
               },
             ].map((s) => (
-              <div key={s.title} className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+              <div key={s.title} className="rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
                 <div className="font-semibold text-surface-dark">{s.title}</div>
                 <div className="mt-2 text-sm text-surface-text">{s.text}</div>
               </div>
@@ -135,7 +135,7 @@ export function ImpactDashboardPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-2xl border border-brand-100 bg-surface p-6 text-surface-dark md:p-8">
+        <section className="mt-8 rounded-2xl border border-brand-125 bg-surface p-6 text-surface-dark md:p-8">
           <h2 className="text-xl font-semibold">{t('impact_support_recovery_title')}</h2>
           <p className="mt-2 max-w-2xl text-surface-text">
             {t('impact_support_recovery_text')}
@@ -157,7 +157,7 @@ export function ImpactDashboardPage() {
               </Link>
             )}
             <a
-              className="inline-flex rounded-md border border-brand-100 px-4 py-2 font-semibold text-surface-dark hover:bg-brand-50"
+              className="inline-flex rounded-md border border-brand-125 px-4 py-2 font-semibold text-surface-dark hover:bg-brand-50"
               href="mailto:donations@novapath.org"
             >
               {t('impact_contact_donations_team')}

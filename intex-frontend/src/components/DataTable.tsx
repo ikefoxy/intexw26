@@ -32,7 +32,7 @@ export function DataTable<T>({
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-brand-100 bg-surface shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-brand-125 bg-surface shadow-sm">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-brand-50 text-surface-dark">
@@ -96,20 +96,20 @@ export function DataTable<T>({
         </table>
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-brand-100 bg-surface px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-t border-brand-125 bg-surface px-4 py-3">
         <div className="text-sm text-surface-text">
           Page {page} of {totalPages} · {totalCount} total
         </div>
         <div className="flex gap-2">
           <button
-            className="rounded-md border border-brand-100 px-3 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-50"
+            className="rounded-md border border-brand-125 px-3 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-50"
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
           >
             Prev
           </button>
           <button
-            className="rounded-md border border-brand-100 px-3 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-50"
+            className="rounded-md border border-brand-125 px-3 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-50"
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
           >

@@ -61,7 +61,7 @@ export default function CookieBanner({
             className="fixed bottom-5 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-auto sm:w-full sm:max-w-2xl"
           >
             <div
-              className="relative rounded-2xl overflow-hidden border border-brand-100 shadow-2xl bg-surface"
+              className="relative rounded-2xl overflow-hidden border border-brand-125 shadow-2xl bg-surface"
               style={{
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
@@ -113,7 +113,7 @@ export default function CookieBanner({
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => handleChoice("declined")}
-                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-surface-text border border-brand-100 hover:border-brand hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-surface-text border border-brand-125 hover:border-brand hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
                     aria-label="Decline non-essential cookies"
                   >
                     Decline

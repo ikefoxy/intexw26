@@ -85,13 +85,13 @@ export function DonatePage() {
               {t('donate_subtitle')}
             </p>
           </div>
-          <div className="rounded-lg border border-brand-100 bg-white px-4 py-2 text-right shadow-sm">
+          <div className="rounded-lg border border-brand-125 bg-white px-4 py-2 text-right shadow-sm">
             <div className="text-xs uppercase tracking-wide text-surface-text">{t('donate_lifetime_giving')}</div>
             <div className="text-xl font-semibold text-surface-dark">${lifetimeGiving.toFixed(2)}</div>
           </div>
         </div>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-slate-300 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-surface-dark">{t('donate_form_title')}</h2>
           <form className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3" onSubmit={onSubmitDonation}>
             <input
@@ -101,14 +101,14 @@ export function DonatePage() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder={t('donate_amount_placeholder')}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
               required
             />
             <input
               value={campaignName}
               onChange={(e) => setCampaignName(e.target.value)}
               placeholder={t('donate_campaign_placeholder')}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <button
               type="submit"
@@ -123,14 +123,14 @@ export function DonatePage() {
               onChange={(e) => setNotes(e.target.value)}
               placeholder={t('donate_notes_placeholder')}
               rows={2}
-              className="md:col-span-3 rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="md:col-span-3 rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
           </form>
           {formError && <p className="mt-2 text-sm text-red-500">{formError}</p>}
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-300 bg-slate-50 px-5 py-3">
             <h2 className="flex items-center gap-2 text-base font-semibold text-surface-dark">
               <CalendarIcon className="h-4 w-4 text-brand" />
               {t('donate_history_title')}
@@ -144,7 +144,7 @@ export function DonatePage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-200 bg-white text-sm text-surface-text">
+                <tr className="border-b border-slate-300 bg-white text-sm text-surface-text">
                   <th className="px-5 py-3 font-medium">{t('table_date')}</th>
                   <th className="px-5 py-3 font-medium">{t('table_designation')}</th>
                   <th className="px-5 py-3 font-medium">{t('table_amount')}</th>

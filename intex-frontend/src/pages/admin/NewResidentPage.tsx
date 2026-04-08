@@ -150,7 +150,7 @@ export function NewResidentPage() {
       <NavBar />
       <main className="mx-auto max-w-4xl px-4 py-6">
         <h1 className="text-2xl font-bold text-surface-dark">New Resident</h1>
-        <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+        <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
           {error && <ErrorMessage message={error} />}
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -159,21 +159,21 @@ export function NewResidentPage() {
               onChange={(e) => update('caseControlNo', e.target.value)}
               placeholder="Case Control No"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.internalCode}
               onChange={(e) => update('internalCode', e.target.value)}
               placeholder="Internal Code"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <select
               value={form.safehouseId}
               onChange={(e) => update('safehouseId', e.target.value)}
               disabled={loadingSafehouses || safehouses.length === 0}
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             >
               {safehouses.length === 0 ? (
                 <option value="">No safehouses available</option>
@@ -190,7 +190,7 @@ export function NewResidentPage() {
               onChange={(e) => update('caseStatus', e.target.value)}
               placeholder="Case Status"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -198,14 +198,14 @@ export function NewResidentPage() {
               onChange={(e) => update('caseCategory', e.target.value)}
               placeholder="Case Category"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.sex}
               onChange={(e) => update('sex', e.target.value)}
               placeholder="Sex"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -213,14 +213,14 @@ export function NewResidentPage() {
               onChange={(e) => update('dateOfBirth', e.target.value)}
               type="date"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.birthStatus}
               onChange={(e) => update('birthStatus', e.target.value)}
               placeholder="Birth Status"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -228,14 +228,14 @@ export function NewResidentPage() {
               onChange={(e) => update('placeOfBirth', e.target.value)}
               placeholder="Place of Birth"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.religion}
               onChange={(e) => update('religion', e.target.value)}
               placeholder="Religion"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -243,14 +243,14 @@ export function NewResidentPage() {
               onChange={(e) => update('referralSource', e.target.value)}
               placeholder="Referral Source"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.assignedSocialWorker}
               onChange={(e) => update('assignedSocialWorker', e.target.value)}
               placeholder="Assigned Social Worker"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -258,14 +258,14 @@ export function NewResidentPage() {
               onChange={(e) => update('initialRiskLevel', e.target.value)}
               placeholder="Initial Risk Level"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.currentRiskLevel}
               onChange={(e) => update('currentRiskLevel', e.target.value)}
               placeholder="Current Risk Level"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <input
@@ -273,14 +273,14 @@ export function NewResidentPage() {
               onChange={(e) => update('dateOfAdmission', e.target.value)}
               type="date"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <input
               value={form.dateEnrolled}
               onChange={(e) => update('dateEnrolled', e.target.value)}
               type="date"
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
 
             <textarea
@@ -289,14 +289,14 @@ export function NewResidentPage() {
               placeholder="Initial Case Assessment"
               required
               rows={3}
-              className="md:col-span-2 rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="md:col-span-2 rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
             <textarea
               value={form.notesRestricted}
               onChange={(e) => update('notesRestricted', e.target.value)}
               placeholder="Restricted Notes (optional)"
               rows={2}
-              className="md:col-span-2 rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              className="md:col-span-2 rounded-md border border-brand-125 bg-surface px-3 py-2 text-sm"
             />
           </div>
 
@@ -311,7 +311,7 @@ export function NewResidentPage() {
             <button
               type="button"
               onClick={() => navigate('/admin/residents')}
-              className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold hover:bg-brand-50"
+              className="rounded-md border border-brand-125 px-4 py-2 text-sm font-semibold hover:bg-brand-50"
             >
               Cancel
             </button>

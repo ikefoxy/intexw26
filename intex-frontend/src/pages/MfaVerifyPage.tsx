@@ -39,7 +39,7 @@ export function MfaVerifyPage() {
   if (!pendingMfa) {
     return (
       <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-surface p-8 text-center shadow-sm">
+        <div className="w-full max-w-md rounded-2xl border border-brand-125 bg-surface p-8 text-center shadow-sm">
           <h1 className="font-display text-2xl font-bold text-surface-dark">No MFA session found</h1>
           <p className="mt-2 text-sm text-surface-text">Please sign in again to continue.</p>
           <button
@@ -56,7 +56,7 @@ export function MfaVerifyPage() {
 
   return (
     <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
+      <div className="w-full max-w-md rounded-2xl border border-brand-125 bg-surface p-8 shadow-sm">
         <div className="mb-4">
           <Link to="/login" className="text-sm font-medium text-brand hover:text-brand-dark">
             ← Back to login
@@ -69,18 +69,18 @@ export function MfaVerifyPage() {
         </p>
 
         {(pendingMfa.requiresMfaSetup || pendingMfa.authenticatorUri || pendingMfa.sharedKey) && (
-          <div className="mt-5 rounded-xl border border-brand-100 bg-brand-50 p-4">
+          <div className="mt-5 rounded-xl border border-brand-125 bg-brand-50 p-4">
             <p className="text-sm font-semibold text-surface-dark">Set up your authenticator first</p>
             <p className="mt-1 text-sm text-surface-text">
               Scan the QR code or enter the setup key manually in Google Authenticator, then enter the 6-digit code below.
             </p>
             {pendingMfa.authenticatorUri ? (
-              <div className="mt-3 inline-block rounded-lg border border-brand-100 bg-white p-2">
+              <div className="mt-3 inline-block rounded-lg border border-brand-125 bg-white p-2">
                 <QRCodeSVG value={pendingMfa.authenticatorUri} size={160} />
               </div>
             ) : null}
             {pendingMfa.sharedKey ? (
-              <div className="mt-3 rounded-md border border-brand-100 bg-white px-3 py-2">
+              <div className="mt-3 rounded-md border border-brand-125 bg-white px-3 py-2">
                 <p className="text-xs font-semibold text-surface-text">Setup key</p>
                 <p className="mt-1 break-all font-mono text-sm text-surface-dark">{pendingMfa.sharedKey}</p>
               </div>
@@ -99,7 +99,7 @@ export function MfaVerifyPage() {
             inputMode="numeric"
             autoComplete="one-time-code"
             placeholder="123456"
-            className="w-full rounded-xl border border-brand-100 bg-surface px-4 py-3 text-center text-xl tracking-[0.35em] text-surface-dark outline-none focus:border-brand"
+            className="w-full rounded-xl border border-brand-125 bg-surface px-4 py-3 text-center text-xl tracking-[0.35em] text-surface-dark outline-none focus:border-brand"
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}

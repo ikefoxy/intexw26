@@ -82,7 +82,7 @@ export function MfaSetupPage() {
 
   return (
     <div className="min-h-screen bg-brand-50 px-4 py-10 sm:px-6">
-      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-brand-125 bg-surface p-8 shadow-sm">
         <div className="mb-4">
           <Link to={user ? '/admin' : '/login'} className="text-sm font-medium text-brand hover:text-brand-dark">
             {user ? '← Back to dashboard' : '← Back to login'}
@@ -100,7 +100,7 @@ export function MfaSetupPage() {
           <p className="mt-8 text-sm text-surface-text">Loading setup...</p>
         ) : (
           <div className="mt-8 grid gap-6 md:grid-cols-[220px_1fr] md:items-start">
-            <div className="rounded-xl border border-brand-100 bg-brand-50 p-3">
+            <div className="rounded-xl border border-brand-125 bg-brand-50 p-3">
               {uri ? (
                 <QRCodeSVG value={uri} size={196} bgColor="transparent" fgColor="#0f172a" />
               ) : (
@@ -110,7 +110,7 @@ export function MfaSetupPage() {
 
             <div>
               {sharedKey && (
-                <div className="rounded-xl border border-brand-100 bg-brand-50 p-3 text-sm text-surface-text">
+                <div className="rounded-xl border border-brand-125 bg-brand-50 p-3 text-sm text-surface-text">
                   <p className="font-medium text-surface-dark">Manual key</p>
                   <p className="mt-1 break-all font-mono text-xs">{sharedKey}</p>
                 </div>
@@ -127,7 +127,7 @@ export function MfaSetupPage() {
                   inputMode="numeric"
                   autoComplete="one-time-code"
                   placeholder="123456"
-                  className="w-full rounded-xl border border-brand-100 bg-surface px-4 py-3 text-lg tracking-[0.3em] text-surface-dark outline-none focus:border-brand"
+                  className="w-full rounded-xl border border-brand-125 bg-surface px-4 py-3 text-lg tracking-[0.3em] text-surface-dark outline-none focus:border-brand"
                 />
 
                 {error && <p className="text-sm text-red-500">{error}</p>}

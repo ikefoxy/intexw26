@@ -151,7 +151,7 @@ export function ReportsPage() {
               <button
                 type="button"
                 onClick={() => navigate('/admin/donors')}
-                className="text-left rounded-xl border border-brand-100 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="text-left rounded-xl border border-brand-125 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 aria-label="Open supporters page"
                 title="Open supporters page"
               >
@@ -160,7 +160,7 @@ export function ReportsPage() {
               <button
                 type="button"
                 onClick={() => navigate('/admin/donors?status=Active')}
-                className="text-left rounded-xl border border-brand-100 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="text-left rounded-xl border border-brand-125 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 aria-label="Open active supporters page"
                 title="Open active supporters page"
               >
@@ -169,7 +169,7 @@ export function ReportsPage() {
               <button
                 type="button"
                 onClick={() => navigate('/admin/donations')}
-                className="text-left rounded-xl border border-brand-100 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="text-left rounded-xl border border-brand-125 bg-surface p-0 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 aria-label="Open donations list"
                 title="Open donations list"
               >
@@ -179,7 +179,7 @@ export function ReportsPage() {
             </section>
 
             <section className="mt-6 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+              <div className="rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
                 <div className="font-semibold text-surface-dark">Donations trend (last 8 months)</div>
                 <div className="mt-4 h-72">
                   <ResponsiveContainer width="100%" height="100%">
@@ -194,7 +194,7 @@ export function ReportsPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+              <div className="rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
                 <div className="font-semibold text-surface-dark">Supporters by type</div>
                 <div className="mt-4 h-72">
                   <ResponsiveContainer width="100%" height="100%">
@@ -211,7 +211,7 @@ export function ReportsPage() {
               </div>
             </section>
 
-            <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+            <section className="mt-6 rounded-2xl border border-brand-125 bg-surface p-5 shadow-sm">
               <div className="font-semibold text-surface-dark">Safehouse occupancy (%)</div>
               <div className="mt-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
