@@ -14,7 +14,7 @@ function meetsPasswordPolicy(password: string): boolean {
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
-  const [token, setToken] = useState('')
+  const [resetToken, setResetToken] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [step, setStep] = useState<'request' | 'reset' | 'done'>('request')
@@ -40,12 +40,8 @@ export function ForgotPasswordPage() {
     setLoading(true)
     try {
       const res = await requestPasswordReset(email.trim())
-      if (res.resetToken) {
-        setToken(res.resetToken)
-        setInfo('Reset token generated for development. Paste it below and set your new password.')
-      } else {
-        setInfo('If this email exists, a reset token has been issued. Continue below with your token.')
-      }
+      setResetToken(res.resetToken ?? '')
+      setInfo('Continue to set a new password for this email.')
       setStep('reset')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to request password reset.')
@@ -59,8 +55,8 @@ export function ForgotPasswordPage() {
     setError('')
     setInfo('')
 
-    if (!email.trim() || !token.trim() || !newPassword) {
-      setError('Email, token, and new password are required.')
+    if (!email.trim() || !newPassword) {
+      setError('Email and new password are required.')
       return
     }
 
@@ -76,7 +72,7 @@ export function ForgotPasswordPage() {
 
     setLoading(true)
     try {
-      await resetPasswordRequest(email.trim(), token.trim(), newPassword)
+      await resetPasswordRequest(email.trim(), newPassword, resetToken || undefined)
       setStep('done')
       setInfo('Password reset successful. You can sign in now.')
     } catch (err) {
@@ -91,7 +87,7 @@ export function ForgotPasswordPage() {
       <div className="w-full max-w-xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
         <h1 className="text-2xl font-bold">Reset your password</h1>
         <p className="mt-2 text-sm text-surface-text">
-          Request a token, then submit your token and new password.
+          Step 1: Enter your email. Step 2: Set your new password.
         </p>
 
         {error && <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
@@ -120,7 +116,7 @@ export function ForgotPasswordPage() {
               disabled={loading}
               className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark disabled:opacity-60"
             >
-              {loading ? 'Requesting...' : 'Request Reset Token'}
+              {loading ? 'Continuing...' : 'Continue'}
             </button>
           </form>
         )}
@@ -128,31 +124,14 @@ export function ForgotPasswordPage() {
         {step === 'reset' && (
           <form className="mt-5 space-y-3" onSubmit={onResetPassword}>
             <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="reset-email-confirm">
-                Email
-              </label>
+              <label className="mb-1 block text-sm font-medium" htmlFor="reset-email-confirm">Email</label>
               <input
                 id="reset-email-confirm"
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="reset-token">
-                Reset Token
-              </label>
-              <textarea
-                id="reset-token"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                rows={3}
-                className="w-full rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
-                placeholder="Paste reset token"
+                readOnly
+                className="w-full rounded-md border border-brand-100 bg-slate-50 px-3 py-2 text-sm text-surface-text"
                 required
               />
             </div>

@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
             <Link to="/admin/reports" className="rounded-md border border-brand-100 px-3 py-2 text-sm font-semibold hover:bg-brand-50">
               Reports
             </Link>
-            <Link to="/admin/residents" className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+            <Link to="/admin/residents" className="rounded-md border border-brand-100 px-3 py-2 text-sm font-semibold hover:bg-brand-50">
               Caseload
             </Link>
           </div>

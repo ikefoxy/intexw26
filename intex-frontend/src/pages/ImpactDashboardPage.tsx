@@ -139,10 +139,10 @@ export function ImpactDashboardPage() {
             Donations fund safe housing, clinical support, education planning, and reintegration services. All public reporting is anonymized.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {user?.roles?.includes('Donor') ? (
+            {user?.roles?.includes('Donor') || user?.roles?.includes('Admin') ? (
               <Link
                 className="inline-flex rounded-md bg-brand px-4 py-2 font-semibold text-surface hover:bg-brand-dark"
-                to="/donor/dashboard#donate-form"
+                to="/donate"
               >
                 Make a Donation
               </Link>
@@ -166,4 +166,3 @@ export function ImpactDashboardPage() {
     </div>
   )
 }
-

@@ -21,6 +21,7 @@ import { VisitationPage } from './pages/admin/VisitationPage'
 import { ReportsPage } from './pages/admin/ReportsPage'
 import { SocialMediaPage } from './pages/admin/SocialMediaPage'
 import { AdminDonationsPage } from './pages/admin/AdminDonationsPage'
+import DonatePage from './pages/DonatePage'
 
 
 export default function App() {
@@ -57,6 +58,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Donor']}>
               <DonorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/donate"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Donor']}>
+              <DonatePage />
             </ProtectedRoute>
           }
         />

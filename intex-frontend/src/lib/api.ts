@@ -73,10 +73,10 @@ export async function requestPasswordReset(email: string): Promise<ForgotPasswor
   return res.data
 }
 
-export async function resetPasswordRequest(email: string, token: string, newPassword: string): Promise<{ success?: boolean }> {
+export async function resetPasswordRequest(email: string, newPassword: string, token?: string): Promise<{ success?: boolean }> {
   const res = await api.post<{ success?: boolean }>('/api/auth/reset-password', {
     email,
-    token,
+    token: token ?? null,
     newPassword,
   })
   return res.data

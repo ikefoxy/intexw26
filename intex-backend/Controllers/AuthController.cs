@@ -17,18 +17,15 @@ public class AuthController : ControllerBase
     private const string MfaIssuer = "NovaPath";
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly JwtTokenService _jwtTokenService;
-    private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<ApplicationUser> userManager,
         JwtTokenService jwtTokenService,
-        IWebHostEnvironment environment,
         ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
-        _environment = environment;
         _logger = logger;
     }
 
@@ -203,18 +200,21 @@ public class AuthController : ControllerBase
 
         return Ok(new ForgotPasswordResponse(
             Success: true,
-            ResetToken: _environment.IsDevelopment() ? resetToken : null));
+            ResetToken: resetToken));
     }
 
     [HttpPost("reset-password")]
     [AllowAnonymous]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
     {
-        if (string.IsNullOrWhiteSpace(req.Email)
-            || string.IsNullOrWhiteSpace(req.Token)
-            || string.IsNullOrWhiteSpace(req.NewPassword))
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.NewPassword))
         {
-            return BadRequest(new { message = "Email, token, and new password are required." });
+            return BadRequest(new { message = "Email and new password are required." });
+        }
+
+        if (string.IsNullOrWhiteSpace(req.Token))
+        {
+            return BadRequest(new { message = "Invalid reset request." });
         }
 
         var user = await _userManager.FindByEmailAsync(req.Email.Trim());
@@ -387,4 +387,3 @@ public class AuthController : ControllerBase
         return $"otpauth://totp/{Uri.EscapeDataString(MfaIssuer)}:{Uri.EscapeDataString(email)}?secret={Uri.EscapeDataString(unformattedKey)}&issuer={Uri.EscapeDataString(MfaIssuer)}&digits=6";
     }
 }
-

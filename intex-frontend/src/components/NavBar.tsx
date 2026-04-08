@@ -45,7 +45,7 @@ export function NavBar() {
                 <NavLink to="/donor/dashboard" end className={navLinkClass}>
                   My Dashboard
                 </NavLink>
-                <NavLink to="/donor/dashboard#donate-form" className={navLinkClass}>
+                <NavLink to="/donate" className={navLinkClass}>
                   Make Donation
                 </NavLink>
               </>
@@ -62,6 +62,9 @@ export function NavBar() {
                 </NavLink>
                 <NavLink to="/admin/reports" className={navLinkClass}>
                   Reports
+                </NavLink>
+                <NavLink to="/donate" className={navLinkClass}>
+                  Donate
                 </NavLink>
                 <NavLink to="/admin/social-media" className={navLinkClass}>
                   Social Media
@@ -96,4 +99,3 @@ export function NavBar() {
     </header>
   )
 }
-
