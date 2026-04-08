@@ -41,9 +41,14 @@ export function NavBar() {
 
           <nav className="hidden items-center gap-2 md:flex">
             {isDonor && !isAdmin ? (
-              <NavLink to="/donor/dashboard" end className={navLinkClass}>
-                My Dashboard
-              </NavLink>
+              <>
+                <NavLink to="/donor/dashboard" end className={navLinkClass}>
+                  My Dashboard
+                </NavLink>
+                <NavLink to="/donate" className={navLinkClass}>
+                  Make Donation
+                </NavLink>
+              </>
             ) : (
               <>
                 <NavLink to="/admin" end className={navLinkClass}>
@@ -57,6 +62,9 @@ export function NavBar() {
                 </NavLink>
                 <NavLink to="/admin/reports" className={navLinkClass}>
                   Reports
+                </NavLink>
+                <NavLink to="/donate" className={navLinkClass}>
+                  Donate
                 </NavLink>
                 <NavLink to="/admin/social-media" className={navLinkClass}>
                   Social Media
@@ -91,4 +99,3 @@ export function NavBar() {
     </header>
   )
 }
-

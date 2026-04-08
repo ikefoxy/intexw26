@@ -17,11 +17,16 @@ public class AuthController : ControllerBase
     private const string MfaIssuer = "NovaPath";
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly JwtTokenService _jwtTokenService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(UserManager<ApplicationUser> userManager, JwtTokenService jwtTokenService)
+    public AuthController(
+        UserManager<ApplicationUser> userManager,
+        JwtTokenService jwtTokenService,
+        ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -174,6 +179,63 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>Public self-registration. New accounts receive the Donor role only.</summary>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword([FromBody] ForgotPasswordRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Email))
+        {
+            return BadRequest(new { message = "Email is required." });
+        }
+
+        var normalizedEmail = req.Email.Trim();
+        var user = await _userManager.FindByEmailAsync(normalizedEmail);
+
+        string? resetToken = null;
+        if (user is not null)
+        {
+            resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            _logger.LogInformation("Password reset requested for {Email}.", normalizedEmail);
+        }
+
+        return Ok(new ForgotPasswordResponse(
+            Success: true,
+            ResetToken: resetToken));
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.NewPassword))
+        {
+            return BadRequest(new { message = "Email and new password are required." });
+        }
+
+        if (string.IsNullOrWhiteSpace(req.Token))
+        {
+            return BadRequest(new { message = "Invalid reset request." });
+        }
+
+        var user = await _userManager.FindByEmailAsync(req.Email.Trim());
+        if (user is null)
+        {
+            return BadRequest(new { message = "Invalid reset request." });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, req.Token, req.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Unable to reset password.",
+                errors = result.Errors.Select(e => e.Description).ToArray()
+            });
+        }
+
+        return Ok(new { success = true });
+    }
+
     [HttpPost("signup")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginResponse>> Signup([FromBody] LoginRequest req)
@@ -325,4 +387,3 @@ public class AuthController : ControllerBase
         return $"otpauth://totp/{Uri.EscapeDataString(MfaIssuer)}:{Uri.EscapeDataString(email)}?secret={Uri.EscapeDataString(unformattedKey)}&issuer={Uri.EscapeDataString(MfaIssuer)}&digits=6";
     }
 }
-
