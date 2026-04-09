@@ -216,21 +216,23 @@ export async function createHomeVisitation(payload: {
   residentId: number
   date: string
   assessment: string
+  entryType?: 'Home Visitation' | 'Case Conference'
 }): Promise<HomeVisitation> {
+  const isConference = payload.entryType === 'Case Conference'
   const body = {
     residentId: payload.residentId,
     visitDate: payload.date,
     socialWorker: 'Unassigned',
-    visitType: 'Home Visit',
+    visitType: isConference ? 'Case Conference' : 'Home Visit',
     locationVisited: 'Not specified',
     familyMembersPresent: 'Not specified',
-    purpose: 'Routine follow-up',
+    purpose: isConference ? 'Case Conference Review' : 'Routine follow-up',
     observations: payload.assessment,
     familyCooperationLevel: 'Unknown',
     safetyConcernsNoted: false,
     followUpNeeded: false,
     followUpNotes: '',
-    visitOutcome: 'Pending review',
+    visitOutcome: isConference ? 'Conference logged' : 'Pending review',
   }
   const res = await api.post<HomeVisitation>('/api/home-visitations', body, { headers: getHeaders() })
   return res.data

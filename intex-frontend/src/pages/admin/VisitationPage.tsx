@@ -8,6 +8,7 @@ export function VisitationPage() {
   const parsedResidentId = useMemo(() => Number(residentId), [residentId])
   const [date, setDate] = useState('')
   const [assessment, setAssessment] = useState('')
+  const [entryType, setEntryType] = useState<'Home Visitation' | 'Case Conference'>('Home Visitation')
   const [items, setItems] = useState<HomeVisitation[]>([])
   const [conferenceItems, setConferenceItems] = useState<HomeVisitation[]>([])
   const [activeTab, setActiveTab] = useState<'visitations' | 'conferences'>('visitations')
@@ -53,7 +54,7 @@ export function VisitationPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     if (!date || !assessment.trim()) {
-      setError('Please provide both date and assessment.')
+      setError(`Please provide both date and ${entryType === 'Case Conference' ? 'conference notes' : 'assessment'}.`)
       return
     }
 
@@ -64,9 +65,11 @@ export function VisitationPage() {
         residentId: parsedResidentId,
         date,
         assessment: assessment.trim(),
+        entryType,
       })
       setAssessment('')
       setDate('')
+      setEntryType('Home Visitation')
       await loadHistory()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create visitation entry.')
@@ -83,8 +86,19 @@ export function VisitationPage() {
         <div className="mt-2 text-sm text-surface-text">ResidentId: {residentId}</div>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-surface-dark">New Visitation Entry</h2>
+          <h2 className="text-lg font-semibold text-surface-dark">New Visitation / Conference Entry</h2>
           <form className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={onSubmit}>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-surface-text">Entry Type</label>
+              <select
+                value={entryType}
+                onChange={(e) => setEntryType(e.target.value as 'Home Visitation' | 'Case Conference')}
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+              >
+                <option value="Home Visitation">Home Visitation</option>
+                <option value="Case Conference">Case Conference</option>
+              </select>
+            </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-surface-text">ResidentId</label>
               <input
@@ -103,13 +117,19 @@ export function VisitationPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-surface-text">Assessment</label>
+              <label className="mb-1 block text-sm font-medium text-surface-text">
+                {entryType === 'Case Conference' ? 'Conference Notes' : 'Assessment'}
+              </label>
               <textarea
                 value={assessment}
                 onChange={(e) => setAssessment(e.target.value)}
                 rows={4}
                 className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
-                placeholder="Home visitation assessment details"
+                placeholder={
+                  entryType === 'Case Conference'
+                    ? 'Case conference notes and decisions'
+                    : 'Home visitation assessment details'
+                }
               />
             </div>
             <div className="md:col-span-2">
@@ -118,7 +138,7 @@ export function VisitationPage() {
                 disabled={submitting}
                 className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-70"
               >
-                {submitting ? 'Saving...' : 'Save Visitation'}
+                {submitting ? 'Saving...' : entryType === 'Case Conference' ? 'Save Case Conference' : 'Save Visitation'}
               </button>
             </div>
           </form>
@@ -221,4 +241,3 @@ export function VisitationPage() {
     </div>
   )
 }
-
