@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../state/AuthContext'
+import { isPortugueseLanguage } from '../lib/locale'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `px-3 py-2 rounded-md text-sm font-medium ${
@@ -37,13 +38,13 @@ export function NavBar() {
               type="button"
               onClick={() => navigate(-1)}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-50 hover:text-surface-dark"
-              aria-label="Go back"
-              title="Go back"
+              aria-label={t('nav_go_back')}
+              title={t('nav_go_back')}
             >
               <span aria-hidden="true">←</span>
             </button>
             <Link to={homePath} className="font-semibold tracking-tight text-surface-dark">
-              Nova Path
+              {t('nav')}
             </Link>
           </div>
 
@@ -91,7 +92,7 @@ export function NavBar() {
             >
               <span aria-hidden="true">🌐</span>
               <span className="text-xs font-semibold uppercase tracking-wide">
-                {currentLanguage.toLowerCase().startsWith('pt') ? 'PT' : 'EN'}
+                {isPortuguese ? 'PT' : 'EN'}
               </span>
             </button>
             <div className="hidden text-sm text-surface-text sm:block">{user?.email}</div>
