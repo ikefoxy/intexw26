@@ -23,7 +23,7 @@ export function NavBar() {
   const isAdmin = user?.roles?.includes('Admin') ?? false
   const isDonor = user?.roles?.includes('Donor') ?? false
   const viewLabel = isAdmin ? t('nav_admin_view') : isDonor ? t('nav_donor_view') : t('nav_user_view')
-  const homePath = isAdmin ? '/admin' : isDonor ? '/donor/dashboard' : '/'
+  const homePath = isDonor ? '/donor/dashboard' : '/'
   const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
   const isPortuguese = isPortugueseLanguage(currentLanguage)
   const nextLanguage = isPortuguese ? 'en' : 'pt'
