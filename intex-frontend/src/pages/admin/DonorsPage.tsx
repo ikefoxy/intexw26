@@ -186,7 +186,7 @@ export function DonorsPage() {
           {canManage ? (
             <button
               onClick={() => navigate('/admin/donors/new')}
-              className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50"
+              className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark"
             >
               {t('donors_add_supporter')}
             </button>

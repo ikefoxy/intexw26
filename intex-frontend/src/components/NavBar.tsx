@@ -5,7 +5,7 @@ import { useAuth } from '../state/AuthContext'
 import { isPortugueseLanguage } from '../lib/locale'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `px-3 py-2 rounded-md text-sm font-medium ${
+  `px-3 py-2 rounded-lg text-sm font-semibold ${
     isActive ? 'bg-brand-100 text-brand' : 'text-surface-text hover:bg-brand-50 hover:text-surface-dark'
   }`
 
@@ -37,9 +37,9 @@ export function NavBar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-brand-100/40 bg-white/95 md:bg-white/20 md:backdrop-blur-md">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="flex h-14 items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="flex min-h-[68px] items-center justify-between gap-5 py-2">
+          <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -49,12 +49,12 @@ export function NavBar() {
             >
               <span aria-hidden="true">←</span>
             </button>
-            <Link to={homePath} className="font-semibold tracking-tight text-surface-dark">
+            <Link to={homePath} className="text-4 font-bold tracking-tight leading-tight text-surface-dark">
               {t('nav')}
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden items-center gap-1 lg:flex xl:gap-2">
             {canAccessOps ? (
               <>
                 <NavLink to="/admin" end className={navLinkClass}>
@@ -68,9 +68,6 @@ export function NavBar() {
                 </NavLink>
                 <NavLink to="/admin/reports" className={navLinkClass}>
                   {t('nav_reports')}
-                </NavLink>
-                <NavLink to="/donate" className={navLinkClass}>
-                  {t('nav_donate')}
                 </NavLink>
                 <NavLink to="/admin/social-media" className={navLinkClass}>
                   {t('nav_social_media')}
@@ -86,8 +83,8 @@ export function NavBar() {
             )}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-brand-100 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand md:inline-flex">
+          <div className="flex items-center gap-2 xl:gap-3">
+            <span className="hidden rounded-full border border-brand-100 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand lg:inline-flex">
               {viewLabel}
             </span>
             <button
@@ -102,10 +99,10 @@ export function NavBar() {
                 {isPortuguese ? 'PT' : 'EN'}
               </span>
             </button>
-            <div className="hidden text-sm text-surface-text sm:block">{user?.email}</div>
+            <div className="hidden max-w-[180px] truncate text-sm text-surface-text xl:block">{user?.email}</div>
             <button
               onClick={logout}
-              className="hidden rounded-md bg-brand px-3 py-2 text-sm font-semibold text-surface hover:bg-brand-dark md:inline-flex"
+              className="hidden rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark md:inline-flex"
             >
               {t('nav_logout')}
             </button>
@@ -153,9 +150,6 @@ export function NavBar() {
                   </NavLink>
                   <NavLink to="/admin/reports" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_reports')}
-                  </NavLink>
-                  <NavLink to="/donate" className={mobileNavLinkClass} onClick={closeMobileMenu}>
-                    {t('nav_donate')}
                   </NavLink>
                   <NavLink to="/admin/social-media" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_social_media')}
