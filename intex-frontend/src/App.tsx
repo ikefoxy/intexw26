@@ -21,6 +21,7 @@ import { ReportsPage } from './pages/admin/ReportsPage'
 import { SocialMediaPage } from './pages/admin/SocialMediaPage'
 import { AdminDonationsPage } from './pages/admin/AdminDonationsPage'
 import DonatePage from './pages/DonatePage'
+import DonorDashboard from './pages/DonorDashboard'
 
 
 export default function App() {
@@ -35,7 +36,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/impact" element={<ImpactDashboardPage />} />
 
-        <Route element={<ProtectedRoute allowedRoles={['Admin', 'Donor']} />}>
+        <Route element={<ProtectedRoute requiredRole="Admin" />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/residents" element={<CaseloadPage />} />
           <Route path="/admin/donors" element={<DonorsPage />} />
@@ -43,9 +44,6 @@ export default function App() {
           <Route path="/admin/donations" element={<AdminDonationsPage />} />
           <Route path="/admin/social-media" element={<SocialMediaPage />} />
           <Route path="/admin/social-media/ml-dashboard" element={<Navigate to="/admin/social-media" replace />} />
-        </Route>
-
-        <Route element={<ProtectedRoute requiredRole="Admin" />}>
           <Route path="/admin/residents/new" element={<NewResidentPage />} />
           <Route path="/admin/residents/:id" element={<ResidentDetailPage />} />
           <Route path="/admin/donors/new" element={<NewSupporterPage />} />
@@ -60,7 +58,7 @@ export default function App() {
           path="/donor/dashboard"
           element={
             <ProtectedRoute allowedRoles={['Donor']}>
-              <Navigate to="/admin" replace />
+              <DonorDashboard />
             </ProtectedRoute>
           }
         />

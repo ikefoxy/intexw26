@@ -14,6 +14,7 @@ export function DonatePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [formError, setFormError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   const [amount, setAmount] = useState('')
@@ -59,6 +60,7 @@ export function DonatePage() {
         campaignName: campaignName.trim() || undefined,
         notes: notes.trim() || undefined,
       })
+      setSuccessMessage(t('donate_success_popup', { amount: formatUsd(parsedAmount, i18n.resolvedLanguage) }))
       setAmount('')
       setCampaignName('')
       setNotes('')
@@ -93,6 +95,15 @@ export function DonatePage() {
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 rounded-xl border border-brand-100 bg-brand-50 p-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-surface-dark">{t('donate_who_title')}</h3>
+            <p className="mt-2 text-sm text-surface-text">{t('donate_who_intro')}</p>
+            <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
+              <div className="rounded-md border border-brand-100 bg-white px-3 py-2 text-sm text-surface-text">{t('donate_who_1')}</div>
+              <div className="rounded-md border border-brand-100 bg-white px-3 py-2 text-sm text-surface-text">{t('donate_who_2')}</div>
+              <div className="rounded-md border border-brand-100 bg-white px-3 py-2 text-sm text-surface-text">{t('donate_who_3')}</div>
+            </div>
+          </div>
           <h2 className="text-lg font-semibold text-surface-dark">{t('donate_form_title')}</h2>
           <form className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3" onSubmit={onSubmitDonation}>
             <input
@@ -189,6 +200,28 @@ export function DonatePage() {
           ) : null}
         </div>
       </main>
+
+      {successMessage ? (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-label={t('donate_success_title')}>
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45"
+            onClick={() => setSuccessMessage('')}
+            aria-label={t('donate_success_close')}
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-brand-100 bg-white p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-surface-dark">{t('donate_success_title')}</h2>
+            <p className="mt-2 text-sm text-surface-text">{successMessage}</p>
+            <button
+              type="button"
+              onClick={() => setSuccessMessage('')}
+              className="mt-5 inline-flex rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark"
+            >
+              {t('donate_success_close')}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

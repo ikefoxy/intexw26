@@ -1,23 +1,30 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarIcon, HeartIcon, TrendingUpIcon } from 'lucide-react'
-import { createMyDonation, getMyDonations, getPublicImpactSnapshot, type Donation } from '../lib/api'
-import { formatDate, formatUsd } from '../lib/locale'
+import { HeartIcon, ShieldCheckIcon, UsersIcon } from 'lucide-react'
+import { NavBar } from '../components/NavBar'
+import { getMyDonations, getPublicImpactSnapshot, type Donation } from '../lib/api'
+import { formatUsd } from '../lib/locale'
 import { useAuth } from '../state/AuthContext'
+
+function toVagueCount(value: number, step = 10): string {
+  if (!Number.isFinite(value) || value <= 0) return '0+'
+  if (value < step) return `${Math.floor(value)}+`
+  const rounded = Math.floor(value / step) * step
+  return `${rounded}+`
+}
 
 export function DonorDashboard() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [donations, setDonations] = useState<Donation[]>([])
+  const [residentsSupported, setResidentsSupported] = useState<number>(0)
   const [activeSafehouses, setActiveSafehouses] = useState<number>(0)
   const [totalDonors, setTotalDonors] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(true)
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>('')
-  const [formError, setFormError] = useState<string>('')
-  const [amount, setAmount] = useState('')
-  const [campaignName, setCampaignName] = useState('')
-  const [notes, setNotes] = useState('')
+
+  const donorName = user?.email?.split('@')[0] || t('donor_default_name')
 
   const lifetimeGiving = useMemo(
     () => donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0),
@@ -30,6 +37,7 @@ export function DonorDashboard() {
     try {
       const [donationRows, snapshot] = await Promise.all([getMyDonations(), getPublicImpactSnapshot()])
       setDonations(donationRows)
+      setResidentsSupported(snapshot.residentsSupported ?? 0)
       setActiveSafehouses(snapshot.activeSafehouses ?? 0)
       setTotalDonors(snapshot.totalDonors ?? 0)
     } catch (e) {
@@ -43,152 +51,80 @@ export function DonorDashboard() {
     void loadData()
   }, [])
 
-  async function onSubmitDonation(e: FormEvent) {
-    e.preventDefault()
-    setFormError('')
-    const parsedAmount = Number(amount)
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setFormError(t('donate_amount_error'))
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      await createMyDonation({
-        amount: parsedAmount,
-        campaignName: campaignName.trim() || undefined,
-        notes: notes.trim() || undefined,
-      })
-      setAmount('')
-      setCampaignName('')
-      setNotes('')
-      await loadData()
-    } catch (e) {
-      setFormError(e instanceof Error ? e.message : t('donate_submit_error'))
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   return (
-    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-surface-dark">
-          {t('donor_welcome_back')}, {user?.email?.split('@')[0] || t('donor_default_name')}
-        </h1>
-      </div>
+    <div className="min-h-full bg-brand-50 text-surface-dark">
+      <NavBar />
+      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{t('donor_dashboard_eyebrow')}</p>
+          <h1 className="mt-2 text-3xl font-bold text-surface-dark">
+            {t('donor_dashboard_title', { name: donorName })}
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-surface-text">
+            {t('donor_dashboard_intro')}
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link
+              to="/donate"
+              className="inline-flex rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark"
+            >
+              {t('nav_make_donation')}
+            </Link>
+            <span className="text-sm text-surface-text">{t('donor_dashboard_thank_you')}</span>
+          </div>
+        </section>
 
-      <section id="donate-form" className="bg-surface border border-slate-200 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-surface-dark">{t('donate_title')}</h2>
-        <form className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3" onSubmit={onSubmitDonation}>
-          <input
-            type="number"
-            min="1"
-            step="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder={t('donate_amount_placeholder')}
-            className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
-            required
-          />
-          <input
-            value={campaignName}
-            onChange={(e) => setCampaignName(e.target.value)}
-            placeholder={t('donate_campaign_placeholder')}
-            className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark disabled:opacity-60"
-          >
-            {submitting ? t('donate_submitting') : t('donate_submit')}
-          </button>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder={t('donate_notes_placeholder')}
-            className="md:col-span-3 rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
-            rows={2}
-          />
-        </form>
-        {formError && <p className="mt-2 text-sm text-red-500">{formError}</p>}
-      </section>
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-brand">
+              <UsersIcon className="h-5 w-5" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-surface-text">{t('donor_helped_people_label')}</p>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-surface-dark">{loading ? '...' : toVagueCount(residentsSupported, 25)}</p>
+            <p className="mt-1 text-sm text-surface-text">{t('donor_helped_people_caption')}</p>
+          </article>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
-          <div className="p-3 bg-brand-50 text-brand rounded-lg">
-            <HeartIcon className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-sm text-surface-text font-medium">{t('donate_lifetime_giving')}</p>
-            <p className="text-2xl font-bold text-surface-dark">{formatUsd(lifetimeGiving, i18n.resolvedLanguage)}</p>
-          </div>
-        </div>
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
-          <div className="p-3 bg-accent/10 text-accent rounded-lg">
-            <TrendingUpIcon className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-sm text-surface-text font-medium">{t('donor_safehouses_supported')}</p>
-            <p className="text-2xl font-bold text-surface-dark">{activeSafehouses}</p>
-          </div>
-        </div>
-        <div className="bg-surface border border-slate-200 p-6 rounded-xl shadow-sm flex items-center space-x-4">
-          <div className="p-3 bg-brand-50 text-brand rounded-lg">
-            <HeartIcon className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-sm text-surface-text font-medium">{t('donor_community_donors')}</p>
-            <p className="text-2xl font-bold text-surface-dark">{totalDonors}</p>
-          </div>
-        </div>
-      </div>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-brand">
+              <ShieldCheckIcon className="h-5 w-5" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-surface-text">{t('donor_safehouses_supported')}</p>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-surface-dark">{loading ? '...' : toVagueCount(activeSafehouses, 5)}</p>
+            <p className="mt-1 text-sm text-surface-text">{t('donor_safehouse_caption')}</p>
+          </article>
 
-      <div className="bg-surface border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-surface-dark flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-brand" />
-            {t('donate_history_title')}
-          </h2>
-          <button className="text-sm text-brand hover:text-brand-dark font-medium" type="button">{t('donor_download_receipt')}</button>
-        </div>
-        {loading && <p className="px-6 py-3 text-sm text-surface-text">{t('donate_history_loading')}</p>}
-        {!loading && error && <p className="px-6 py-3 text-sm text-red-500">{error}</p>}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-white border-b border-slate-200 text-sm text-surface-text">
-                <th className="px-6 py-3 font-medium">{t('table_date')}</th>
-                <th className="px-6 py-3 font-medium">{t('donor_fund_designation')}</th>
-                <th className="px-6 py-3 font-medium">{t('table_amount')}</th>
-                <th className="px-6 py-3 font-medium">{t('table_status')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {!loading && donations.length === 0 && (
-                <tr>
-                  <td className="px-6 py-4 text-surface-text" colSpan={4}>
-                    {t('donate_no_records')}
-                  </td>
-                </tr>
-              )}
-              {donations.map((d) => (
-                <tr key={d.donationId} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 text-surface-text">{formatDate(d.donationDate, i18n.resolvedLanguage)}</td>
-                  <td className="px-6 py-4 font-medium text-surface-dark">{d.campaignName || d.designation || t('donate_general_fund')}</td>
-                  <td className="px-6 py-4 text-surface-dark font-semibold">{formatUsd(Number(d.amount), i18n.resolvedLanguage)}</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full">
-                      {t('donate_completed')}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-brand">
+              <HeartIcon className="h-5 w-5" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-surface-text">{t('donor_community_donors')}</p>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-surface-dark">{loading ? '...' : toVagueCount(totalDonors, 25)}</p>
+            <p className="mt-1 text-sm text-surface-text">{t('donor_community_caption')}</p>
+          </article>
+
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-brand">
+              <HeartIcon className="h-5 w-5" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-surface-text">{t('donate_lifetime_giving')}</p>
+            </div>
+            <p className="mt-2 text-3xl font-bold text-surface-dark">
+              {loading ? '...' : formatUsd(lifetimeGiving, i18n.resolvedLanguage)}
+            </p>
+            <p className="mt-1 text-sm text-surface-text">{t('donor_lifetime_caption')}</p>
+          </article>
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-surface-dark">{t('donor_dashboard_where_title')}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-surface-text">{t('donor_dashboard_where_intro')}</p>
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-surface-text">{t('donor_dashboard_where_1')}</div>
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-surface-text">{t('donor_dashboard_where_2')}</div>
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-surface-text">{t('donor_dashboard_where_3')}</div>
+          </div>
+          {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+        </section>
+      </main>
     </div>
   )
 }

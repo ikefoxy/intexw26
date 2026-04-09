@@ -66,7 +66,13 @@ export function MfaSetupPage() {
       } else {
         const loggedInUser = await verifyMfa(code.trim())
         setSuccess('MFA setup complete. Signing you in...')
-        const target = consumePostLoginRedirect() ?? (loggedInUser.roles.includes('Admin') || loggedInUser.roles.includes('Donor') ? '/admin' : '/impact')
+        const target =
+          consumePostLoginRedirect() ??
+          (loggedInUser.roles.includes('Admin')
+            ? '/admin'
+            : loggedInUser.roles.includes('Donor')
+              ? '/donor/dashboard'
+              : '/impact')
         navigate(target, { replace: true })
       }
       setCode('')
@@ -78,7 +84,7 @@ export function MfaSetupPage() {
   }
 
   if (!user && !pendingMfa) return <Navigate to="/login" replace />
-  if (user && !hasRole('Admin')) return <Navigate to="/admin" replace />
+  if (user && !hasRole('Admin')) return <Navigate to="/donor/dashboard" replace />
 
   return (
     <div className="min-h-screen bg-brand-50 px-4 py-10 sm:px-6">
