@@ -35,13 +35,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
-        // Password complexity is enforced in auth endpoints per rubric requirement:
-        // minimum length 14, with no required character classes.
-        options.Password.RequiredLength = 1;
+        options.Password.RequiredLength = 14;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredUniqueChars = 1;
 
         options.Lockout.MaxFailedAccessAttempts = 5;
     })

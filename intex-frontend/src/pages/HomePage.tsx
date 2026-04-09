@@ -203,7 +203,7 @@ export default function HomePage() {
   const { token, user, logout } = useAuth();
   const { t, i18n: i18nInstance } = useTranslation();
   const [snapshot, setSnapshot] = useState<PublicImpactSnapshot | null>(null);
-  const heroSlides = [brazil1, brazil2, brazil3, brazil5];
+  const heroSlides = [brazil5, brazil3, brazil2, brazil1];
   const [activeSlide, setActiveSlide] = useState(0);
   const currentLanguage = i18nInstance.resolvedLanguage ?? "en";
   const isPortuguese = isPortugueseLanguage(currentLanguage);
