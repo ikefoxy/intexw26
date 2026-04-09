@@ -13,20 +13,20 @@ public static class EnvConnectionLoader
     public static void ApplyDatabaseConnectionFromEnvFile()
     {
         var path = FindEnvFilePath();
-        if (path is null)
-            return;
-
-        foreach (var raw in File.ReadAllLines(path))
+        if (path is not null)
         {
-            var line = raw.Trim();
-            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
-                continue;
-            var eq = line.IndexOf('=');
-            if (eq <= 0)
-                continue;
-            var key = line[..eq].Trim();
-            var value = line[(eq + 1)..].Trim();
-            Environment.SetEnvironmentVariable(key, value);
+            foreach (var raw in File.ReadAllLines(path))
+            {
+                var line = raw.Trim();
+                if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
+                    continue;
+                var eq = line.IndexOf('=');
+                if (eq <= 0)
+                    continue;
+                var key = line[..eq].Trim();
+                var value = line[(eq + 1)..].Trim();
+                Environment.SetEnvironmentVariable(key, value);
+            }
         }
 
         var server = Environment.GetEnvironmentVariable("DB_SERVER");
