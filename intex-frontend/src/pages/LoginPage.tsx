@@ -2,6 +2,7 @@ import { useId, useState, type CSSProperties, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../state/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const QUOTES = [
   {
@@ -153,6 +154,7 @@ export function LoginPage() {
   const { login, signup } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -195,23 +197,22 @@ export function LoginPage() {
   function validate(): boolean {
     const errors: typeof fieldErrors = {};
     if (!email.trim()) {
-      errors.email = "Email is required.";
+      errors.email = t("login_error_email_required");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email address.";
+      errors.email = t("login_error_email_invalid");
     }
     if (!password) {
-      errors.password = "Password is required.";
+      errors.password = t("login_error_password_required");
     } else if (mode === "signup") {
       if (!meetsPasswordPolicy(password)) {
-        errors.password =
-          "Use at least 12 characters with uppercase, lowercase, a number, and a symbol.";
+        errors.password = t("login_error_password_policy");
       }
     }
     if (mode === "signup") {
       if (!confirmPassword) {
-        errors.confirmPassword = "Please confirm your password.";
+        errors.confirmPassword = t("login_error_confirm_password_required");
       } else if (confirmPassword !== password) {
-        errors.confirmPassword = "Passwords do not match.";
+        errors.confirmPassword = t("login_error_password_mismatch");
       }
     }
     setFieldErrors(errors);
@@ -243,7 +244,7 @@ export function LoginPage() {
       }
     } catch (err: unknown) {
       setServerError(
-        err instanceof Error ? err.message : "An unexpected error occurred."
+        err instanceof Error ? err.message : t("login_error_unexpected")
       );
     } finally {
       setLoading(false);
@@ -461,7 +462,7 @@ export function LoginPage() {
       >
         <div className="absolute left-6 top-6 sm:left-10 sm:top-8">
           <Link to="/" className="text-sm font-medium text-brand hover:text-brand-dark">
-            ← Back to home
+            {t("back_to_home")}
           </Link>
         </div>
         <div
@@ -502,12 +503,14 @@ export function LoginPage() {
 
           <div className="mb-9">
             <h1 className="font-display font-bold text-3xl text-surface-dark mb-2 tracking-tight">
-              {mode === "signin" ? "Welcome back" : "Create an account"}
+              {mode === "signin"
+                ? t("login_title_welcome_back")
+                : t("login_title_create_account")}
             </h1>
             <p className="text-surface-text text-sm">
               {mode === "signin"
-                ? "Sign in to access the Nova Path portal."
-                : "Register as a donor. You can view impact; admin access is invite-only."}
+                ? t("login_subtitle_signin")
+                : t("login_subtitle_signup")}
             </p>
           </div>
 
@@ -515,13 +518,13 @@ export function LoginPage() {
             onSubmit={handleSubmit}
             noValidate
             aria-label={
-              mode === "signin" ? "Sign in to Nova Path" : "Create a Nova Path account"
+              mode === "signin" ? t("login_form_aria_signin") : t("login_form_aria_signup")
             }
           >
             <div className="flex flex-col gap-5">
               <Field
                 id={emailId}
-                label="Email address"
+                label={t("login_email_label")}
                 type="email"
                 value={email}
                 onChange={(v) => {
@@ -531,14 +534,14 @@ export function LoginPage() {
                   setServerError("");
                 }}
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("login_email_placeholder")}
                 error={fieldErrors.email}
                 disabled={loading}
               />
 
               <Field
                 id={passwordId}
-                label="Password"
+                label={t("login_password_label")}
                 type="password"
                 value={password}
                 onChange={(v) => {
@@ -548,7 +551,7 @@ export function LoginPage() {
                   setServerError("");
                 }}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                placeholder="••••••••"
+                placeholder={t("login_password_placeholder")}
                 error={fieldErrors.password}
                 disabled={loading}
               />
@@ -556,7 +559,7 @@ export function LoginPage() {
               {mode === "signup" && (
                 <Field
                   id={confirmPasswordId}
-                  label="Confirm password"
+                  label={t("login_confirm_password_label")}
                   type="password"
                   value={confirmPassword}
                   onChange={(v) => {
@@ -566,7 +569,7 @@ export function LoginPage() {
                     setServerError("");
                   }}
                   autoComplete="new-password"
-                  placeholder="••••••••"
+                  placeholder={t("login_password_placeholder")}
                   error={fieldErrors.confirmPassword}
                   disabled={loading}
                 />
@@ -578,7 +581,7 @@ export function LoginPage() {
                     href="/forgot-password"
                     className="text-[12px] text-surface-text hover:text-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand rounded"
                   >
-                    Forgot password?
+                    {t("login_forgot_password")}
                   </a>
                 </div>
               )}
@@ -634,11 +637,11 @@ export function LoginPage() {
                 aria-label={
                   loading
                     ? mode === "signup"
-                      ? "Creating account, please wait"
-                      : "Signing in, please wait"
+                      ? t("login_aria_creating_account")
+                      : t("login_aria_signing_in")
                     : mode === "signup"
-                      ? "Create account"
-                      : "Sign in"
+                      ? t("login_submit_signup")
+                      : t("login_submit_signin")
                 }
                 aria-busy={loading}
                 className="relative mt-1 w-full py-3.5 rounded-xl font-semibold text-white text-sm overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-brand-50 disabled:cursor-not-allowed disabled:opacity-80 transition-opacity bg-brand hover:bg-brand-dark"
@@ -688,11 +691,13 @@ export function LoginPage() {
                           strokeLinecap="round"
                         />
                       </svg>
-                      {mode === "signup" ? "Creating account..." : "Signing in..."}
+                      {mode === "signup"
+                        ? t("login_loading_creating_account")
+                        : t("login_loading_signing_in")}
                     </>
                   ) : (
                     <>
-                      {mode === "signup" ? "Create account" : "Sign in"}
+                      {mode === "signup" ? t("login_submit_signup") : t("login_submit_signin")}
                       <svg
                         width="14"
                         height="14"
@@ -718,7 +723,7 @@ export function LoginPage() {
           <p className="mt-6 text-center text-sm text-surface-text">
             {mode === "signin" ? (
               <>
-                New here?{" "}
+                {t("login_new_here")}{" "}
                 <button
                   type="button"
                   className="font-semibold text-brand hover:underline"
@@ -729,12 +734,12 @@ export function LoginPage() {
                     setConfirmPassword("");
                   }}
                 >
-                  Create an account
+                  {t("login_cta_create_account")}
                 </button>
               </>
             ) : (
               <>
-                Already have an account?{" "}
+                {t("login_already_have_account")}{" "}
                 <button
                   type="button"
                   className="font-semibold text-brand hover:underline"
@@ -745,21 +750,21 @@ export function LoginPage() {
                     setConfirmPassword("");
                   }}
                 >
-                  Sign in
+                  {t("login_cta_sign_in")}
                 </button>
               </>
             )}
           </p>
 
           <p className="mt-6 text-center text-[12px] text-slate-600">
-            Contact{" "}
+            {t("login_contact_prefix")}{" "}
             <a
               href="mailto:admin@novapath.org.br"
               className="text-surface-text hover:text-brand transition-colors underline underline-offset-2"
             >
               admin@novapath.org.br
             </a>{" "}
-            for access issues.
+            {t("login_contact_suffix")}
           </p>
         </motion.div>
       </main>
