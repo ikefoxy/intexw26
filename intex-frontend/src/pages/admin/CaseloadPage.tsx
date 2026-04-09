@@ -258,14 +258,9 @@ export function CaseloadPage() {
     }
   }, [caseStatus, safehouseId, caseCategory, riskLevel, socialWorker, debouncedSearch, t])
 
+  /** Simple: Name, Category, Risk, Social Worker, Actions. Detailed: same, then Case No., Safehouse, Status, then Actions. */
   const allColumnDefs = useMemo<Array<{ key: CaseloadSortKey } & ColumnDef<Resident>>>(
     () => [
-      {
-        key: 'caseNo',
-        header: t('caseload_col_case_no'),
-        sortValue: (r) => r.caseControlNo,
-        render: (r) => r.caseControlNo,
-      },
       {
         key: 'name',
         header: t('caseload_col_name'),
@@ -275,12 +270,6 @@ export function CaseloadPage() {
             {r.internalCode}
           </span>
         ),
-      },
-      {
-        key: 'safehouse',
-        header: t('caseload_col_safehouse'),
-        sortValue: (r) => r.safehouse?.name ?? String(r.safehouseId),
-        render: (r) => r.safehouse?.name ?? String(r.safehouseId),
       },
       {
         key: 'category',
@@ -299,16 +288,28 @@ export function CaseloadPage() {
         ),
       },
       {
-        key: 'status',
-        header: t('caseload_col_status'),
-        sortValue: (r) => pickCaseStatusField(r),
-        render: (r) => pickCaseStatusField(r),
-      },
-      {
         key: 'socialWorker',
         header: t('caseload_col_social_worker'),
         sortValue: (r) => r.assignedSocialWorker,
         render: (r) => r.assignedSocialWorker,
+      },
+      {
+        key: 'caseNo',
+        header: t('caseload_col_case_no'),
+        sortValue: (r) => r.caseControlNo,
+        render: (r) => r.caseControlNo,
+      },
+      {
+        key: 'safehouse',
+        header: t('caseload_col_safehouse'),
+        sortValue: (r) => r.safehouse?.name ?? String(r.safehouseId),
+        render: (r) => r.safehouse?.name ?? String(r.safehouseId),
+      },
+      {
+        key: 'status',
+        header: t('caseload_col_status'),
+        sortValue: (r) => pickCaseStatusField(r),
+        render: (r) => pickCaseStatusField(r),
       },
       ...(canManage
         ? [{
