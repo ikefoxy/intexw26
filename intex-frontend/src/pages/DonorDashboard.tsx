@@ -80,7 +80,7 @@ export function DonorDashboard() {
               <UsersIcon className="h-5 w-5" />
               <p className="text-xs font-semibold uppercase tracking-wide text-surface-text">{t('donor_helped_people_label')}</p>
             </div>
-            <p className="mt-2 text-3xl font-bold text-surface-dark">{loading ? '...' : toVagueCount(residentsSupported, 25)}</p>
+            <p className="mt-2 text-3xl font-bold text-surface-dark">{loading ? '...' : toVagueCount(residentsSupported, 5)}</p>
             <p className="mt-1 text-sm text-surface-text">{t('donor_helped_people_caption')}</p>
           </article>
 

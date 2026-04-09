@@ -18,6 +18,24 @@ public class ProcessRecordingsController : ControllerBase
         _db = db;
     }
 
+    /// <summary>Recent rows + total count for dashboards without loading full history.</summary>
+    [HttpGet("resident/{residentId:int}/preview")]
+    public async Task<ActionResult<object>> GetPreviewForResident(int residentId, [FromQuery] int take = 5)
+    {
+        take = take is < 1 or > 50 ? 5 : take;
+
+        var totalCount = await _db.ProcessRecordings.AsNoTracking()
+            .CountAsync(r => r.ResidentId == residentId);
+
+        var items = await _db.ProcessRecordings.AsNoTracking()
+            .Where(r => r.ResidentId == residentId)
+            .OrderByDescending(r => r.SessionDate)
+            .Take(take)
+            .ToListAsync();
+
+        return Ok(new { items, totalCount });
+    }
+
     [HttpGet("resident/{residentId:int}")]
     public async Task<ActionResult<IReadOnlyList<ProcessRecording>>> GetForResident(int residentId)
     {

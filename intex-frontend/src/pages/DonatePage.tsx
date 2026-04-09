@@ -20,6 +20,11 @@ export function DonatePage() {
   const [amount, setAmount] = useState('')
   const [campaignName, setCampaignName] = useState('')
   const [notes, setNotes] = useState('')
+  const [pendingDonation, setPendingDonation] = useState<{
+    amount: number
+    campaignName?: string
+    notes?: string
+  } | null>(null)
 
   const lifetimeGiving = useMemo(
     () => donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0),
@@ -43,7 +48,7 @@ export function DonatePage() {
     void loadData()
   }, [])
 
-  async function onSubmitDonation(e: FormEvent) {
+  function onSubmitDonation(e: FormEvent) {
     e.preventDefault()
     setFormError('')
 
@@ -52,22 +57,32 @@ export function DonatePage() {
       setFormError(t('donate_amount_error'))
       return
     }
-    const confirmed = window.confirm(`Are you sure you want to submit a donation of ${formatUsd(parsedAmount, i18n.resolvedLanguage)} to Nova Path?`)
-    if (!confirmed) return
+    setPendingDonation({
+      amount: parsedAmount,
+      campaignName: campaignName.trim() || undefined,
+      notes: notes.trim() || undefined,
+    })
+  }
 
+  async function submitConfirmedDonation() {
+    if (!pendingDonation) return
     setSubmitting(true)
+    setFormError('')
     try {
       await createMyDonation({
-        amount: parsedAmount,
-        campaignName: campaignName.trim() || undefined,
-        notes: notes.trim() || undefined,
+        amount: pendingDonation.amount,
+        campaignName: pendingDonation.campaignName,
+        notes: pendingDonation.notes,
       })
-      setSuccessMessage(t('donate_success_popup', { amount: formatUsd(parsedAmount, i18n.resolvedLanguage) }))
+      const amt = pendingDonation.amount
+      setPendingDonation(null)
+      setSuccessMessage(t('donate_success_popup', { amount: formatUsd(amt, i18n.resolvedLanguage) }))
       setAmount('')
       setCampaignName('')
       setNotes('')
       await loadData()
     } catch (e) {
+      setPendingDonation(null)
       const message = e instanceof Error ? e.message : t('donate_submit_error')
       if (message.includes('403')) {
         setFormError(t('donate_unauthorized'))
@@ -126,7 +141,7 @@ export function DonatePage() {
             />
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || pendingDonation !== null}
               className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark disabled:opacity-60"
             >
               {submitting ? t('donate_submitting') : t('donate_submit')}
@@ -202,6 +217,50 @@ export function DonatePage() {
           ) : null}
         </div>
       </main>
+
+      {pendingDonation ? (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="donate-confirm-title"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45"
+            onClick={() => !submitting && setPendingDonation(null)}
+            aria-label={t('donate_confirm_cancel')}
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-brand-100 bg-white p-6 shadow-2xl">
+            <h2 id="donate-confirm-title" className="text-xl font-semibold text-surface-dark">
+              {t('donate_confirm_title')}
+            </h2>
+            <p className="mt-2 text-sm text-surface-text">
+              {t('donate_confirm_submit', {
+                amount: formatUsd(pendingDonation.amount, i18n.resolvedLanguage),
+              })}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => setPendingDonation(null)}
+                className="rounded-md border border-brand-100 px-4 py-2 text-sm font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-50"
+              >
+                {t('donate_confirm_cancel')}
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => void submitConfirmedDonation()}
+                className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-surface hover:bg-brand-dark disabled:opacity-60"
+              >
+                {submitting ? t('donate_submitting') : t('donate_confirm_yes')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {successMessage ? (
         <div className="fixed inset-0 z-[110] flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-label={t('donate_success_title')}>

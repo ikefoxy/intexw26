@@ -150,16 +150,121 @@ public class ResidentsController : ControllerBase
         return Ok(statuses);
     }
 
+    /// <summary>Next internal code after the highest existing <c>LS-####</c> style value (default <c>LS-0001</c> if none).</summary>
+    [HttpGet("next-internal-code")]
+    public async Task<ActionResult<object>> GetNextInternalCode()
+    {
+        const string prefix = "LS-";
+        const int minDigits = 4;
+
+        var codes = await _db.Residents.AsNoTracking()
+            .Select(r => r.InternalCode)
+            .ToListAsync();
+
+        var maxNum = 0;
+        var maxWidth = minDigits;
+
+        foreach (var raw in codes)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) continue;
+            var code = raw.Trim();
+            if (!code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+
+            var suffix = code[prefix.Length..];
+            if (suffix.Length == 0 || !suffix.All(char.IsDigit)) continue;
+            if (!int.TryParse(suffix, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var n))
+                continue;
+
+            maxNum = Math.Max(maxNum, n);
+            maxWidth = Math.Max(maxWidth, suffix.Length);
+        }
+
+        var next = maxNum + 1;
+        var digitCount = Math.Max(maxWidth, next.ToString(System.Globalization.CultureInfo.InvariantCulture).Length);
+        var padded = next.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(digitCount, '0');
+        return Ok(new { internalCode = $"{prefix}{padded}" });
+    }
+
+    /// <summary>Next case control number in <c>C0000</c> form: letter C plus four digits, one higher than the largest existing match (starts at <c>C0001</c>).</summary>
+    [HttpGet("suggested-case-control-no")]
+    public async Task<ActionResult<object>> GetSuggestedCaseControlNo(CancellationToken ct)
+    {
+        const int maxSuffix = 9999;
+
+        var codes = await _db.Residents.AsNoTracking()
+            .Select(r => r.CaseControlNo)
+            .ToListAsync(ct);
+
+        var maxNum = 0;
+        var foundAny = false;
+        foreach (var raw in codes)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) continue;
+            var code = raw.Trim();
+            if (code.Length != 5) continue;
+            if (!code.StartsWith('C') && !code.StartsWith('c')) continue;
+            var suffix = code[1..];
+            if (suffix.Length != 4 || !suffix.All(char.IsDigit)) continue;
+            if (!int.TryParse(suffix, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var n))
+                continue;
+            foundAny = true;
+            maxNum = Math.Max(maxNum, n);
+        }
+
+        var next = foundAny ? maxNum + 1 : 1;
+        if (next > maxSuffix)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { message = "Case control numbers are exhausted (C0001–C9999)." });
+        }
+
+        var candidate = $"C{next.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(4, '0')}";
+        var taken = await _db.Residents.AsNoTracking()
+            .AnyAsync(r => r.CaseControlNo == candidate, ct);
+        if (!taken)
+            return Ok(new { caseControlNo = candidate });
+
+        // Rare: gap / casing duplicate; scan upward for a free C#### slot
+        for (var n = next + 1; n <= maxSuffix; n++)
+        {
+            var alt = $"C{n.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(4, '0')}";
+            if (!await _db.Residents.AsNoTracking().AnyAsync(r => r.CaseControlNo == alt, ct))
+                return Ok(new { caseControlNo = alt });
+        }
+
+        return StatusCode(StatusCodes.Status503ServiceUnavailable,
+            new { message = "Could not allocate a unique case control number." });
+    }
+
+    /// <summary>Resident row + safehouse only. Use preview/count endpoints for related lists (large payloads were stalling the detail page).</summary>
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Resident>> GetResident(int id)
     {
         var resident = await _db.Residents.AsNoTracking()
             .Include(r => r.Safehouse)
-            .Include(r => r.ProcessRecordings)
-            .Include(r => r.HomeVisitations)
             .FirstOrDefaultAsync(r => r.ResidentId == id);
 
         return resident is null ? NotFound() : Ok(resident);
+    }
+
+    [HttpGet("{id:int}/related-counts")]
+    public async Task<ActionResult<object>> GetResidentRelatedCounts(int id)
+    {
+        var exists = await _db.Residents.AsNoTracking().AnyAsync(r => r.ResidentId == id);
+        if (!exists) return NotFound();
+
+        var educationRecords = await _db.EducationRecords.AsNoTracking().CountAsync(e => e.ResidentId == id);
+        var healthWellbeingRecords = await _db.HealthWellbeingRecords.AsNoTracking().CountAsync(h => h.ResidentId == id);
+        var incidentReports = await _db.IncidentReports.AsNoTracking().CountAsync(i => i.ResidentId == id);
+        var interventionPlans = await _db.InterventionPlans.AsNoTracking().CountAsync(p => p.ResidentId == id);
+
+        return Ok(new
+        {
+            educationRecords,
+            healthWellbeingRecords,
+            incidentReports,
+            interventionPlans,
+        });
     }
 
     [HttpPost]
@@ -269,12 +374,15 @@ public class ResidentsController : ControllerBase
             });
         }
 
+        var averageRiskScore = scoresByResidentId.Values.Average();
+
         if (!scoresByResidentId.TryGetValue(id, out var riskScore))
         {
             return Ok(new
             {
                 residentId = id,
                 riskScore = (decimal?)null,
+                averageRiskScore,
                 message = "No risk score for this resident in the model output.",
                 modelUsed = ResidentRecommendationsFileName,
                 peerMatches = Array.Empty<object>(),
@@ -286,6 +394,7 @@ public class ResidentsController : ControllerBase
         {
             residentId = id,
             riskScore,
+            averageRiskScore,
             message = (string?)null,
             modelUsed = ResidentRecommendationsFileName,
             peerMatches = Array.Empty<object>(),

@@ -18,6 +18,23 @@ public class HomeVisitationsController : ControllerBase
         _db = db;
     }
 
+    [HttpGet("resident/{residentId:int}/preview")]
+    public async Task<ActionResult<object>> GetPreviewForResident(int residentId, [FromQuery] int take = 5)
+    {
+        take = take is < 1 or > 50 ? 5 : take;
+
+        var totalCount = await _db.HomeVisitations.AsNoTracking()
+            .CountAsync(v => v.ResidentId == residentId);
+
+        var items = await _db.HomeVisitations.AsNoTracking()
+            .Where(v => v.ResidentId == residentId)
+            .OrderByDescending(v => v.VisitDate)
+            .Take(take)
+            .ToListAsync();
+
+        return Ok(new { items, totalCount });
+    }
+
     [HttpGet("resident/{residentId:int}")]
     public async Task<ActionResult<IReadOnlyList<HomeVisitation>>> GetForResident(int residentId)
     {

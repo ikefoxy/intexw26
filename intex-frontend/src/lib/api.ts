@@ -93,6 +93,8 @@ export type ResidentMlRecommendations = {
   modelUsed?: string
   /** Model risk score from resident_recommendations.json (0–1 scale in sample data). */
   riskScore?: number | null
+  /** Mean of all risk scores in the model output file (same scale as riskScore). */
+  averageRiskScore?: number | null
   message?: string | null
   peerMatches: ResidentRecommendation[]
   suggestedInterventions: string[]
@@ -104,6 +106,7 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
       residentId?: number
       modelUsed?: string
       riskScore?: number | null
+      averageRiskScore?: number | null
       message?: string | null
       peerMatches?: ResidentRecommendation[]
       suggestedInterventions?: string[]
@@ -126,6 +129,10 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
       residentId: res.data.residentId ?? id,
       modelUsed: res.data.modelUsed,
       riskScore: res.data.riskScore ?? null,
+      averageRiskScore:
+        res.data.averageRiskScore != null && Number.isFinite(res.data.averageRiskScore)
+          ? res.data.averageRiskScore
+          : null,
       message: res.data.message ?? null,
       peerMatches,
       suggestedInterventions,
@@ -168,6 +175,42 @@ export type HomeVisitation = {
   followUpNeeded: boolean
   followUpNotes?: string | null
   visitOutcome: string
+}
+
+export type ActivityPreview<T> = { items: T[]; totalCount: number }
+
+export type ResidentRelatedCounts = {
+  educationRecords: number
+  healthWellbeingRecords: number
+  incidentReports: number
+  interventionPlans: number
+}
+
+export async function getProcessRecordingsPreview(
+  residentId: number,
+  take = 5
+): Promise<ActivityPreview<ProcessRecording>> {
+  const res = await api.get<ActivityPreview<ProcessRecording>>(
+    `/api/process-recordings/resident/${residentId}/preview`,
+    { params: { take } }
+  )
+  return res.data
+}
+
+export async function getHomeVisitationsPreview(
+  residentId: number,
+  take = 5
+): Promise<ActivityPreview<HomeVisitation>> {
+  const res = await api.get<ActivityPreview<HomeVisitation>>(
+    `/api/home-visitations/resident/${residentId}/preview`,
+    { params: { take } }
+  )
+  return res.data
+}
+
+export async function getResidentRelatedCounts(residentId: number): Promise<ResidentRelatedCounts> {
+  const res = await api.get<ResidentRelatedCounts>(`/api/residents/${residentId}/related-counts`)
+  return res.data
 }
 
 export async function getProcessRecordings(residentId: number): Promise<ProcessRecording[]> {
@@ -332,8 +375,14 @@ export async function createMyDonation(payload: {
 }
 
 export async function getPublicImpactSnapshot(): Promise<PublicImpactSnapshot> {
-  const res = await api.get<PublicImpactSnapshot>('/api/public/stats')
-  return res.data
+  const res = await api.get<
+    PublicImpactSnapshot & { totalGirlsServed?: number; TotalGirlsServed?: number }
+  >('/api/public/stats')
+  const d = res.data
+  const fromApi = d.residentsSupported ?? d.totalGirlsServed ?? d.TotalGirlsServed
+  const residentsSupported =
+    typeof fromApi === 'number' && Number.isFinite(fromApi) ? fromApi : d.residentsSupported
+  return { ...d, residentsSupported }
 }
 
 export async function getSupporterById(supporterId: number): Promise<SupporterDetail> {

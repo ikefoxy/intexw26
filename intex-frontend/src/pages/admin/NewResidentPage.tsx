@@ -33,6 +33,7 @@ export function NewResidentPage() {
   const [loadingSafehouses, setLoadingSafehouses] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loadingResidentDefaults, setLoadingResidentDefaults] = useState(true)
   const [form, setForm] = useState<ResidentFormState>({
     caseControlNo: '',
     internalCode: '',
@@ -73,6 +74,43 @@ export function NewResidentPage() {
         if (!cancelled) setError('Unable to load safehouses.')
       } finally {
         if (!cancelled) setLoadingSafehouses(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    setLoadingResidentDefaults(true)
+    ;(async () => {
+      try {
+        const [internalRes, caseRes] = await Promise.allSettled([
+          api.get<{ internalCode: string }>('/api/residents/next-internal-code'),
+          api.get<{ caseControlNo: string }>('/api/residents/suggested-case-control-no'),
+        ])
+        if (cancelled) return
+
+        setForm((prev) => {
+          let internalCode = prev.internalCode
+          let caseControlNo = prev.caseControlNo
+          if (internalRes.status === 'fulfilled' && internalRes.value.data?.internalCode && !internalCode.trim()) {
+            internalCode = internalRes.value.data.internalCode
+          }
+          if (caseRes.status === 'fulfilled' && caseRes.value.data?.caseControlNo) {
+            caseControlNo = caseRes.value.data.caseControlNo
+          }
+          return { ...prev, internalCode, caseControlNo }
+        })
+
+        if (caseRes.status !== 'fulfilled' || !caseRes.value.data?.caseControlNo) {
+          setError('Unable to assign a unique case control number. Refresh the page and try again.')
+        }
+      } catch {
+        if (!cancelled) setError('Unable to load default resident identifiers. Refresh the page and try again.')
+      } finally {
+        if (!cancelled) setLoadingResidentDefaults(false)
       }
     })()
     return () => {
@@ -158,15 +196,17 @@ export function NewResidentPage() {
           <div className="grid gap-3 md:grid-cols-2">
             <input
               value={form.caseControlNo}
-              onChange={(e) => update('caseControlNo', e.target.value)}
-              placeholder="Case Control No"
+              readOnly
+              aria-readonly="true"
+              placeholder={loadingResidentDefaults ? 'Assigning case number…' : 'Case control no. (C0001)'}
               required
-              className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
+              title="Assigned automatically; cannot be changed here"
+              className="cursor-default rounded-md border border-brand-100 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
             />
             <input
               value={form.internalCode}
               onChange={(e) => update('internalCode', e.target.value)}
-              placeholder="Internal Code"
+              placeholder="Internal code (e.g. LS-0061)"
               required
               className="rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm"
             />
@@ -305,7 +345,13 @@ export function NewResidentPage() {
           <div className="mt-5 flex gap-3">
             <button
               type="submit"
-              disabled={saving || loadingSafehouses || safehouses.length === 0}
+              disabled={
+                saving ||
+                loadingSafehouses ||
+                safehouses.length === 0 ||
+                loadingResidentDefaults ||
+                !form.caseControlNo.trim()
+              }
               className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Create Resident'}

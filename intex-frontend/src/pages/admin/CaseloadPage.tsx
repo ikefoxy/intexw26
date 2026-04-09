@@ -89,6 +89,8 @@ const SIMPLE_SORTABLE_KEYS = new Set<CaseloadSortKey>(['name', 'risk', 'category
 
 const RISK_LEVEL_OPTIONS = ['Low', 'Moderate', 'High', 'Critical']
 
+const TABLE_PAGE_SIZE = 25
+
 const filterControlClass =
   'rounded-md border border-brand-100 bg-surface px-3 py-2 text-sm text-surface-text'
 
@@ -141,6 +143,11 @@ export function CaseloadPage() {
     direction: 'asc',
   })
   const [detailedView, setDetailedView] = useState(false)
+  const [tablePage, setTablePage] = useState(1)
+
+  useEffect(() => {
+    setTablePage(1)
+  }, [caseStatus, safehouseId, caseCategory, riskLevel, socialWorker, debouncedSearch])
 
   useEffect(() => {
     if (detailedView) return
@@ -374,6 +381,17 @@ export function CaseloadPage() {
     })
   }, [displayRows, sort.column, sort.direction, columnDefs])
 
+  const totalTablePages = Math.max(1, Math.ceil(sortedRows.length / TABLE_PAGE_SIZE))
+
+  useEffect(() => {
+    setTablePage((p) => Math.min(p, totalTablePages))
+  }, [totalTablePages])
+
+  const pagedRows = useMemo(() => {
+    const start = (tablePage - 1) * TABLE_PAGE_SIZE
+    return sortedRows.slice(start, start + TABLE_PAGE_SIZE)
+  }, [sortedRows, tablePage])
+
   const handleSortColumn = useCallback(
     (header: string) => {
       const selected = columnDefs.find((c) => c.header === header)
@@ -568,13 +586,11 @@ export function CaseloadPage() {
           ) : (
             <DataTable
               columns={columns}
-              rows={sortedRows}
-              page={1}
-              pageSize={Math.max(sortedRows.length, 1)}
+              rows={pagedRows}
+              page={tablePage}
+              pageSize={TABLE_PAGE_SIZE}
               totalCount={sortedRows.length}
-              onPageChange={() => {
-                // Residents view intentionally renders all rows; pagination controls are inert.
-              }}
+              onPageChange={setTablePage}
               sort={{
                 column: activeSortHeader,
                 direction: sort.direction,
