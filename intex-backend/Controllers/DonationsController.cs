@@ -80,6 +80,34 @@ public class DonationsController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("my-history")]
+    [Authorize(Roles = "Donor")]
+    public async Task<ActionResult<IReadOnlyList<Donation>>> GetMyDonationHistory()
+    {
+        var email = User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new { message = "Could not resolve current user identity." });
+        }
+
+        var supporterId = await _db.Supporters.AsNoTracking()
+            .Where(s => s.Email == email)
+            .Select(s => (int?)s.SupporterId)
+            .FirstOrDefaultAsync();
+
+        if (!supporterId.HasValue)
+        {
+            return Ok(Array.Empty<Donation>());
+        }
+
+        var items = await _db.Donations.AsNoTracking()
+            .Where(d => d.SupporterId == supporterId.Value)
+            .OrderByDescending(d => d.DonationDate)
+            .ToListAsync();
+
+        return Ok(items);
+    }
+
     [HttpPost("me")]
     [Authorize]
     public async Task<ActionResult<Donation>> CreateMyDonation([FromBody] DonorDonationRequest req)

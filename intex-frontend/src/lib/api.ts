@@ -91,6 +91,9 @@ export type ResidentRecommendation = {
 export type ResidentMlRecommendations = {
   residentId: number
   modelUsed?: string
+  /** Model risk score from resident_recommendations.json (0–1 scale in sample data). */
+  riskScore?: number | null
+  message?: string | null
   peerMatches: ResidentRecommendation[]
   suggestedInterventions: string[]
 }
@@ -100,6 +103,8 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
     const res = await api.get<{
       residentId?: number
       modelUsed?: string
+      riskScore?: number | null
+      message?: string | null
       peerMatches?: ResidentRecommendation[]
       suggestedInterventions?: string[]
       recommendedResidentIds?: number[]
@@ -120,6 +125,8 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
     return {
       residentId: res.data.residentId ?? id,
       modelUsed: res.data.modelUsed,
+      riskScore: res.data.riskScore ?? null,
+      message: res.data.message ?? null,
       peerMatches,
       suggestedInterventions,
     }

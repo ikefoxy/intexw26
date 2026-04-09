@@ -65,12 +65,12 @@ export function ResidentDetailPage() {
         </div>
 
         <section className="mt-6 rounded-2xl bg-surface border border-slate-200 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-surface-dark">AI-Assisted Peer Matches</h2>
+          <h2 className="text-lg font-semibold text-surface-dark">Resident risk score (model output)</h2>
           <p className="mt-1 text-sm text-surface-text">
-            Suggested peer connections based on the latest recommendation model output.
+            Risk score loaded from <code className="rounded bg-slate-100 px-1">resident_recommendations.json</code> produced by the ML pipeline.
           </p>
           {recommendations?.modelUsed && (
-            <p className="mt-1 text-xs text-surface-text">Model: {recommendations.modelUsed}</p>
+            <p className="mt-1 text-xs text-surface-text">Source: {recommendations.modelUsed}</p>
           )}
 
           {recommendationsLoading ? (
@@ -81,6 +81,12 @@ export function ResidentDetailPage() {
             <p className="mt-4 text-sm text-surface-text">
               No recommendation data is available yet for this resident.
             </p>
+          ) : recommendations.riskScore != null && Number.isFinite(recommendations.riskScore) ? (
+            <p className="mt-4 text-lg font-semibold text-surface-dark">
+              Risk score: {recommendations.riskScore.toFixed(4)}
+            </p>
+          ) : recommendations.message ? (
+            <p className="mt-4 text-sm text-surface-text">{recommendations.message}</p>
           ) : recommendations.peerMatches.length === 0 ? (
             <p className="mt-4 text-sm text-surface-text">No peer matches were found for this resident.</p>
           ) : (

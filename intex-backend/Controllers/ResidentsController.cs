@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Intex.Backend.Data;
 using Intex.Backend.Dtos;
 using Intex.Backend.Models;
@@ -9,14 +10,23 @@ namespace Intex.Backend.Controllers;
 
 [ApiController]
 [Route("api/residents")]
-[Authorize(Roles = "Admin,Donor")]
+[Authorize(Roles = "Admin")]
 public class ResidentsController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
+    private const string ResidentRecommendationsFileName = "resident_recommendations.json";
 
-    public ResidentsController(ApplicationDbContext db)
+    private readonly ApplicationDbContext _db;
+    private readonly IWebHostEnvironment _env;
+    private readonly ILogger<ResidentsController> _logger;
+
+    public ResidentsController(
+        ApplicationDbContext db,
+        IWebHostEnvironment env,
+        ILogger<ResidentsController> logger)
     {
         _db = db;
+        _env = env;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -138,92 +148,148 @@ public class ResidentsController : ControllerBase
             return NotFound(new { message = "Resident not found." });
         }
 
-        var peerCandidates = await _db.Residents
-            .AsNoTracking()
-            .Where(r => r.ResidentId != id)
-            .Select(r => new
+        var path = Path.Combine(_env.ContentRootPath, ResidentRecommendationsFileName);
+        if (!System.IO.File.Exists(path))
+        {
+            return Ok(new
             {
-                r.ResidentId,
-                r.SafehouseId,
-                r.CaseCategory,
-                r.CurrentRiskLevel,
-                r.InitialRiskLevel,
-                r.CreatedAt,
-            })
-            .ToListAsync();
+                residentId = id,
+                riskScore = (decimal?)null,
+                message = $"Model output file '{ResidentRecommendationsFileName}' was not found.",
+                modelUsed = ResidentRecommendationsFileName,
+                peerMatches = Array.Empty<object>(),
+                suggestedInterventions = Array.Empty<string>(),
+            });
+        }
 
-        var peerMatches = peerCandidates
-            .Select(candidate =>
+        string json;
+        try
+        {
+            json = await System.IO.File.ReadAllTextAsync(path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not read {File}", ResidentRecommendationsFileName);
+            return Ok(new
             {
-                decimal score = 0m;
-                var reasons = new List<string>();
+                residentId = id,
+                riskScore = (decimal?)null,
+                message = $"Could not read '{ResidentRecommendationsFileName}'.",
+                modelUsed = ResidentRecommendationsFileName,
+                peerMatches = Array.Empty<object>(),
+                suggestedInterventions = Array.Empty<string>(),
+            });
+        }
 
-                if (candidate.SafehouseId == resident.SafehouseId)
-                {
-                    score += 0.45m;
-                    reasons.Add("Same safehouse");
-                }
-
-                if (string.Equals(candidate.CaseCategory, resident.CaseCategory, StringComparison.OrdinalIgnoreCase))
-                {
-                    score += 0.30m;
-                    reasons.Add("Same case category");
-                }
-
-                if (string.Equals(candidate.CurrentRiskLevel, resident.CurrentRiskLevel, StringComparison.OrdinalIgnoreCase))
-                {
-                    score += 0.15m;
-                    reasons.Add("Same current risk level");
-                }
-
-                if (string.Equals(candidate.InitialRiskLevel, resident.InitialRiskLevel, StringComparison.OrdinalIgnoreCase))
-                {
-                    score += 0.10m;
-                    reasons.Add("Similar initial risk profile");
-                }
-
-                return new
-                {
-                    matchId = candidate.ResidentId,
-                    similarityScore = Math.Round(score, 2),
-                    matchReason = reasons.Count > 0 ? string.Join(", ", reasons) : "Closest profile from available records",
-                    createdAt = candidate.CreatedAt,
-                };
-            })
-            .Where(x => x.similarityScore > 0m)
-            .OrderByDescending(x => x.similarityScore)
-            .ThenByDescending(x => x.createdAt)
-            .Take(5)
-            .Select(x => new { x.matchId, x.similarityScore, x.matchReason })
-            .ToList();
-
-        var residentAndPeerIds = peerMatches
-            .Select(x => x.matchId)
-            .Append(id)
-            .Distinct()
-            .ToList();
-
-        var suggestedInterventions = await _db.InterventionPlans
-            .AsNoTracking()
-            .Where(p => residentAndPeerIds.Contains(p.ResidentId))
-            .GroupBy(p => p.PlanCategory)
-            .Select(g => new
+        if (!TryParseRiskScores(json, out var scoresByResidentId, out var parseError))
+        {
+            return Ok(new
             {
-                intervention = g.Key,
-                usageCount = g.Count(),
-            })
-            .OrderByDescending(x => x.usageCount)
-            .ThenBy(x => x.intervention)
-            .Take(5)
-            .Select(x => x.intervention)
-            .ToListAsync();
+                residentId = id,
+                riskScore = (decimal?)null,
+                message = parseError,
+                modelUsed = ResidentRecommendationsFileName,
+                peerMatches = Array.Empty<object>(),
+                suggestedInterventions = Array.Empty<string>(),
+            });
+        }
+
+        if (!scoresByResidentId.TryGetValue(id, out var riskScore))
+        {
+            return Ok(new
+            {
+                residentId = id,
+                riskScore = (decimal?)null,
+                message = "No risk score for this resident in the model output.",
+                modelUsed = ResidentRecommendationsFileName,
+                peerMatches = Array.Empty<object>(),
+                suggestedInterventions = Array.Empty<string>(),
+            });
+        }
 
         return Ok(new
         {
             residentId = id,
-            modelUsed = "Database similarity scoring (safehouse, case category, risk profile)",
-            peerMatches,
-            suggestedInterventions,
+            riskScore,
+            message = (string?)null,
+            modelUsed = ResidentRecommendationsFileName,
+            peerMatches = Array.Empty<object>(),
+            suggestedInterventions = Array.Empty<string>(),
         });
+    }
+
+    private static bool TryParseRiskScores(string json, out Dictionary<int, decimal> scores, out string? error)
+    {
+        scores = new Dictionary<int, decimal>();
+        error = null;
+
+        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        try
+        {
+            var asIntKeys = JsonSerializer.Deserialize<Dictionary<int, decimal>>(json, opts);
+            if (asIntKeys is { Count: > 0 })
+            {
+                scores = asIntKeys;
+                return true;
+            }
+        }
+        catch (JsonException)
+        {
+            // try other shapes
+        }
+
+        try
+        {
+            var asStringKeys = JsonSerializer.Deserialize<Dictionary<string, decimal>>(json, opts);
+            if (asStringKeys is { Count: > 0 })
+            {
+                foreach (var kv in asStringKeys)
+                {
+                    if (!int.TryParse(kv.Key, out var rid))
+                    {
+                        error = $"Invalid resident id key in JSON: '{kv.Key}'.";
+                        scores.Clear();
+                        return false;
+                    }
+
+                    scores[rid] = kv.Value;
+                }
+
+                return true;
+            }
+        }
+        catch (JsonException)
+        {
+            // try array
+        }
+
+        try
+        {
+            var rows = JsonSerializer.Deserialize<List<RiskScoreJsonRow>>(json, opts);
+            if (rows is { Count: > 0 })
+            {
+                foreach (var row in rows)
+                {
+                    scores[row.ResidentId] = row.RiskScore;
+                }
+
+                return true;
+            }
+        }
+        catch (JsonException ex)
+        {
+            error = $"Could not parse '{ResidentRecommendationsFileName}': {ex.Message}";
+            return false;
+        }
+
+        error = $"Could not parse '{ResidentRecommendationsFileName}' (expected object map of resident id → score or an array of rows).";
+        return false;
+    }
+
+    private sealed class RiskScoreJsonRow
+    {
+        public int ResidentId { get; set; }
+        public decimal RiskScore { get; set; }
     }
 }

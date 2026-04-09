@@ -13,7 +13,6 @@ namespace Intex.Backend.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private const int MinimumPasswordLength = 14;
     private const string MfaLoginPurpose = "mfa-login";
     private const string MfaIssuer = "NovaPath";
     private readonly UserManager<ApplicationUser> _userManager;
@@ -219,10 +218,6 @@ public class AuthController : ControllerBase
         }
 
         var normalizedPassword = req.NewPassword.Trim();
-        if (normalizedPassword.Length < MinimumPasswordLength)
-        {
-            return BadRequest(new { message = $"Password must be at least {MinimumPasswordLength} characters." });
-        }
 
         var user = await _userManager.FindByEmailAsync(req.Email.Trim());
         if (user is null)
@@ -254,10 +249,6 @@ public class AuthController : ControllerBase
 
         var normalizedEmail = req.Email.Trim();
         var normalizedPassword = req.Password.Trim();
-        if (normalizedPassword.Length < MinimumPasswordLength)
-        {
-            return BadRequest(new { message = $"Password must be at least {MinimumPasswordLength} characters." });
-        }
 
         var existing = await _userManager.FindByEmailAsync(normalizedEmail);
         if (existing is not null)
@@ -325,10 +316,6 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
         {
             return BadRequest(new { message = "Email and password are required." });
-        }
-        if (req.Password.Trim().Length < MinimumPasswordLength)
-        {
-            return BadRequest(new { message = $"Password must be at least {MinimumPasswordLength} characters." });
         }
 
         if (req.Role is not ("Admin" or "Donor"))
