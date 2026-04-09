@@ -11,15 +11,13 @@ public static class IdentitySeeder
         var donorPassword = config["Seed:DonorPassword"];
         var mfaAdminPassword = config["Seed:MfaAdminPassword"];
 
-        if (
-            string.IsNullOrWhiteSpace(adminPassword) ||
+        // In hosted environments, seed credentials may be intentionally absent.
+        // Do not fail startup if seed config is not provided.
+        if (string.IsNullOrWhiteSpace(adminPassword) ||
             string.IsNullOrWhiteSpace(donorPassword) ||
-            string.IsNullOrWhiteSpace(mfaAdminPassword)
-        )
+            string.IsNullOrWhiteSpace(mfaAdminPassword))
         {
-            throw new InvalidOperationException(
-                "Seed passwords are required. Configure Seed:AdminPassword, Seed:DonorPassword, and Seed:MfaAdminPassword."
-            );
+            return;
         }
 
         using var scope = services.CreateScope();
