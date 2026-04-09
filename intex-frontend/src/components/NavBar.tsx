@@ -9,6 +9,11 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'bg-brand-100 text-brand' : 'text-surface-text hover:bg-brand-50 hover:text-surface-dark'
   }`
 
+const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `block w-full rounded-md px-3 py-2 text-left text-base font-medium ${
+    isActive ? 'bg-brand-100 text-brand' : 'text-surface-text hover:bg-brand-50 hover:text-surface-dark'
+  }`
+
 export function NavBar() {
   const { i18n: i18nInstance, t } = useTranslation()
   const navigate = useNavigate()
@@ -29,7 +34,7 @@ export function NavBar() {
   }, [location.pathname])
 
   return (
-    <header className="border-b border-brand-100/40 bg-white/20 backdrop-blur-md">
+    <header className="border-b border-brand-100/40 bg-white/95 md:bg-white/20 md:backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-14 items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -116,46 +121,46 @@ export function NavBar() {
         </div>
       </div>
       {isMobileMenuOpen ? (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true">
           <button
             type="button"
-            className="absolute inset-0 bg-surface-dark/30"
+            className="absolute inset-0 bg-black/40"
             onClick={closeMobileMenu}
             aria-label="Close menu"
           />
           <aside
             id="mobile-nav-menu"
-            className="absolute right-0 top-0 h-full w-72 max-w-[85vw] border-l border-brand-100 bg-white p-4 shadow-xl"
+            className="absolute right-0 top-0 z-[101] h-full w-72 max-w-[85vw] overflow-y-auto border-l border-brand-100 bg-white p-4 shadow-xl"
           >
             <div className="mb-4 text-sm text-surface-text">{user?.email}</div>
             <nav className="flex flex-col gap-2">
               {isDonor && !isAdmin ? (
                 <>
-                  <NavLink to="/donor/dashboard" end className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/donor/dashboard" end className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_my_dashboard')}
                   </NavLink>
-                  <NavLink to="/donate" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/donate" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_make_donation')}
                   </NavLink>
                 </>
               ) : (
                 <>
-                  <NavLink to="/admin" end className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/admin" end className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_dashboard')}
                   </NavLink>
-                  <NavLink to="/admin/residents" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/admin/residents" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_residents')}
                   </NavLink>
-                  <NavLink to="/admin/donors" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/admin/donors" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_donors')}
                   </NavLink>
-                  <NavLink to="/admin/reports" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/admin/reports" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_reports')}
                   </NavLink>
-                  <NavLink to="/donate" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/donate" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_donate')}
                   </NavLink>
-                  <NavLink to="/admin/social-media" className={navLinkClass} onClick={closeMobileMenu}>
+                  <NavLink to="/admin/social-media" className={mobileNavLinkClass} onClick={closeMobileMenu}>
                     {t('nav_social_media')}
                   </NavLink>
                 </>
