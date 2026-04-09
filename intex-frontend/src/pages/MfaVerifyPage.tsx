@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { useAuth } from '../state/AuthContext'
+import { useAuth } from '../state/useAuth'
+import { LanguageToggle } from '../components/LanguageToggle'
 
 export function MfaVerifyPage() {
   const { pendingMfa, verifyMfa } = useAuth()
@@ -38,7 +39,10 @@ export function MfaVerifyPage() {
 
   if (!pendingMfa) {
     return (
-      <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-brand-50 flex flex-col items-center px-4 py-6">
+        <div className="w-full max-w-md mb-4 flex items-center justify-end">
+          <LanguageToggle />
+        </div>
         <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-surface p-8 text-center shadow-sm">
           <h1 className="font-display text-2xl font-bold text-surface-dark">No MFA session found</h1>
           <p className="mt-2 text-sm text-surface-text">Please sign in again to continue.</p>
@@ -55,13 +59,14 @@ export function MfaVerifyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-brand-50 flex flex-col items-center px-4 py-6">
+      <div className="w-full max-w-md mb-4 flex items-center justify-between">
+        <Link to="/login" className="text-sm font-medium text-brand hover:text-brand-dark">
+          ← Back to login
+        </Link>
+        <LanguageToggle />
+      </div>
       <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
-        <div className="mb-4">
-          <Link to="/login" className="text-sm font-medium text-brand hover:text-brand-dark">
-            ← Back to login
-          </Link>
-        </div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Multi-Factor Authentication</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-surface-dark">Verify your sign in</h1>
         <p className="mt-2 text-sm text-surface-text">

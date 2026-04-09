@@ -196,7 +196,7 @@ export function CaseloadPage() {
     ],
     [t]
   )
-  const columns = useMemo<ColumnDef<Resident>[]>(() => columnDefs.map(({ key: _, ...col }) => col), [columnDefs])
+  const columns = useMemo<ColumnDef<Resident>[]>(() => columnDefs, [columnDefs])
 
   const sortedRows = useMemo(() => {
     const col = columnDefs.find((c) => c.key === sort.column)

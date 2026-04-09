@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { formatCompactUsd, getNumberLocale, isPortugueseLanguage } from "../lib/locale";
-import { useAuth } from "../state/AuthContext";
+import { useAuth } from "../state/useAuth";
 import brazil1 from "../assets/brazil1.png";
 import brazil2 from "../assets/brazil2.png";
 import brazil3 from "../assets/brazil3.png";

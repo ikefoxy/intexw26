@@ -144,7 +144,7 @@ export function DonorsPage() {
     ],
     [t, i18n.resolvedLanguage]
   )
-  const columns = useMemo<ColumnDef<Supporter>[]>(() => columnDefs.map(({ key: _, ...col }) => col), [columnDefs])
+  const columns = useMemo<ColumnDef<Supporter>[]>(() => columnDefs, [columnDefs])
 
   const sortedRows = useMemo(() => {
     const col = columnDefs.find((c) => c.key === sort.column)

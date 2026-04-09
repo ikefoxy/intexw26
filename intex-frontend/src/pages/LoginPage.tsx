@@ -1,8 +1,9 @@
 import { useId, useState, type CSSProperties, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../state/AuthContext";
+import { useAuth } from "../state/useAuth";
 import { useTranslation } from "react-i18next";
+import { LanguageToggle } from "../components/LanguageToggle";
 
 const QUOTES = [
   {
@@ -142,12 +143,7 @@ function Field({
 }
 
 function meetsPasswordPolicy(p: string): boolean {
-  if (p.length < 12) return false;
-  if (!/[A-Z]/.test(p)) return false;
-  if (!/[a-z]/.test(p)) return false;
-  if (!/[0-9]/.test(p)) return false;
-  if (!/[^A-Za-z0-9]/.test(p)) return false;
-  return true;
+  return p.length >= 14;
 }
 
 export function LoginPage() {
@@ -460,10 +456,13 @@ export function LoginPage() {
             "linear-gradient(160deg,#f8fafc 0%,#f1f5f9 60%,#ffffff 100%)",
         }}
       >
-        <div className="absolute left-6 top-6 sm:left-10 sm:top-8">
+        <div className="absolute left-6 top-6 sm:left-10 sm:top-8 flex items-center gap-3">
           <Link to="/" className="text-sm font-medium text-brand hover:text-brand-dark">
             {t("back_to_home")}
           </Link>
+        </div>
+        <div className="absolute right-6 top-6 sm:right-10 sm:top-8">
+          <LanguageToggle />
         </div>
         <div
           aria-hidden="true"
@@ -555,6 +554,11 @@ export function LoginPage() {
                 error={fieldErrors.password}
                 disabled={loading}
               />
+              {mode === "signup" && (
+                <p className="-mt-3 text-xs text-surface-text">
+                  {t("login_password_policy_hint")}
+                </p>
+              )}
 
               {mode === "signup" && (
                 <Field

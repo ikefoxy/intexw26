@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../lib/api'
-import { useAuth } from '../state/AuthContext'
+import { useAuth } from '../state/useAuth'
+import { LanguageToggle } from '../components/LanguageToggle'
 import { MetricCard } from '../components/MetricCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { ErrorMessage } from '../components/ErrorMessage'
@@ -42,7 +43,7 @@ function tryParseMetrics(snapshot: PublicImpactSnapshot | null): Partial<PublicS
 }
 
 export function ImpactDashboardPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [snapshot, setSnapshot] = useState<PublicImpactSnapshot | null>(null)
   const [stats, setStats] = useState<PublicStats | null>(null)
@@ -77,23 +78,40 @@ export function ImpactDashboardPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [t])
 
-  const headline = useMemo(() => snapshot?.headline || t('impact_title'), [snapshot, t])
+  const language = i18n.resolvedLanguage ?? 'en'
+
+  const headline = useMemo(() => {
+    if (language.startsWith('pt')) {
+      return t('impact_snapshot_headline_default')
+    }
+    return snapshot?.headline || t('impact_title')
+  }, [snapshot, t, language])
+
+  const summary = useMemo(() => {
+    if (language.startsWith('pt')) {
+      return t('impact_snapshot_summary_default')
+    }
+    return snapshot?.summaryText ?? ''
+  }, [snapshot, t, language])
 
   return (
     <div className="min-h-full text-surface-dark">
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <Link to="/" className="text-sm font-medium text-brand hover:text-brand-dark">
-            {t('back_to_home')}
-          </Link>
-          <Link to="/login" className="text-sm font-medium text-surface-text hover:text-surface-dark">
-            {t('nav_login')}
-          </Link>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="text-sm font-medium text-brand hover:text-brand-dark">
+              {t('back_to_home')}
+            </Link>
+            <Link to="/login" className="text-sm font-medium text-surface-text hover:text-surface-dark">
+              {t('nav_login')}
+            </Link>
+          </div>
+          <LanguageToggle />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-surface-dark">{headline}</h1>
-        {snapshot?.summaryText && <p className="mt-2 max-w-3xl text-surface-text">{snapshot.summaryText}</p>}
+        {summary && <p className="mt-2 max-w-3xl text-surface-text">{summary}</p>}
 
         {error ? (
           <div className="mt-6">

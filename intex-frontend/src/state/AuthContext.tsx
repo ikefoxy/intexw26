@@ -1,35 +1,9 @@
-import React, { createContext, useContext, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { isAxiosError } from 'axios'
 import { api, enableMfaRequest, getMfaSetupRequest, loginRequest, verifyMfaLoginRequest } from '../lib/api'
 import { decodeEmail, decodeRoles } from '../auth/jwt'
-
-type AuthUser = {
-  email: string
-  roles: string[]
-}
-
-type MfaPendingState = {
-  mfaToken: string
-  email?: string
-  requiresMfaSetup?: boolean
-  sharedKey?: string
-  authenticatorUri?: string
-}
-
-type AuthContextValue = {
-  token: string | null
-  user: AuthUser | null
-  pendingMfa: MfaPendingState | null
-  login: (email: string, password: string) => Promise<AuthUser | null>
-  verifyMfa: (code: string) => Promise<AuthUser>
-  getMfaSetup: () => Promise<{ sharedKey?: string; authenticatorUri?: string }>
-  enableMfa: (code: string) => Promise<void>
-  signup: (email: string, password: string) => Promise<AuthUser>
-  logout: () => void
-  hasRole: (role: string) => boolean
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null)
+import type { AuthContextValue, AuthUser, MfaPendingState } from './authContext'
+import { AuthContext } from './authContext'
 
 function readInitial(): { token: string | null; user: AuthUser | null } {
   const token = localStorage.getItem('np_token')
@@ -52,8 +26,8 @@ function readPendingMfa(): MfaPendingState | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const initial = useMemo(readInitial, [])
-  const initialPendingMfa = useMemo(readPendingMfa, [])
+  const initial = useMemo(() => readInitial(), [])
+  const initialPendingMfa = useMemo(() => readPendingMfa(), [])
   const [token, setToken] = useState<string | null>(initial.token)
   const [user, setUser] = useState<AuthUser | null>(initial.user)
   const [pendingMfa, setPendingMfa] = useState<MfaPendingState | null>(initialPendingMfa)
@@ -185,10 +159,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
-}
-

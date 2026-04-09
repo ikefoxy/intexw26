@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { NavBar } from '../components/NavBar'
 import { createMyDonation, getMyDonations, type Donation } from '../lib/api'
 import { formatDate, formatUsd } from '../lib/locale'
-import { useAuth } from '../state/AuthContext'
+import { useAuth } from '../state/useAuth'
 
 export function DonatePage() {
   const { t, i18n } = useTranslation()

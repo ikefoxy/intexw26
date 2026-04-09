@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView } from "framer-motion";
+import { LanguageToggle } from "../components/LanguageToggle";
 
 interface Section {
   id: string;
@@ -823,19 +824,22 @@ export default function PrivacyPage() {
 
       <header className="sticky top-0 z-30 border-b border-brand-100/40 bg-white/20 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a
-            href="/"
-            className="flex items-center gap-2 font-display font-bold text-base text-surface-text hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
-            aria-label="Back to Nova Path home"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Nova Path
-          </a>
-          <span className="text-surface-text text-xs">
-            Last updated: {LAST_UPDATED}
-          </span>
+          <div className="flex items-center gap-4">
+            <a
+              href="/"
+              className="flex items-center gap-2 font-display font-bold text-base text-surface-text hover:text-surface-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+              aria-label="Back to Nova Path home"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Nova Path
+            </a>
+            <span className="text-surface-text text-xs">
+              Last updated: {LAST_UPDATED}
+            </span>
+          </div>
+          <LanguageToggle />
         </div>
       </header>
 

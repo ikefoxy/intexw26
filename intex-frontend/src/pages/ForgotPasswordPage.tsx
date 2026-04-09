@@ -2,15 +2,10 @@ import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { requestPasswordReset, resetPasswordRequest } from '../lib/api'
+import { LanguageToggle } from '../components/LanguageToggle'
 
 function meetsPasswordPolicy(password: string): boolean {
-  return (
-    password.length >= 12 &&
-    /[A-Z]/.test(password) &&
-    /[a-z]/.test(password) &&
-    /[0-9]/.test(password) &&
-    /[^A-Za-z0-9]/.test(password)
-  )
+  return password.length >= 14
 }
 
 export function ForgotPasswordPage() {
@@ -85,7 +80,13 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-50 text-surface-dark flex items-center justify-center px-6 py-8">
+    <div className="min-h-screen bg-brand-50 text-surface-dark flex flex-col items-center px-6 py-8">
+      <div className="w-full max-w-xl mb-4 flex items-center justify-between">
+        <Link to="/login" className="text-sm font-medium text-brand hover:text-brand-dark">
+          {t('reset_back_to_login')}
+        </Link>
+        <LanguageToggle />
+      </div>
       <div className="w-full max-w-xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
         <h1 className="text-2xl font-bold">{t('reset_title')}</h1>
         <p className="mt-2 text-sm text-surface-text">

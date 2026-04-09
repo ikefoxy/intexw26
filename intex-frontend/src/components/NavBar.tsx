@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../state/AuthContext'
-import { isPortugueseLanguage } from '../lib/locale'
+import { useAuth } from '../state/useAuth'
+import { LanguageToggle } from './LanguageToggle'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `px-3 py-2 rounded-md text-sm font-medium ${
@@ -15,24 +15,17 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   }`
 
 export function NavBar() {
-  const { i18n: i18nInstance, t } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const { user, logout } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [mobileMenuPath, setMobileMenuPath] = useState<string | null>(null)
+  const isMobileMenuOpen = mobileMenuPath === location.pathname
   const isAdmin = user?.roles?.includes('Admin') ?? false
   const isDonor = user?.roles?.includes('Donor') ?? false
   const viewLabel = isAdmin ? t('nav_admin_view') : isDonor ? t('nav_donor_view') : t('nav_user_view')
   const homePath = isDonor && !isAdmin ? '/donor/dashboard' : '/admin'
-  const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
-  const isPortuguese = isPortugueseLanguage(currentLanguage)
-  const nextLanguage = isPortuguese ? 'en' : 'pt'
-  const languageToggleLabel = isPortuguese ? t('language_switch_to_english') : t('language_switch_to_portuguese')
-  const closeMobileMenu = () => setIsMobileMenuOpen(false)
-
-  useEffect(() => {
-    closeMobileMenu()
-  }, [location.pathname])
+  const closeMobileMenu = () => setMobileMenuPath(null)
 
   return (
     <header className="sticky top-0 z-50 border-b border-brand-100/40 bg-white/95 md:bg-white/20 md:backdrop-blur-md">
@@ -91,18 +84,7 @@ export function NavBar() {
             <span className="hidden rounded-full border border-brand-100 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand md:inline-flex">
               {viewLabel}
             </span>
-            <button
-              type="button"
-              onClick={() => void i18nInstance.changeLanguage(nextLanguage)}
-              className="inline-flex h-9 items-center gap-2 rounded-md border border-brand-100 px-2.5 text-surface-text hover:bg-brand-100 hover:text-surface-dark"
-              aria-label={languageToggleLabel}
-              title={languageToggleLabel}
-            >
-              <span aria-hidden="true">🌐</span>
-              <span className="text-xs font-semibold uppercase tracking-wide">
-                {isPortuguese ? 'PT' : 'EN'}
-              </span>
-            </button>
+            <LanguageToggle />
             <div className="hidden text-sm text-surface-text sm:block">{user?.email}</div>
             <button
               onClick={logout}
@@ -112,7 +94,9 @@ export function NavBar() {
             </button>
             <button
               type="button"
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              onClick={() =>
+                setMobileMenuPath((prev) => (prev === location.pathname ? null : location.pathname))
+              }
               className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-50 hover:text-surface-dark md:hidden"
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               title={isMobileMenuOpen ? 'Close menu' : 'Open menu'}

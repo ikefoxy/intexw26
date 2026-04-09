@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { useAuth } from '../state/AuthContext'
+import { useAuth } from '../state/useAuth'
+import { LanguageToggle } from '../components/LanguageToggle'
 
 export function MfaSetupPage() {
   const { user, pendingMfa, hasRole, getMfaSetup, enableMfa, verifyMfa } = useAuth()
@@ -82,12 +83,13 @@ export function MfaSetupPage() {
 
   return (
     <div className="min-h-screen bg-brand-50 px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-2xl mb-4 flex items-center justify-between">
+        <Link to={user ? '/admin' : '/login'} className="text-sm font-medium text-brand hover:text-brand-dark">
+          {user ? '← Back to dashboard' : '← Back to login'}
+        </Link>
+        <LanguageToggle />
+      </div>
       <div className="mx-auto w-full max-w-2xl rounded-2xl border border-brand-100 bg-surface p-8 shadow-sm">
-        <div className="mb-4">
-          <Link to={user ? '/admin' : '/login'} className="text-sm font-medium text-brand hover:text-brand-dark">
-            {user ? '← Back to dashboard' : '← Back to login'}
-          </Link>
-        </div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
           {user ? 'Admin Security' : 'First-Time MFA Setup'}
         </p>

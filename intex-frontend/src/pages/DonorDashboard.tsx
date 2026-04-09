@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CalendarIcon, HeartIcon, TrendingUpIcon } from 'lucide-react'
 import { createMyDonation, getMyDonations, getPublicImpactSnapshot, type Donation } from '../lib/api'
 import { formatDate, formatUsd } from '../lib/locale'
-import { useAuth } from '../state/AuthContext'
+import { useAuth } from '../state/useAuth'
 
 export function DonorDashboard() {
   const { t, i18n } = useTranslation()
-  const { user } = useAuth()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [donations, setDonations] = useState<Donation[]>([])
   const [activeSafehouses, setActiveSafehouses] = useState<number>(0)
   const [totalDonors, setTotalDonors] = useState<number>(0)
@@ -72,10 +74,39 @@ export function DonorDashboard() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5 px-4 py-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-surface-dark">
-          {t('donor_welcome_back')}, {user?.email?.split('@')[0] || t('donor_default_name')}
-        </h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-brand-100 text-surface-text hover:bg-brand-50 hover:text-surface-dark"
+            aria-label={t('nav_go_back')}
+            title={t('nav_go_back')}
+          >
+            ←
+          </button>
+          <h1 className="text-3xl font-bold text-surface-dark">
+            {t('donor_welcome_back')}, {user?.email?.split('@')[0] || t('donor_default_name')}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Link
+            to="/"
+            className="rounded-full border border-brand-100 px-3 py-1.5 text-surface-text hover:bg-brand-50 hover:text-surface-dark"
+          >
+            {t('nav_impact')}
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              logout()
+              navigate('/', { replace: true })
+            }}
+            className="rounded-full bg-brand px-3 py-1.5 font-semibold text-surface hover:bg-brand-dark"
+          >
+            {t('nav_logout')}
+          </button>
+        </div>
       </div>
 
       <section id="donate-form" className="bg-surface border border-slate-200 rounded-xl shadow-sm p-6">
