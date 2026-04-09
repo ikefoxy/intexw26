@@ -614,6 +614,7 @@ export function ResidentDetailPage() {
 
   function handleStartEdit() {
     if (!resident) return
+    if (!window.confirm(t('resident_detail_confirm_edit'))) return
     setSaveError(null)
     setForm(mapResidentToForm(resident))
     setIsEditing(true)
@@ -715,6 +716,24 @@ export function ResidentDetailPage() {
 
         {!invalidId ? (
           <>
+            <div className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+              <div className="text-sm text-surface-text">Resident workflow actions</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link
+                  to={`/admin/process-recordings/${id}`}
+                  className="inline-flex items-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-dark"
+                >
+                  Open Process Recordings
+                </Link>
+                <Link
+                  to={`/admin/visitations/${id}`}
+                  className="inline-flex items-center rounded-md border border-brand-100 px-3 py-2 text-xs font-semibold text-surface-dark hover:bg-brand-50"
+                >
+                  Open Visitations
+                </Link>
+              </div>
+            </div>
+
             <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
               {recommendationsLoading ? (
                 <p className="text-sm text-surface-text">Loading resident risk score...</p>
@@ -1004,24 +1023,6 @@ export function ResidentDetailPage() {
             </div>
           </form>
         ) : null}
-
-        <div className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
-          <div className="text-sm text-surface-text">Resident workflow actions</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link
-              to={`/admin/process-recordings/${id}`}
-              className="inline-flex items-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-dark"
-            >
-              Open Process Recordings
-            </Link>
-            <Link
-              to={`/admin/visitations/${id}`}
-              className="inline-flex items-center rounded-md border border-brand-100 px-3 py-2 text-xs font-semibold text-surface-dark hover:bg-brand-50"
-            >
-              Open Visitations
-            </Link>
-          </div>
-        </div>
       </main>
     </div>
   )

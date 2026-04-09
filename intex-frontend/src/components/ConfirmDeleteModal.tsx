@@ -29,7 +29,7 @@ export function ConfirmDeleteModal({
             </button>
             <button
               onClick={onConfirm}
-              className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-surface hover:bg-brand-dark"
+              className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700"
             >
               Delete
             </button>

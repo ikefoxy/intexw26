@@ -144,6 +144,7 @@
   "resident_detail_save_changes": "Save changes",
   "resident_detail_cancel_edit": "Cancel",
   "resident_detail_editing_title": "Edit resident",
+  "resident_detail_confirm_edit": "Are you sure you want to edit this resident's information?",
   "resident_detail_confirm_save": "Save changes to this resident record?",
   "resident_detail_confirm_delete": "Permanently delete this resident? This cannot be undone.",
   "resident_detail_confirm_discard": "Discard unsaved changes?",

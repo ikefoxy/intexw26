@@ -144,6 +144,7 @@
   "resident_detail_save_changes": "Salvar alteracoes",
   "resident_detail_cancel_edit": "Cancelar",
   "resident_detail_editing_title": "Editar residente",
+  "resident_detail_confirm_edit": "Tem certeza de que deseja editar as informacoes deste residente?",
   "resident_detail_confirm_save": "Salvar as alteracoes neste residente?",
   "resident_detail_confirm_delete": "Excluir permanentemente este residente? Isso nao pode ser desfeito.",
   "resident_detail_confirm_discard": "Descartar alteracoes nao salvas?",

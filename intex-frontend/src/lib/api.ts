@@ -242,6 +242,18 @@ export async function createProcessRecording(payload: {
   return res.data
 }
 
+export async function updateProcessRecording(
+  row: ProcessRecording,
+  updates: { sessionDate: string; sessionNarrative: string }
+): Promise<void> {
+  const body = {
+    ...row,
+    sessionDate: updates.sessionDate,
+    sessionNarrative: updates.sessionNarrative,
+  }
+  await api.put(`/api/process-recordings/${row.recordingId}`, body, { headers: getHeaders() })
+}
+
 export async function deleteProcessRecording(recordingId: number): Promise<void> {
   await api.delete(`/api/process-recordings/${recordingId}`, {
     params: { confirm: true },
@@ -286,6 +298,26 @@ export async function createHomeVisitation(payload: {
   }
   const res = await api.post<HomeVisitation>('/api/home-visitations', body, { headers: getHeaders() })
   return res.data
+}
+
+export async function updateHomeVisitation(
+  row: HomeVisitation,
+  updates: { visitDate: string; observations: string; visitOutcome: string }
+): Promise<void> {
+  const body = {
+    ...row,
+    visitDate: updates.visitDate,
+    observations: updates.observations,
+    visitOutcome: updates.visitOutcome,
+  }
+  await api.put(`/api/home-visitations/${row.visitationId}`, body, { headers: getHeaders() })
+}
+
+export async function deleteHomeVisitation(visitationId: number): Promise<void> {
+  await api.delete(`/api/home-visitations/${visitationId}`, {
+    params: { confirm: true },
+    headers: getHeaders(),
+  })
 }
 
 export type Donation = {

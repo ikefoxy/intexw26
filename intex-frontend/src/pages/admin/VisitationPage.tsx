@@ -1,7 +1,22 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
+import { ConfirmDeleteModal } from '../../components/ConfirmDeleteModal'
 import { NavBar } from '../../components/NavBar'
-import { createHomeVisitation, getCaseConferences, getHomeVisitations, type HomeVisitation } from '../../lib/api'
+import {
+  createHomeVisitation,
+  deleteHomeVisitation,
+  getCaseConferences,
+  getHomeVisitations,
+  updateHomeVisitation,
+  type HomeVisitation,
+} from '../../lib/api'
+
+function toDateInputValue(iso: string): string {
+  if (!iso) return ''
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return ''
+  return new Date(t).toISOString().slice(0, 10)
+}
 
 export function VisitationPage() {
   const { residentId } = useParams()
@@ -17,6 +32,14 @@ export function VisitationPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [conferenceError, setConferenceError] = useState<string | null>(null)
+  const [showNewEntryForm, setShowNewEntryForm] = useState(false)
+  const [editingVisitationId, setEditingVisitationId] = useState<number | null>(null)
+  const [editVisitDate, setEditVisitDate] = useState('')
+  const [editObservations, setEditObservations] = useState('')
+  const [editVisitOutcome, setEditVisitOutcome] = useState('')
+  const [savingVisitationId, setSavingVisitationId] = useState<number | null>(null)
+  const [confirmDeleteVisitationId, setConfirmDeleteVisitationId] = useState<number | null>(null)
+  const [deletingVisitationId, setDeletingVisitationId] = useState<number | null>(null)
 
   async function loadHistory() {
     if (!Number.isFinite(parsedResidentId) || parsedResidentId <= 0) {
@@ -51,6 +74,21 @@ export function VisitationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedResidentId])
 
+  const pastAssessmentChoices = useMemo(() => {
+    const source = entryType === 'Case Conference' ? conferenceItems : items
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const row of source) {
+      const s = row.observations?.trim()
+      if (s && !seen.has(s)) {
+        seen.add(s)
+        out.push(s)
+      }
+    }
+    out.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+    return out
+  }, [entryType, items, conferenceItems])
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     if (!date || !assessment.trim()) {
@@ -72,11 +110,80 @@ export function VisitationPage() {
       setAssessment('')
       setDate('')
       setEntryType('Home Visitation')
+      setShowNewEntryForm(false)
       await loadHistory()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create visitation entry.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  function startEditVisitation(row: HomeVisitation) {
+    setEditingVisitationId(row.visitationId)
+    setEditVisitDate(toDateInputValue(row.visitDate))
+    setEditObservations(row.observations)
+    setEditVisitOutcome(row.visitOutcome)
+    setError(null)
+    setConferenceError(null)
+  }
+
+  function cancelEditVisitation() {
+    setEditingVisitationId(null)
+    setEditVisitDate('')
+    setEditObservations('')
+    setEditVisitOutcome('')
+  }
+
+  async function saveEditVisitation(row: HomeVisitation) {
+    if (!editVisitDate || !editObservations.trim()) {
+      const msg = 'Please provide both date and notes/assessment.'
+      setError(msg)
+      setConferenceError(msg)
+      return
+    }
+    if (!editVisitOutcome.trim()) {
+      const msg = 'Please provide an outcome.'
+      setError(msg)
+      setConferenceError(msg)
+      return
+    }
+    setSavingVisitationId(row.visitationId)
+    setError(null)
+    setConferenceError(null)
+    try {
+      await updateHomeVisitation(row, {
+        visitDate: editVisitDate,
+        observations: editObservations.trim(),
+        visitOutcome: editVisitOutcome.trim(),
+      })
+      await loadHistory()
+      cancelEditVisitation()
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to update record.'
+      setError(msg)
+      setConferenceError(msg)
+    } finally {
+      setSavingVisitationId(null)
+    }
+  }
+
+  async function onConfirmDeleteVisitation() {
+    if (!confirmDeleteVisitationId) return
+    setDeletingVisitationId(confirmDeleteVisitationId)
+    setError(null)
+    setConferenceError(null)
+    try {
+      await deleteHomeVisitation(confirmDeleteVisitationId)
+      setConfirmDeleteVisitationId(null)
+      if (editingVisitationId === confirmDeleteVisitationId) cancelEditVisitation()
+      await loadHistory()
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to delete record.'
+      setError(msg)
+      setConferenceError(msg)
+    } finally {
+      setDeletingVisitationId(null)
     }
   }
 
@@ -88,63 +195,119 @@ export function VisitationPage() {
         <div className="mt-2 text-sm text-surface-text">ResidentId: {residentId}</div>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-surface-dark">New Visitation / Conference Entry</h2>
-          <form className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={onSubmit}>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-surface-text">Entry Type</label>
-              <select
-                value={entryType}
-                onChange={(e) => setEntryType(e.target.value as 'Home Visitation' | 'Case Conference')}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
-              >
-                <option value="Home Visitation">Home Visitation</option>
-                <option value="Case Conference">Case Conference</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-surface-text">ResidentId</label>
-              <input
-                value={Number.isFinite(parsedResidentId) ? parsedResidentId : ''}
-                disabled
-                className="w-full rounded-md border border-slate-200 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-surface-text">Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-surface-text">
-                {entryType === 'Case Conference' ? 'Conference Notes' : 'Assessment'}
-              </label>
-              <textarea
-                value={assessment}
-                onChange={(e) => setAssessment(e.target.value)}
-                rows={4}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
-                placeholder={
-                  entryType === 'Case Conference'
-                    ? 'Case conference notes and decisions'
-                    : 'Home visitation assessment details'
-                }
-              />
-            </div>
-            <div className="md:col-span-2">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-70"
-              >
-                {submitting ? 'Saving...' : entryType === 'Case Conference' ? 'Save Case Conference' : 'Save Visitation'}
-              </button>
-            </div>
-          </form>
-          {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+          {!showNewEntryForm ? (
+            <button
+              type="button"
+              onClick={() => setShowNewEntryForm(true)}
+              className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+            >
+              New Visitation / Conference Entry
+            </button>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-surface-dark">New Visitation / Conference Entry</h2>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewEntryForm(false)
+                    setDate('')
+                    setAssessment('')
+                    setEntryType('Home Visitation')
+                    setError(null)
+                  }}
+                  className="rounded-md border border-brand-100 px-3 py-1.5 text-sm font-semibold text-surface-dark hover:bg-brand-50"
+                >
+                  Cancel
+                </button>
+              </div>
+              <form className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={onSubmit}>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-surface-text">Entry Type</label>
+                  <select
+                    value={entryType}
+                    onChange={(e) => {
+                      setEntryType(e.target.value as 'Home Visitation' | 'Case Conference')
+                      setAssessment('')
+                    }}
+                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                  >
+                    <option value="Home Visitation">Home Visitation</option>
+                    <option value="Case Conference">Case Conference</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-surface-text">ResidentId</label>
+                  <input
+                    value={Number.isFinite(parsedResidentId) ? parsedResidentId : ''}
+                    disabled
+                    className="w-full rounded-md border border-slate-200 bg-brand-50 px-3 py-2 text-sm text-surface-dark"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-surface-text">Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="mb-1 block text-sm font-medium text-surface-text">
+                    {entryType === 'Case Conference' ? 'Conference Notes' : 'Assessment'}
+                  </label>
+                  {pastAssessmentChoices.length > 0 ? (
+                    <select
+                      value={assessment}
+                      onChange={(e) => setAssessment(e.target.value)}
+                      required
+                      className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                    >
+                      <option value="">
+                        {entryType === 'Case Conference'
+                          ? 'Select from past conference notes…'
+                          : 'Select from past assessments…'}
+                      </option>
+                      {pastAssessmentChoices.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt.length > 140 ? `${opt.slice(0, 137)}…` : opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <>
+                      <p className="mb-2 text-xs text-surface-text">
+                        No prior {entryType === 'Case Conference' ? 'conference notes' : 'assessments'} for this resident
+                        yet. Enter text for this first record; later entries can be chosen from the dropdown.
+                      </p>
+                      <textarea
+                        value={assessment}
+                        onChange={(e) => setAssessment(e.target.value)}
+                        rows={4}
+                        className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                        placeholder={
+                          entryType === 'Case Conference'
+                            ? 'Case conference notes and decisions'
+                            : 'Home visitation assessment details'
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+                <div className="md:col-span-2">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-70"
+                  >
+                    {submitting ? 'Saving...' : entryType === 'Case Conference' ? 'Save Case Conference' : 'Save Visitation'}
+                  </button>
+                </div>
+              </form>
+              {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+            </>
+          )}
         </section>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
@@ -188,16 +351,85 @@ export function VisitationPage() {
                         <th className="px-3 py-2 font-medium">Date</th>
                         <th className="px-3 py-2 font-medium">Assessment</th>
                         <th className="px-3 py-2 font-medium">Outcome</th>
+                        <th className="px-3 py-2 font-medium">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((row) => (
-                        <tr key={row.visitationId} className="border-b border-slate-100 align-top">
-                          <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
-                          <td className="px-3 py-2 text-surface-text">{row.observations}</td>
-                          <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>
-                        </tr>
-                      ))}
+                      {items.map((row) =>
+                        editingVisitationId === row.visitationId ? (
+                          <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                            <td className="px-3 py-2" colSpan={3}>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                <input
+                                  type="date"
+                                  value={editVisitDate}
+                                  onChange={(e) => setEditVisitDate(e.target.value)}
+                                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                                <input
+                                  value={editVisitOutcome}
+                                  onChange={(e) => setEditVisitOutcome(e.target.value)}
+                                  placeholder="Outcome"
+                                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                                <textarea
+                                  value={editObservations}
+                                  onChange={(e) => setEditObservations(e.target.value)}
+                                  rows={3}
+                                  placeholder="Assessment / notes"
+                                  className="md:col-span-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 align-top">
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => void saveEditVisitation(row)}
+                                  disabled={savingVisitationId === row.visitationId}
+                                  className="rounded-md bg-brand px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
+                                >
+                                  {savingVisitationId === row.visitationId ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEditVisitation}
+                                  disabled={savingVisitationId === row.visitationId}
+                                  className="rounded-md border border-brand-100 px-2.5 py-1.5 text-xs font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-60"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                            <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
+                            <td className="px-3 py-2 text-surface-text">{row.observations}</td>
+                            <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>
+                            <td className="px-3 py-2">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditVisitation(row)}
+                                  disabled={editingVisitationId !== null && editingVisitationId !== row.visitationId}
+                                  className="rounded-md border border-brand-100 px-2.5 py-1.5 text-xs font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-60"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteVisitationId(row.visitationId)}
+                                  disabled={deletingVisitationId === row.visitationId}
+                                  className="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
+                                >
+                                  {deletingVisitationId === row.visitationId ? 'Deleting...' : 'Delete'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -221,16 +453,85 @@ export function VisitationPage() {
                         <th className="px-3 py-2 font-medium">Date</th>
                         <th className="px-3 py-2 font-medium">Conference Notes</th>
                         <th className="px-3 py-2 font-medium">Outcome</th>
+                        <th className="px-3 py-2 font-medium">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {conferenceItems.map((row) => (
-                        <tr key={row.visitationId} className="border-b border-slate-100 align-top">
-                          <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
-                          <td className="px-3 py-2 text-surface-text">{row.observations}</td>
-                          <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>
-                        </tr>
-                      ))}
+                      {conferenceItems.map((row) =>
+                        editingVisitationId === row.visitationId ? (
+                          <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                            <td className="px-3 py-2" colSpan={3}>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                <input
+                                  type="date"
+                                  value={editVisitDate}
+                                  onChange={(e) => setEditVisitDate(e.target.value)}
+                                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                                <input
+                                  value={editVisitOutcome}
+                                  onChange={(e) => setEditVisitOutcome(e.target.value)}
+                                  placeholder="Outcome"
+                                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                                <textarea
+                                  value={editObservations}
+                                  onChange={(e) => setEditObservations(e.target.value)}
+                                  rows={3}
+                                  placeholder="Conference notes"
+                                  className="md:col-span-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-surface-dark"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 align-top">
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => void saveEditVisitation(row)}
+                                  disabled={savingVisitationId === row.visitationId}
+                                  className="rounded-md bg-brand px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
+                                >
+                                  {savingVisitationId === row.visitationId ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEditVisitation}
+                                  disabled={savingVisitationId === row.visitationId}
+                                  className="rounded-md border border-brand-100 px-2.5 py-1.5 text-xs font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-60"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr key={row.visitationId} className="border-b border-slate-100 align-top">
+                            <td className="px-3 py-2 text-surface-dark">{new Date(row.visitDate).toLocaleDateString()}</td>
+                            <td className="px-3 py-2 text-surface-text">{row.observations}</td>
+                            <td className="px-3 py-2 text-surface-text">{row.visitOutcome}</td>
+                            <td className="px-3 py-2">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditVisitation(row)}
+                                  disabled={editingVisitationId !== null && editingVisitationId !== row.visitationId}
+                                  className="rounded-md border border-brand-100 px-2.5 py-1.5 text-xs font-semibold text-surface-dark hover:bg-brand-50 disabled:opacity-60"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteVisitationId(row.visitationId)}
+                                  disabled={deletingVisitationId === row.visitationId}
+                                  className="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
+                                >
+                                  {deletingVisitationId === row.visitationId ? 'Deleting...' : 'Delete'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -240,6 +541,12 @@ export function VisitationPage() {
           )}
         </section>
       </main>
+      <ConfirmDeleteModal
+        open={confirmDeleteVisitationId !== null}
+        title="Delete this visitation / conference record?"
+        onCancel={() => setConfirmDeleteVisitationId(null)}
+        onConfirm={() => void onConfirmDeleteVisitation()}
+      />
     </div>
   )
 }
