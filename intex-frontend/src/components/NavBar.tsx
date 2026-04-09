@@ -19,10 +19,9 @@ export function NavBar() {
   const isDonor = user?.roles?.includes('Donor') ?? false
   const homePath = isDonor && !isAdmin ? '/donor/dashboard' : '/admin'
   const currentLanguage = i18nInstance.resolvedLanguage ?? 'en'
-  const nextLanguage = currentLanguage.toLowerCase().startsWith('pt') ? 'en' : 'pt'
-  const languageToggleLabel = currentLanguage.toLowerCase().startsWith('pt')
-    ? 'Switch to English'
-    : 'Mudar para portugues'
+  const isPortuguese = isPortugueseLanguage(currentLanguage)
+  const nextLanguage = isPortuguese ? 'en' : 'pt'
+  const languageToggleLabel = isPortuguese ? t('language_switch_to_english') : t('language_switch_to_portuguese')
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
   useEffect(() => {
