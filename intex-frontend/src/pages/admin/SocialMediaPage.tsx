@@ -156,6 +156,22 @@ function Badge({ text, color }: { text: string; color: 'green' | 'amber' | 'red'
   )
 }
 
+/* ─── Prefetch: fires as soon as this chunk loads, before React mounts ─── */
+
+let inflightPromise: Promise<MlDashboardPayload> | null = null
+
+function fetchMlDashboard(): Promise<MlDashboardPayload> {
+  if (!inflightPromise) {
+    inflightPromise = api
+      .get<MlDashboardPayload>('/api/social-media/ml-dashboard')
+      .then((r) => r.data)
+      .finally(() => { inflightPromise = null })
+  }
+  return inflightPromise
+}
+
+fetchMlDashboard()
+
 /* ─── Page ─── */
 
 export function SocialMediaPage() {
@@ -164,14 +180,9 @@ export function SocialMediaPage() {
 
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
-      try {
-        const res = await api.get<MlDashboardPayload>('/api/social-media/ml-dashboard')
-        if (!cancelled) setData(res.data)
-      } catch {
-        if (!cancelled) setError('Unable to load social media analytics.')
-      }
-    })()
+    fetchMlDashboard()
+      .then((d) => { if (!cancelled) setData(d) })
+      .catch(() => { if (!cancelled) setError('Unable to load social media analytics.') })
     return () => { cancelled = true }
   }, [])
 
@@ -226,36 +237,104 @@ export function SocialMediaPage() {
           <div className="mt-10 flex justify-center"><LoadingSpinner /></div>
         ) : (
           <>
-            {/* ═══════ 1. MODEL PERFORMANCE ═══════ */}
-            {perf && (
-              <>
-                <h2 className="mt-8 text-lg font-bold text-surface-dark">Model Performance</h2>
-                <p className="mt-1 text-sm text-surface-text">
-                  How well the Random Forest predicts donation referrals vs. a baseline that always guesses the average.
+            {/* ═══════ 1. RECOMMENDATIONS ═══════ */}
+            {ml?.ols_coefficients && ml.ols_coefficients.length > 0 && (
+              <div className="mt-6 rounded-2xl border-2 border-green-200 bg-gradient-to-br from-green-50/80 to-white p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-green-900">Recommendations</h2>
+                <p className="mt-1 text-sm text-green-800/80">
+                  Based on our ML analysis of {ml.n_posts ?? data.meta.nPosts} posts, here is what we recommend to maximize donation referrals — and how much better each action is expected to perform.
                 </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <MetricCard
-                    label="Model R²"
-                    value={perf.r2.toFixed(2)}
-                    sub={`Cross-val: ${perf.cv_r2_mean.toFixed(2)} ± ${perf.cv_r2_std.toFixed(2)}`}
-                  />
-                  <MetricCard
-                    label="Improvement over baseline"
-                    value={`${perf.improvement_over_baseline_pct.toFixed(0)}%`}
-                    sub={`RMSE ${perf.rmse.toFixed(1)} vs baseline ${perf.baseline_rmse.toFixed(1)}`}
-                  />
-                  <MetricCard
-                    label="Mean Absolute Error"
-                    value={perf.mae.toFixed(1)}
-                    sub={`Baseline MAE: ${perf.baseline_mae.toFixed(1)}`}
-                  />
-                  <MetricCard
-                    label="Overfitting gap"
-                    value={`${(((perf.test_rmse - perf.train_rmse) / perf.train_rmse) * 100).toFixed(0)}%`}
-                    sub={`Train RMSE ${perf.train_rmse.toFixed(1)} → Test ${perf.test_rmse.toFixed(1)}`}
-                  />
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  {ml.ols_coefficients
+                    .filter((c) => c.significant && c.coef > 0)
+                    .sort((a, b) => b.coef - a.coef)
+                    .map((c, idx) => {
+                      const best = whatIfChart.length > 0 ? Math.max(...whatIfChart.map((s) => s.referrals)) : null
+                      const generic = whatIfChart.length > 0 ? Math.min(...whatIfChart.map((s) => s.referrals)) : null
+                      const multiplier = best != null && generic != null && generic > 0 ? best / generic : null
+                      return (
+                        <div key={c.feature} className="flex gap-4 rounded-xl border border-green-200 bg-white p-4">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 text-lg font-bold text-green-700">
+                            {idx + 1}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-semibold text-green-900">{c.feature}</span>
+                              <Badge text={`p = ${c.p_value.toFixed(3)}`} color="green" />
+                            </div>
+                            <div className="mt-1 text-xl font-bold text-green-700">
+                              +{c.coef.toFixed(1)} referrals per post
+                            </div>
+                            <div className="mt-0.5 text-xs text-surface-text">
+                              {idx === 0 && multiplier != null
+                                ? `Strongest driver. Posts with all recommendations → ${best?.toFixed(0)} predicted referrals vs ${generic?.toFixed(0)} without.`
+                                : 'per unit increase, all else equal (OLS regression)'}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
                 </div>
-              </>
+
+                {whatIfChart.length >= 2 && (() => {
+                  const best = whatIfChart.reduce((a, b) => (a.referrals > b.referrals ? a : b))
+                  const worst = whatIfChart.reduce((a, b) => (a.referrals < b.referrals ? a : b))
+                  return (
+                    <div className="mt-5 rounded-xl border border-green-100 bg-green-50/40 p-4">
+                      <div className="text-sm font-semibold text-green-900">Expected Performance Comparison</div>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-lg border border-green-200 bg-white px-4 py-3 text-center">
+                          <div className="text-xs uppercase tracking-wide text-surface-text">Following all recommendations</div>
+                          <div className="mt-1 text-3xl font-bold text-green-700">{best.referrals.toFixed(1)}</div>
+                          <div className="text-xs text-surface-text">predicted referrals — {best.full}</div>
+                        </div>
+                        <div className="rounded-lg border border-red-200 bg-white px-4 py-3 text-center">
+                          <div className="text-xs uppercase tracking-wide text-surface-text">Generic post (none applied)</div>
+                          <div className="mt-1 text-3xl font-bold text-red-600">{worst.referrals.toFixed(1)}</div>
+                          <div className="text-xs text-surface-text">predicted referrals — {worst.full}</div>
+                        </div>
+                      </div>
+                      {best.referrals > 0 && worst.referrals > 0 && (
+                        <p className="mt-3 text-center text-sm font-semibold text-green-800">
+                          That's {(best.referrals / worst.referrals).toFixed(0)}× more referrals when you apply the model's recommendations.
+                        </p>
+                      )}
+                      {worst.referrals === 0 && (
+                        <p className="mt-3 text-center text-sm font-semibold text-green-800">
+                          Applying the model's recommendations takes a post from near-zero to an estimated {best.referrals.toFixed(0)} donation referrals.
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {recs && (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-lg border border-green-100 bg-white px-3 py-2">
+                      <div className="text-xs uppercase tracking-wide text-surface-text">Best platform (avg)</div>
+                      <div className="text-lg font-bold">{recs.best_platform ?? '—'}</div>
+                      {recs.best_platform_avg != null && <div className="text-xs text-surface-text">{recs.best_platform_avg.toFixed(1)} avg referrals/post</div>}
+                    </div>
+                    <div className="rounded-lg border border-green-100 bg-white px-3 py-2">
+                      <div className="text-xs uppercase tracking-wide text-surface-text">Best timing (avg)</div>
+                      <div className="text-lg font-bold">{recs.best_day ?? '—'} at {recs.best_hour != null ? `${recs.best_hour}:00` : '—'}</div>
+                    </div>
+                    <div className="rounded-lg border border-green-100 bg-white px-3 py-2">
+                      <div className="text-xs uppercase tracking-wide text-surface-text">Best topic (avg)</div>
+                      <div className="text-lg font-bold">{recs.best_topic ?? '—'}</div>
+                    </div>
+                  </div>
+                )}
+
+                {perf && (
+                  <p className="mt-4 text-xs text-green-700/70">
+                    Model confidence: R² = {perf.r2.toFixed(2)} (cross-validated {perf.cv_r2_mean.toFixed(2)} ± {perf.cv_r2_std.toFixed(2)}),{' '}
+                    {perf.improvement_over_baseline_pct.toFixed(0)}% more accurate than guessing the average.
+                    Recommendations are from OLS causal regression (R² = {(ml.ols_r2 ?? 0).toFixed(2)}) using only pre-publication features you can control.
+                  </p>
+                )}
+              </div>
             )}
 
             {/* ═══════ 2. FEATURE IMPORTANCE (RF) ═══════ */}
@@ -377,40 +456,35 @@ export function SocialMediaPage() {
               </>
             )}
 
-            {/* ═══════ 5. KEY TAKEAWAY ═══════ */}
-            {recs && (
-              <div className="mt-8 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50/80 to-white p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-indigo-900">Bottom Line from the Model</h2>
-                <p className="mt-2 text-sm text-indigo-800/90 leading-relaxed">
-                  The single strongest predictor of donation referrals is{' '}
-                  <strong>including a resident story</strong>{' '}
-                  (OLS: +36.5 referrals, p &lt; 0.001; RF importance: 0.40 — 3× the next feature).
-                  {recs.story_lift_pct != null && recs.story_lift_pct > 0 && (
-                    <> Posts with resident stories average <strong>{(recs.story_lift_pct / 100).toFixed(1)}× more</strong> referrals.</>
-                  )}
-                  {' '}Boosting adds ~11.7 referrals (p = 0.019). Longer captions and later posting hours help modestly.
-                  {recs.cta_lift_pct != null && recs.cta_lift_pct < 0 && (
-                    <> Interestingly, call-to-action posts show <strong>{Math.abs(recs.cta_lift_pct).toFixed(0)}% fewer</strong> referrals and the effect is not statistically significant — focus on storytelling instead.</>
-                  )}
+            {/* ═══════ 5. MODEL PERFORMANCE ═══════ */}
+            {perf && (
+              <div className="mt-8">
+                <h2 className="text-lg font-bold text-surface-dark">Model Performance</h2>
+                <p className="mt-1 text-sm text-surface-text">
+                  How well the Random Forest predicts donation referrals vs. a baseline that always guesses the average.
                 </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-lg border border-indigo-100 bg-white px-3 py-2">
-                    <div className="text-xs uppercase tracking-wide text-surface-text">Best platform (avg)</div>
-                    <div className="text-lg font-bold">{recs.best_platform ?? '—'}</div>
-                    {recs.best_platform_avg != null && <div className="text-xs text-surface-text">{recs.best_platform_avg.toFixed(1)} avg referrals/post</div>}
-                  </div>
-                  <div className="rounded-lg border border-indigo-100 bg-white px-3 py-2">
-                    <div className="text-xs uppercase tracking-wide text-surface-text">Best timing (avg)</div>
-                    <div className="text-lg font-bold">{recs.best_day ?? '—'} at {recs.best_hour != null ? `${recs.best_hour}:00` : '—'}</div>
-                  </div>
-                  <div className="rounded-lg border border-indigo-100 bg-white px-3 py-2">
-                    <div className="text-xs uppercase tracking-wide text-surface-text">Best topic (avg)</div>
-                    <div className="text-lg font-bold">{recs.best_topic ?? '—'}</div>
-                  </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <MetricCard
+                    label="Model R²"
+                    value={perf.r2.toFixed(2)}
+                    sub={`Cross-val: ${perf.cv_r2_mean.toFixed(2)} ± ${perf.cv_r2_std.toFixed(2)}`}
+                  />
+                  <MetricCard
+                    label="Improvement over baseline"
+                    value={`${perf.improvement_over_baseline_pct.toFixed(0)}%`}
+                    sub={`RMSE ${perf.rmse.toFixed(1)} vs baseline ${perf.baseline_rmse.toFixed(1)}`}
+                  />
+                  <MetricCard
+                    label="Mean Absolute Error"
+                    value={perf.mae.toFixed(1)}
+                    sub={`Baseline MAE: ${perf.baseline_mae.toFixed(1)}`}
+                  />
+                  <MetricCard
+                    label="Overfitting gap"
+                    value={`${(((perf.test_rmse - perf.train_rmse) / perf.train_rmse) * 100).toFixed(0)}%`}
+                    sub={`Train RMSE ${perf.train_rmse.toFixed(1)} → Test ${perf.test_rmse.toFixed(1)}`}
+                  />
                 </div>
-                <p className="mt-3 text-xs text-indigo-600/70">
-                  Platform, timing, and topic are from simple averages (not model-predicted). The causal drivers and what-if scenarios above come from the ML pipeline.
-                </p>
               </div>
             )}
 
