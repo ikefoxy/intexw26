@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { HeartIcon, ShieldCheckIcon, UsersIcon } from 'lucide-react'
+import { CalendarIcon, HeartIcon, ShieldCheckIcon, UsersIcon } from 'lucide-react'
 import { NavBar } from '../components/NavBar'
 import { getMyDonations, getPublicImpactSnapshot, type Donation } from '../lib/api'
-import { formatUsd } from '../lib/locale'
+import { formatDate, formatUsd } from '../lib/locale'
 import { useAuth } from '../state/AuthContext'
 
 function toVagueCount(value: number, step = 10): string {
@@ -112,6 +112,55 @@ export function DonorDashboard() {
             </p>
             <p className="mt-1 text-sm text-surface-text">{t('donor_lifetime_caption')}</p>
           </article>
+        </section>
+
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-surface-dark">
+              <CalendarIcon className="h-4 w-4 text-brand" />
+              {t('donate_history_title')}
+            </h2>
+            <div className="text-xs text-surface-text">{user?.email}</div>
+          </div>
+
+          {loading && <p className="px-5 py-3 text-sm text-surface-text">{t('donate_history_loading')}</p>}
+          {!loading && error && <p className="px-5 py-3 text-sm text-red-500">{error}</p>}
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              <thead>
+                <tr className="border-b border-slate-200 bg-white text-sm text-surface-text">
+                  <th className="px-5 py-3 font-medium">{t('table_date')}</th>
+                  <th className="px-5 py-3 font-medium">{t('table_designation')}</th>
+                  <th className="px-5 py-3 font-medium">{t('table_amount')}</th>
+                  <th className="px-5 py-3 font-medium">{t('table_status')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {!loading && donations.length === 0 && (
+                  <tr>
+                    <td className="px-5 py-4 text-sm text-surface-text" colSpan={4}>
+                      {t('donate_no_records')}
+                    </td>
+                  </tr>
+                )}
+                {donations.map((d) => (
+                  <tr key={d.donationId} className="hover:bg-slate-50">
+                    <td className="px-5 py-4 text-sm text-surface-text">{formatDate(d.donationDate, i18n.resolvedLanguage)}</td>
+                    <td className="px-5 py-4 text-sm font-medium text-surface-dark">
+                      {d.campaignName || d.designation || t('donate_general_fund')}
+                    </td>
+                    <td className="px-5 py-4 text-sm font-semibold text-surface-dark">{formatUsd(Number(d.amount), i18n.resolvedLanguage)}</td>
+                    <td className="px-5 py-4">
+                      <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                        {t('donate_completed')}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

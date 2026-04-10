@@ -3,6 +3,7 @@
 # - Secret: INTEX_AZURE_WEBAPP_FRONTEND_PUBLISH_PROFILE
 # - Variable: INTEX_AZURE_WEBAPP_FRONTEND_NAME (for example: intexw26-web-21573)
 # - Variable: VITE_API_BASE_URL (for example: https://intexw26-api-21573.azurewebsites.net)
+# - Variable: VITE_GA_MEASUREMENT_ID (Google Analytics 4 measurement ID, e.g. G-XXXXXXXXXX)
 
 name: Deploy frontend (Azure App Service)
 
@@ -35,6 +36,7 @@ jobs:
         run: npm run build
         env:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

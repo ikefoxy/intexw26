@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { initAnalytics, onConsentChange } from "../lib/analytics";
 
 const STORAGE_KEY = "novapath_cookie_consent";
 
@@ -13,6 +14,7 @@ export default function CookieBanner({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    initAnalytics();
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
       const id = setTimeout(() => setVisible(true), 900);
@@ -22,6 +24,7 @@ export default function CookieBanner({
 
   function handleChoice(value: ConsentValue) {
     localStorage.setItem(STORAGE_KEY, value);
+    onConsentChange(value);
     setVisible(false);
     onConsent?.(value);
   }

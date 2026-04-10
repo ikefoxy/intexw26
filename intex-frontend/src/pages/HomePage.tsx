@@ -656,6 +656,12 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <span className="font-display text-sm font-semibold text-surface-dark">{content.nav}</span>
           <p className="text-xs text-surface-text">{content.section.footer}</p>
+          <Link
+            to="/privacy"
+            className="text-xs text-surface-text underline underline-offset-2 hover:text-brand transition-colors"
+          >
+            {content.section.navPrivacy}
+          </Link>
           <p className="text-xs text-surface-text/75">{content.section.systems}</p>
         </div>
       </footer>
