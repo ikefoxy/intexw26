@@ -122,7 +122,7 @@ public class SocialMediaMlDashboardController : ControllerBase
             .Take(24)
             .ToList();
 
-        var insights = LoadInsights();
+        var mlInsights = LoadMlInsights();
 
         var response = new SocialMediaMlDashboardResponse(
             meta,
@@ -136,13 +136,13 @@ public class SocialMediaMlDashboardController : ControllerBase
                 dowAvgs.Select(x => Math.Round(x.Avg, 4)).ToList()),
             cadence,
             combos,
-            insights
+            mlInsights
         );
 
         return Ok(response);
     }
 
-    private MlInsights? LoadInsights()
+    private JsonElement? LoadMlInsights()
     {
         var searchPaths = new[]
         {
@@ -156,12 +156,8 @@ public class SocialMediaMlDashboardController : ControllerBase
             try
             {
                 var json = System.IO.File.ReadAllText(path);
-                var opts = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-                };
-                return JsonSerializer.Deserialize<MlInsights>(json, opts);
+                using var doc = JsonDocument.Parse(json);
+                return doc.RootElement.Clone();
             }
             catch { }
         }

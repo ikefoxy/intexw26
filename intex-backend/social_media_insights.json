@@ -1,10 +1,69 @@
 {
-  "best_platform": "WhatsApp",
-  "best_platform_avg": 23.1,
-  "best_post_type": "ImpactStory",
-  "best_hour": 10,
-  "best_day": "Tuesday",
-  "best_topic": "Health",
-  "cta_lift_pct": -17.2,
-  "story_lift_pct": 632.1
+  "model_type": "Random Forest Regressor",
+  "target": "donation_referrals",
+  "n_posts": 812,
+  "model_performance": {
+    "r2": 0.584,
+    "rmse": 21.191,
+    "mae": 7.617,
+    "cv_r2_mean": 0.564,
+    "cv_r2_std": 0.057,
+    "baseline_rmse": 32.89,
+    "baseline_mae": 17.706,
+    "improvement_over_baseline_pct": 35.6,
+    "train_rmse": 14.433,
+    "test_rmse": 21.191
+  },
+  "ols_r2": 0.266,
+  "ols_coefficients": [
+    {"feature": "Resident story", "coef": 36.47, "p_value": 0.0, "significant": true},
+    {"feature": "Boosted post", "coef": 11.68, "p_value": 0.019, "significant": true},
+    {"feature": "Post hour (per hr)", "coef": 0.59, "p_value": 0.0, "significant": true},
+    {"feature": "Caption length (per char)", "coef": 0.15, "p_value": 0.0, "significant": true},
+    {"feature": "Call-to-action", "coef": 2.72, "p_value": 0.174, "significant": false},
+    {"feature": "Hashtag count", "coef": -1.04, "p_value": 0.128, "significant": false},
+    {"feature": "Boost budget (₱)", "coef": 0.001, "p_value": 0.693, "significant": false}
+  ],
+  "feature_importances": [
+    {"feature": "Resident story", "importance": 0.4015},
+    {"feature": "Profile visits", "importance": 0.1253},
+    {"feature": "Reach", "importance": 0.087},
+    {"feature": "Hashtag count", "importance": 0.0208},
+    {"feature": "Impressions", "importance": 0.009},
+    {"feature": "Follower count", "importance": 0.0039},
+    {"feature": "Post hour", "importance": 0.0033},
+    {"feature": "Boost budget", "importance": 0.0033}
+  ],
+  "what_if_scenarios": [
+    {
+      "name": "Story + boosted + long caption",
+      "description": "Resident story, boosted ₱500, 10am, 250-char caption",
+      "predicted_referrals": 65.1
+    },
+    {
+      "name": "Story + organic",
+      "description": "Resident story, not boosted, 10am, 150-char caption",
+      "predicted_referrals": 38.4
+    },
+    {
+      "name": "Campaign + boosted",
+      "description": "No story, boosted ₱300, noon, 80-char, with CTA",
+      "predicted_referrals": 4.4
+    },
+    {
+      "name": "Generic post",
+      "description": "No story, no boost, 8am, 50-char caption",
+      "predicted_referrals": 0
+    }
+  ],
+  "top_recommendations": {
+    "best_platform": "WhatsApp",
+    "best_platform_avg": 23.1,
+    "best_post_type": "ImpactStory",
+    "best_hour": 10,
+    "best_day": "Tuesday",
+    "best_topic": "Health",
+    "cta_lift_pct": -17.2,
+    "story_lift_pct": 632.1
+  }
 }

@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Intex.Backend.Dtos;
 
 public record LabelDecimalSeries(IReadOnlyList<string> Labels, IReadOnlyList<decimal> Values);
@@ -7,17 +9,6 @@ public record LabelIntSeries(IReadOnlyList<string> Labels, IReadOnlyList<int> Va
 public record SocialMediaMlDashboardMeta(int NPosts, double WeeklyMean, double WeeklyMedian, double WeeklyStd);
 
 public record SocialMediaPostPlatformCombo(string Label, decimal AvgReferrals);
-
-public record MlInsights(
-    string? BestPlatform,
-    decimal? BestPlatformAvg,
-    string? BestPostType,
-    int? BestHour,
-    string? BestDay,
-    string? BestTopic,
-    decimal? CtaLiftPct,
-    decimal? StoryLiftPct
-);
 
 public record SocialMediaMlDashboardResponse(
     SocialMediaMlDashboardMeta Meta,
@@ -29,5 +20,5 @@ public record SocialMediaMlDashboardResponse(
     LabelDecimalSeries DayOfWeekAvgReferrals,
     LabelIntSeries Cadence,
     IReadOnlyList<SocialMediaPostPlatformCombo> TopPostTypePlatformCombos,
-    MlInsights? Insights = null
+    JsonElement? MlInsights = null
 );
