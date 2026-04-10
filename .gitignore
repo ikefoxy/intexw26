@@ -31,9 +31,13 @@ yarn-error.log*
 .azure/
 
 # ML artifacts
-ML_Pipeline/*.pkl
-ML_Pipeline/*.png
-ML_Pipeline/donor_churn_predictions.csv
-ML_Pipeline/resident_risk_predictions.csv
-ML_Pipeline/social_media_predictions.csv
-ML_Pipeline/Resident_Recommendations.csv
+ml-pipelines/*.pkl
+ml-pipelines/*.png
+ml-pipelines/.output-*.ipynb
+ml-pipelines/donor_churn_predictions.csv
+ml-pipelines/donor_segmentation_predictions.csv
+ml-pipelines/resident_risk_predictions.csv
+ml-pipelines/social_media_predictions.csv
+ml-pipelines/Resident_Recommendations.csv
+intex-backend/donor_segments.json
+intex-backend/resident_recommendations.json

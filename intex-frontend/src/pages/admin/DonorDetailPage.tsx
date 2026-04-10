@@ -6,15 +6,24 @@ import { NavBar } from '../../components/NavBar'
 import {
   getDonationsForSupporter,
   getSupporterById,
+  getSupporterSegment,
   type Donation,
+  type DonorSegment,
   type SupporterDetail,
 } from '../../lib/api'
+
+const personaColors: Record<string, string> = {
+  Champions: 'bg-green-100 text-green-800 border-green-300',
+  'At-Risk Donors': 'bg-red-100 text-red-800 border-red-300',
+  'New/Occasional Donors': 'bg-amber-100 text-amber-800 border-amber-300',
+}
 
 export function DonorDetailPage() {
   const { id } = useParams()
   const supporterId = Number(id)
   const [supporter, setSupporter] = useState<SupporterDetail | null>(null)
   const [donations, setDonations] = useState<Donation[]>([])
+  const [segment, setSegment] = useState<DonorSegment | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,9 +42,13 @@ export function DonorDetailPage() {
 
     ;(async () => {
       try {
-        const detail = await getSupporterById(supporterId)
+        const [detail, seg] = await Promise.all([
+          getSupporterById(supporterId),
+          getSupporterSegment(supporterId),
+        ])
         if (!active) return
         setSupporter(detail)
+        setSegment(seg)
 
         if (Array.isArray(detail.donations) && detail.donations.length > 0) {
           const sorted = [...detail.donations].sort(
@@ -122,6 +135,42 @@ export function DonorDetailPage() {
                 </div>
               </div>
             </section>
+
+            {segment?.persona && (
+              <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
+                <h2 className="text-lg font-semibold text-surface-dark">Donor Persona</h2>
+                <p className="mt-1 text-sm text-surface-text">
+                  ML-powered segment based on recency, frequency, and monetary value.
+                </p>
+                <div className="mt-4 flex items-center gap-3">
+                  <span
+                    className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold ${personaColors[segment.persona] ?? 'bg-slate-100 text-slate-800 border-slate-300'}`}
+                  >
+                    {segment.persona}
+                  </span>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="text-xs uppercase tracking-wide text-surface-text">Recency</div>
+                    <div className="mt-1 text-lg font-semibold text-surface-dark">
+                      {segment.recency ?? '—'} <span className="text-xs font-normal text-surface-text">days</span>
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="text-xs uppercase tracking-wide text-surface-text">Frequency</div>
+                    <div className="mt-1 text-lg font-semibold text-surface-dark">
+                      {segment.frequency ?? '—'} <span className="text-xs font-normal text-surface-text">donations</span>
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div className="text-xs uppercase tracking-wide text-surface-text">Monetary</div>
+                    <div className="mt-1 text-lg font-semibold text-surface-dark">
+                      ${(segment.monetary ?? 0).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
               <h2 className="text-lg font-semibold text-surface-dark">Donation History</h2>

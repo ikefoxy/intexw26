@@ -331,15 +331,7 @@ public class ResidentsController : ControllerBase
         var path = Path.Combine(_env.ContentRootPath, ResidentRecommendationsFileName);
         if (!System.IO.File.Exists(path))
         {
-            return Ok(new
-            {
-                residentId = id,
-                riskScore = (decimal?)null,
-                message = $"Model output file '{ResidentRecommendationsFileName}' was not found.",
-                modelUsed = ResidentRecommendationsFileName,
-                peerMatches = Array.Empty<object>(),
-                suggestedInterventions = Array.Empty<string>(),
-            });
+            return Ok(EmptyRecommendation(id, $"Model output file '{ResidentRecommendationsFileName}' was not found."));
         }
 
         string json;
@@ -350,78 +342,113 @@ public class ResidentsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Could not read {File}", ResidentRecommendationsFileName);
+            return Ok(EmptyRecommendation(id, $"Could not read '{ResidentRecommendationsFileName}'."));
+        }
+
+        if (TryParseRichRecommendations(json, out var richMap))
+        {
+            var avgRisk = richMap.Values.Average(v => v.RiskScore);
+            if (!richMap.TryGetValue(id, out var entry))
+            {
+                return Ok(EmptyRecommendation(id, "No recommendation for this resident in the model output.", avgRisk));
+            }
+
             return Ok(new
             {
                 residentId = id,
-                riskScore = (decimal?)null,
-                message = $"Could not read '{ResidentRecommendationsFileName}'.",
+                riskScore = entry.RiskScore,
+                averageRiskScore = avgRisk,
+                recommendedIntervention = entry.RecommendedIntervention,
+                confidence = entry.Confidence,
+                topDrivers = entry.TopDrivers ?? Array.Empty<string>(),
+                incidentRisk = entry.IncidentRisk,
+                reviewRequired = entry.ReviewRequired,
+                message = (string?)null,
+                modelUsed = ResidentRecommendationsFileName,
+                peerMatches = Array.Empty<object>(),
+                suggestedInterventions = entry.RecommendedIntervention is not null
+                    ? new[] { entry.RecommendedIntervention }
+                    : Array.Empty<string>(),
+            });
+        }
+
+        if (TryParseLegacyScores(json, out var legacyScores, out var parseError))
+        {
+            var avgRisk = legacyScores.Values.Average();
+            if (!legacyScores.TryGetValue(id, out var riskScore))
+            {
+                return Ok(EmptyRecommendation(id, "No risk score for this resident in the model output.", avgRisk));
+            }
+
+            return Ok(new
+            {
+                residentId = id,
+                riskScore,
+                averageRiskScore = avgRisk,
+                recommendedIntervention = (string?)null,
+                confidence = (decimal?)null,
+                topDrivers = Array.Empty<string>(),
+                incidentRisk = (decimal?)null,
+                reviewRequired = false,
+                message = (string?)null,
                 modelUsed = ResidentRecommendationsFileName,
                 peerMatches = Array.Empty<object>(),
                 suggestedInterventions = Array.Empty<string>(),
             });
         }
 
-        if (!TryParseRiskScores(json, out var scoresByResidentId, out var parseError))
-        {
-            return Ok(new
-            {
-                residentId = id,
-                riskScore = (decimal?)null,
-                message = parseError,
-                modelUsed = ResidentRecommendationsFileName,
-                peerMatches = Array.Empty<object>(),
-                suggestedInterventions = Array.Empty<string>(),
-            });
-        }
-
-        var averageRiskScore = scoresByResidentId.Values.Average();
-
-        if (!scoresByResidentId.TryGetValue(id, out var riskScore))
-        {
-            return Ok(new
-            {
-                residentId = id,
-                riskScore = (decimal?)null,
-                averageRiskScore,
-                message = "No risk score for this resident in the model output.",
-                modelUsed = ResidentRecommendationsFileName,
-                peerMatches = Array.Empty<object>(),
-                suggestedInterventions = Array.Empty<string>(),
-            });
-        }
-
-        return Ok(new
-        {
-            residentId = id,
-            riskScore,
-            averageRiskScore,
-            message = (string?)null,
-            modelUsed = ResidentRecommendationsFileName,
-            peerMatches = Array.Empty<object>(),
-            suggestedInterventions = Array.Empty<string>(),
-        });
+        return Ok(EmptyRecommendation(id, parseError));
     }
 
-    private static bool TryParseRiskScores(string json, out Dictionary<int, decimal> scores, out string? error)
+    private static object EmptyRecommendation(int id, string? message, decimal? avgRisk = null) => new
     {
-        scores = new Dictionary<int, decimal>();
-        error = null;
+        residentId = id,
+        riskScore = (decimal?)null,
+        averageRiskScore = avgRisk,
+        recommendedIntervention = (string?)null,
+        confidence = (decimal?)null,
+        topDrivers = Array.Empty<string>(),
+        incidentRisk = (decimal?)null,
+        reviewRequired = false,
+        message,
+        modelUsed = ResidentRecommendationsFileName,
+        peerMatches = Array.Empty<object>(),
+        suggestedInterventions = Array.Empty<string>(),
+    };
 
+    private static bool TryParseRichRecommendations(string json, out Dictionary<int, RecommendationEntry> map)
+    {
+        map = new Dictionary<int, RecommendationEntry>();
         var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         try
         {
-            var asIntKeys = JsonSerializer.Deserialize<Dictionary<int, decimal>>(json, opts);
-            if (asIntKeys is { Count: > 0 })
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, RecommendationEntry>>(json, opts);
+            if (parsed is null || parsed.Count == 0) return false;
+
+            var first = parsed.Values.First();
+            if (first.RecommendedIntervention is null && first.TopDrivers is null)
+                return false;
+
+            foreach (var kv in parsed)
             {
-                scores = asIntKeys;
-                return true;
+                if (!int.TryParse(kv.Key, out var rid)) return false;
+                map[rid] = kv.Value;
             }
+
+            return map.Count > 0;
         }
         catch (JsonException)
         {
-            // try other shapes
+            return false;
         }
+    }
+
+    private static bool TryParseLegacyScores(string json, out Dictionary<int, decimal> scores, out string? error)
+    {
+        scores = new Dictionary<int, decimal>();
+        error = null;
+        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         try
         {
@@ -436,28 +463,20 @@ public class ResidentsController : ControllerBase
                         scores.Clear();
                         return false;
                     }
-
                     scores[rid] = kv.Value;
                 }
-
                 return true;
             }
         }
-        catch (JsonException)
-        {
-            // try array
-        }
+        catch (JsonException) { }
 
         try
         {
-            var rows = JsonSerializer.Deserialize<List<RiskScoreJsonRow>>(json, opts);
+            var rows = JsonSerializer.Deserialize<List<LegacyRiskScoreRow>>(json, opts);
             if (rows is { Count: > 0 })
             {
                 foreach (var row in rows)
-                {
                     scores[row.ResidentId] = row.RiskScore;
-                }
-
                 return true;
             }
         }
@@ -467,11 +486,21 @@ public class ResidentsController : ControllerBase
             return false;
         }
 
-        error = $"Could not parse '{ResidentRecommendationsFileName}' (expected object map of resident id → score or an array of rows).";
+        error = $"Could not parse '{ResidentRecommendationsFileName}'.";
         return false;
     }
 
-    private sealed class RiskScoreJsonRow
+    private sealed class RecommendationEntry
+    {
+        public decimal RiskScore { get; set; }
+        public string? RecommendedIntervention { get; set; }
+        public decimal Confidence { get; set; }
+        public string[]? TopDrivers { get; set; }
+        public decimal IncidentRisk { get; set; }
+        public bool ReviewRequired { get; set; }
+    }
+
+    private sealed class LegacyRiskScoreRow
     {
         public int ResidentId { get; set; }
         public decimal RiskScore { get; set; }

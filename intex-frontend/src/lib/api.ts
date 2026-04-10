@@ -98,6 +98,16 @@ export type ResidentMlRecommendations = {
   message?: string | null
   peerMatches: ResidentRecommendation[]
   suggestedInterventions: string[]
+  /** Recommended intervention category from the intervention recommender pipeline. */
+  recommendedIntervention?: string | null
+  /** Model confidence in the recommendation (0–1). */
+  confidence?: number | null
+  /** Top features driving this recommendation. */
+  topDrivers?: string[]
+  /** Predicted probability of an incident in the next 30 days (0–1). */
+  incidentRisk?: number | null
+  /** Whether manual review is required (high/critical risk or high incident probability). */
+  reviewRequired?: boolean
 }
 
 export async function getResidentRecommendations(id: number): Promise<ResidentMlRecommendations | null> {
@@ -113,6 +123,11 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
       recommendedResidentIds?: number[]
       recommendations?: number[]
       ids?: number[]
+      recommendedIntervention?: string | null
+      confidence?: number | null
+      topDrivers?: string[]
+      incidentRisk?: number | null
+      reviewRequired?: boolean
     }>(`/api/residents/${id}/recommendations`)
     const peerMatches = Array.isArray(res.data.peerMatches)
       ? res.data.peerMatches
@@ -136,6 +151,11 @@ export async function getResidentRecommendations(id: number): Promise<ResidentMl
       message: res.data.message ?? null,
       peerMatches,
       suggestedInterventions,
+      recommendedIntervention: res.data.recommendedIntervention ?? null,
+      confidence: res.data.confidence ?? null,
+      topDrivers: Array.isArray(res.data.topDrivers) ? res.data.topDrivers : [],
+      incidentRisk: res.data.incidentRisk ?? null,
+      reviewRequired: res.data.reviewRequired ?? false,
     }
   } catch {
     // Graceful fallback when ML output is not yet available.
@@ -420,4 +440,25 @@ export async function getPublicImpactSnapshot(): Promise<PublicImpactSnapshot> {
 export async function getSupporterById(supporterId: number): Promise<SupporterDetail> {
   const res = await api.get<SupporterDetail>(`/api/supporters/${supporterId}`, { headers: getHeaders() })
   return res.data
+}
+
+export type DonorSegment = {
+  supporterId: number
+  persona?: string | null
+  recency?: number
+  frequency?: number
+  monetary?: number
+  cluster?: number
+  message?: string | null
+}
+
+export async function getSupporterSegment(supporterId: number): Promise<DonorSegment | null> {
+  try {
+    const res = await api.get<DonorSegment>(`/api/supporters/${supporterId}/segment`, {
+      headers: getHeaders(),
+    })
+    return res.data
+  } catch {
+    return null
+  }
 }

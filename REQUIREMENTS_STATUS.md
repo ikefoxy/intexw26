@@ -26,10 +26,10 @@ Updated: 2026-04-09
 ## IS 455 (ML Pipelines)
 - Notebook execution verified (headless via `jupyter nbconvert --execute`) after dependency setup.
 - Executed successfully:
-  - `ML_Pipeline/donor-churn-classifier.ipynb`
-  - `ML_Pipeline/resident-risk-predictor.ipynb`
-  - `ML_Pipeline/social-media-donation-predictor.ipynb`
-  - `ML_Pipeline/IS455_Master_Models.ipynb` (updated to current CSV schema)
+  - `ml-pipelines/donor-churn-classifier.ipynb`
+  - `ml-pipelines/resident-risk-predictor.ipynb`
+  - `ml-pipelines/social-media-donation-predictor.ipynb`
+  - `ml-pipelines/IS455_Master_Models.ipynb` (updated to current CSV schema)
 - Social media and master notebooks were patched for current dataset schema and numeric feature handling so execution completes.
 
 ## Notes
@@ -66,11 +66,11 @@ Verified against screenshot items 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20.
   - Frontend route protection: `intex-frontend/src/App.tsx` via `ProtectedRoute`.
   - Backend authorization attributes present across controllers (Admin/Donor role restrictions) in `intex-backend/Controllers/*.cs`.
 - `16` ML Pipeline 1 (donor churn): Complete.
-  - Evidence: `ML_Pipeline/donor-churn-classifier.ipynb` plus generated model artifacts (`donor_churn_model.pkl`, prediction CSV/plots).
+  - Evidence: `ml-pipelines/donor-churn-classifier.ipynb` plus generated model artifacts (`donor_churn_model.pkl`, prediction CSV/plots).
 - `17` ML Pipeline 2 (resident risk/reintegration): Complete.
-  - Evidence: `ML_Pipeline/resident-risk-predictor.ipynb` plus generated model artifacts (`resident_risk_model.pkl`, prediction CSV/plots).
+  - Evidence: `ml-pipelines/resident-risk-predictor.ipynb` plus generated model artifacts (`resident_risk_model.pkl`, prediction CSV/plots).
 - `18` ML Pipeline 3 (social media ROI predictor): Complete.
-  - Evidence: `ML_Pipeline/social-media-donation-predictor.ipynb` and executed notebook `ML_Pipeline/social-media-donation-predictor-executed.ipynb` with `social_media_insights.json`.
+  - Evidence: `ml-pipelines/social-media-donation-predictor.ipynb` and executed notebook `ml-pipelines/social-media-donation-predictor-executed.ipynb` with `social_media_insights.json`.
 - `19` Integrate ML outputs into web app: Complete.
   - Evidence:
     - Resident recommendation UI in `intex-frontend/src/pages/admin/ResidentDetailPage.tsx` using `GET /api/residents/{id}/recommendations`.

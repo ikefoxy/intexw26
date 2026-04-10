@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Intex.Backend.Data;
 using Intex.Backend.Dtos;
 using Intex.Backend.Models;
@@ -12,11 +13,17 @@ namespace Intex.Backend.Controllers;
 [Authorize(Roles = "Admin")]
 public class SupportersController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
+    private const string DonorSegmentsFileName = "donor_segments.json";
 
-    public SupportersController(ApplicationDbContext db)
+    private readonly ApplicationDbContext _db;
+    private readonly IWebHostEnvironment _env;
+    private readonly ILogger<SupportersController> _logger;
+
+    public SupportersController(ApplicationDbContext db, IWebHostEnvironment env, ILogger<SupportersController> logger)
     {
         _db = db;
+        _env = env;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -109,5 +116,71 @@ public class SupportersController : ControllerBase
         _db.Supporters.Remove(existing);
         await _db.SaveChangesAsync();
         return NoContent();
+    }
+
+    // GET: api/supporters/{id}/segment
+    [HttpGet("{id:int}/segment")]
+    public async Task<ActionResult> GetSegment(int id)
+    {
+        var supporter = await _db.Supporters.AsNoTracking()
+            .FirstOrDefaultAsync(s => s.SupporterId == id);
+        if (supporter is null) return NotFound(new { message = "Supporter not found." });
+
+        var path = Path.Combine(_env.ContentRootPath, DonorSegmentsFileName);
+        if (!System.IO.File.Exists(path))
+        {
+            return Ok(new
+            {
+                supporterId = id,
+                persona = (string?)null,
+                message = $"Segment file '{DonorSegmentsFileName}' not found."
+            });
+        }
+
+        try
+        {
+            var json = await System.IO.File.ReadAllTextAsync(path);
+            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var segments = JsonSerializer.Deserialize<Dictionary<string, DonorSegmentEntry>>(json, opts);
+
+            if (segments is not null && segments.TryGetValue(id.ToString(), out var entry))
+            {
+                return Ok(new
+                {
+                    supporterId = id,
+                    persona = entry.Persona,
+                    recency = entry.Recency,
+                    frequency = entry.Frequency,
+                    monetary = entry.Monetary,
+                    cluster = entry.Cluster
+                });
+            }
+
+            return Ok(new
+            {
+                supporterId = id,
+                persona = (string?)null,
+                message = "No segment data for this supporter."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not read {File}", DonorSegmentsFileName);
+            return Ok(new
+            {
+                supporterId = id,
+                persona = (string?)null,
+                message = $"Could not read '{DonorSegmentsFileName}'."
+            });
+        }
+    }
+
+    private sealed class DonorSegmentEntry
+    {
+        public string? Persona { get; set; }
+        public int Recency { get; set; }
+        public int Frequency { get; set; }
+        public decimal Monetary { get; set; }
+        public int Cluster { get; set; }
     }
 }
