@@ -150,3 +150,13 @@ def load_query(sql: str) -> pd.DataFrame:
     df = pd.read_sql(sql, engine)
     df.columns = [_to_snake_case(c) for c in df.columns]
     return df
+
+
+def execute_sql(sql: str, params: dict | None = None) -> int:
+    """Execute a write statement (UPDATE/INSERT/DELETE) and return rows affected."""
+    from sqlalchemy import text
+
+    engine = _get_engine()
+    with engine.begin() as conn:
+        result = conn.execute(text(sql), params or {})
+        return result.rowcount
