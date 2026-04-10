@@ -105,11 +105,17 @@ def _get_engine():
     return _engine
 
 
+_COLUMN_ALIASES = {
+    "family_is4ps": "family_is_4ps",
+}
+
+
 def _to_snake_case(name: str) -> str:
-    """Convert PascalCase / camelCase to snake_case."""
+    """Convert PascalCase / camelCase to snake_case, then apply known aliases."""
     s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
-    return s.lower()
+    s = s.lower()
+    return _COLUMN_ALIASES.get(s, s)
 
 
 def load_table(table_name: str) -> pd.DataFrame:
