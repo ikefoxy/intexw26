@@ -30,9 +30,9 @@ public class DashboardController : ControllerBase
         var now = DateTime.UtcNow;
         var startOfMonth = new DateTime(now.Year, now.Month, 1);
         var donationsThisMonth = await _db.Donations.AsNoTracking()
-            .Where(d => d.DonationDate >= startOfMonth)
-            .Select(d => d.Amount ?? d.EstimatedValue ?? 0m)
-            .SumAsync();
+            .Where(d => d.DonationDate >= startOfMonth && d.DonationType.ToLower() == "monetary")
+            .SumAsync(d =>
+                (d.CurrencyCode == "USD" ? 1m : PhpToUsdRate) * (d.Amount ?? d.EstimatedValue ?? 0m));
 
         var conferenceWindowEnd = now.Date.AddDays(30);
         var upcomingCaseConferences = await _db.HomeVisitations.AsNoTracking()
@@ -88,9 +88,9 @@ public class DashboardController : ControllerBase
             .SumAsync(d =>
                 (d.CurrencyCode == "USD" ? 1m : PhpToUsdRate) * (d.Amount ?? d.EstimatedValue ?? 0m));
         var donationsThisMonth = await _db.Donations.AsNoTracking()
-            .Where(d => d.DonationDate >= startOfMonth)
-            .Select(d => d.Amount ?? d.EstimatedValue ?? 0m)
-            .SumAsync();
+            .Where(d => d.DonationDate >= startOfMonth && d.DonationType.ToLower() == "monetary")
+            .SumAsync(d =>
+                (d.CurrencyCode == "USD" ? 1m : PhpToUsdRate) * (d.Amount ?? d.EstimatedValue ?? 0m));
 
         // ── Donation trend (12 months) ──
         var donationTrend = await BuildMonthlyDonations(now, 12);
@@ -156,13 +156,18 @@ public class DashboardController : ControllerBase
     {
         var firstMonth = new DateTime(nowUtc.Year, nowUtc.Month, 1).AddMonths(-(months - 1));
         var rows = await _db.Donations.AsNoTracking()
-            .Where(d => d.DonationDate >= firstMonth)
-            .Select(d => new { d.DonationDate.Year, d.DonationDate.Month, Amount = d.Amount ?? d.EstimatedValue ?? 0m })
+            .Where(d => d.DonationDate >= firstMonth && d.DonationType.ToLower() == "monetary")
+            .Select(d => new
+            {
+                d.DonationDate.Year,
+                d.DonationDate.Month,
+                AmountUsd = (d.CurrencyCode == "USD" ? 1m : PhpToUsdRate) * (d.Amount ?? d.EstimatedValue ?? 0m)
+            })
             .ToListAsync();
 
         var grouped = rows
             .GroupBy(x => new { x.Year, x.Month })
-            .ToDictionary(g => (g.Key.Year, g.Key.Month), g => g.Sum(x => x.Amount));
+            .ToDictionary(g => (g.Key.Year, g.Key.Month), g => g.Sum(x => x.AmountUsd));
 
         var points = new List<MonthlyDonationPoint>(months);
         for (var i = 0; i < months; i++)
