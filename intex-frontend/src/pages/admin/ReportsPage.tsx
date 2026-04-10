@@ -183,8 +183,8 @@ export function ReportsPage() {
             <section className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
                 <div className="font-semibold text-surface-dark">{t('reports_donations_trend')}</div>
-                <div className="mt-4 h-72">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="mt-4 h-72 w-full">
+                  <ResponsiveContainer width="100%" height={288} minWidth={0}>
                     <BarChart data={donationByMonth}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
@@ -198,8 +198,8 @@ export function ReportsPage() {
 
               <div className="rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
                 <div className="font-semibold text-surface-dark">{t('reports_supporters_by_type')}</div>
-                <div className="mt-4 h-72">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="mt-4 h-72 w-full">
+                  <ResponsiveContainer width="100%" height={288} minWidth={0}>
                     <PieChart>
                       <Pie data={supporterTypeBreakdown} dataKey="value" nameKey="name" outerRadius={95} label>
                         {supporterTypeBreakdown.map((entry, idx) => (
@@ -215,8 +215,8 @@ export function ReportsPage() {
 
             <section className="mt-6 rounded-2xl border border-brand-100 bg-surface p-5 shadow-sm">
               <div className="font-semibold text-surface-dark">{t('reports_safehouse_occupancy')}</div>
-              <div className="mt-4 h-80">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="mt-4 h-80 w-full">
+                <ResponsiveContainer width="100%" height={320} minWidth={0}>
                   <BarChart data={safehouseOccupancy} layout="vertical" margin={{ left: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" domain={[0, 100]} />

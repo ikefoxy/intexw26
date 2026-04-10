@@ -143,8 +143,13 @@ app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["Content-Security-Policy"] =
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'";
+    // Dev builds (Vite/React tooling and some deps) may rely on dynamic evaluation;
+    // keep production strict and only relax in Development.
+    var csp = app.Environment.IsDevelopment()
+        ? "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'"
+        : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'";
+
+    context.Response.Headers["Content-Security-Policy"] = csp;
     await next();
 });
 

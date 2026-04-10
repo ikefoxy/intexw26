@@ -94,8 +94,8 @@ export default function AdminDashboardPage() {
                   <h2 className="text-base font-semibold text-surface-dark">{t('admin_monthly_donations')}</h2>
                   <span className="text-xs text-surface-text">{t('admin_last_6_months')}</span>
                 </div>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height={256} minWidth={0}>
                     <BarChart data={donationChartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
