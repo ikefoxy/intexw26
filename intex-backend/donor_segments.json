@@ -1,0 +1,485 @@
+{
+  "1": {
+    "persona": "Champions",
+    "recency": 50,
+    "frequency": 12,
+    "monetary": 9000.03,
+    "cluster": 1
+  },
+  "2": {
+    "persona": "At-Risk Donors",
+    "recency": 337,
+    "frequency": 4,
+    "monetary": 3877.36,
+    "cluster": 0
+  },
+  "3": {
+    "persona": "Champions",
+    "recency": 209,
+    "frequency": 16,
+    "monetary": 12448.13,
+    "cluster": 1
+  },
+  "4": {
+    "persona": "Champions",
+    "recency": 40,
+    "frequency": 11,
+    "monetary": 9934.62,
+    "cluster": 1
+  },
+  "5": {
+    "persona": "At-Risk Donors",
+    "recency": 190,
+    "frequency": 5,
+    "monetary": 4751.17,
+    "cluster": 0
+  },
+  "6": {
+    "persona": "Champions",
+    "recency": 138,
+    "frequency": 9,
+    "monetary": 9574.27,
+    "cluster": 1
+  },
+  "7": {
+    "persona": "Champions",
+    "recency": 103,
+    "frequency": 11,
+    "monetary": 6003.96,
+    "cluster": 1
+  },
+  "8": {
+    "persona": "Champions",
+    "recency": 109,
+    "frequency": 13,
+    "monetary": 9064.84,
+    "cluster": 1
+  },
+  "9": {
+    "persona": "Champions",
+    "recency": 66,
+    "frequency": 9,
+    "monetary": 10315.75,
+    "cluster": 1
+  },
+  "10": {
+    "persona": "At-Risk Donors",
+    "recency": 152,
+    "frequency": 6,
+    "monetary": 3458.54,
+    "cluster": 0
+  },
+  "11": {
+    "persona": "At-Risk Donors",
+    "recency": 115,
+    "frequency": 4,
+    "monetary": 4395.62,
+    "cluster": 0
+  },
+  "12": {
+    "persona": "At-Risk Donors",
+    "recency": 179,
+    "frequency": 7,
+    "monetary": 5002.38,
+    "cluster": 0
+  },
+  "13": {
+    "persona": "At-Risk Donors",
+    "recency": 99,
+    "frequency": 7,
+    "monetary": 3256.82,
+    "cluster": 0
+  },
+  "14": {
+    "persona": "New/Occasional Donors",
+    "recency": 837,
+    "frequency": 1,
+    "monetary": 27.12,
+    "cluster": 2
+  },
+  "15": {
+    "persona": "New/Occasional Donors",
+    "recency": 572,
+    "frequency": 2,
+    "monetary": 925.66,
+    "cluster": 2
+  },
+  "16": {
+    "persona": "At-Risk Donors",
+    "recency": 158,
+    "frequency": 5,
+    "monetary": 2668.23,
+    "cluster": 0
+  },
+  "17": {
+    "persona": "New/Occasional Donors",
+    "recency": 391,
+    "frequency": 4,
+    "monetary": 1406.67,
+    "cluster": 2
+  },
+  "18": {
+    "persona": "At-Risk Donors",
+    "recency": 80,
+    "frequency": 5,
+    "monetary": 3419.58,
+    "cluster": 0
+  },
+  "19": {
+    "persona": "At-Risk Donors",
+    "recency": 149,
+    "frequency": 8,
+    "monetary": 3765.27,
+    "cluster": 0
+  },
+  "20": {
+    "persona": "Champions",
+    "recency": 334,
+    "frequency": 17,
+    "monetary": 14240.29,
+    "cluster": 1
+  },
+  "21": {
+    "persona": "At-Risk Donors",
+    "recency": 101,
+    "frequency": 7,
+    "monetary": 2955.69,
+    "cluster": 0
+  },
+  "22": {
+    "persona": "At-Risk Donors",
+    "recency": 58,
+    "frequency": 5,
+    "monetary": 4326.73,
+    "cluster": 0
+  },
+  "23": {
+    "persona": "New/Occasional Donors",
+    "recency": 380,
+    "frequency": 3,
+    "monetary": 636.53,
+    "cluster": 2
+  },
+  "24": {
+    "persona": "Champions",
+    "recency": 178,
+    "frequency": 9,
+    "monetary": 4168.88,
+    "cluster": 1
+  },
+  "25": {
+    "persona": "Champions",
+    "recency": 55,
+    "frequency": 17,
+    "monetary": 11540.99,
+    "cluster": 1
+  },
+  "26": {
+    "persona": "Champions",
+    "recency": 45,
+    "frequency": 12,
+    "monetary": 7109.62,
+    "cluster": 1
+  },
+  "27": {
+    "persona": "At-Risk Donors",
+    "recency": 51,
+    "frequency": 6,
+    "monetary": 4653.04,
+    "cluster": 0
+  },
+  "29": {
+    "persona": "At-Risk Donors",
+    "recency": 184,
+    "frequency": 6,
+    "monetary": 4837.31,
+    "cluster": 0
+  },
+  "30": {
+    "persona": "At-Risk Donors",
+    "recency": 255,
+    "frequency": 2,
+    "monetary": 4713.84,
+    "cluster": 0
+  },
+  "31": {
+    "persona": "Champions",
+    "recency": 58,
+    "frequency": 20,
+    "monetary": 10003.36,
+    "cluster": 1
+  },
+  "32": {
+    "persona": "At-Risk Donors",
+    "recency": 82,
+    "frequency": 8,
+    "monetary": 5685.9,
+    "cluster": 0
+  },
+  "33": {
+    "persona": "New/Occasional Donors",
+    "recency": 374,
+    "frequency": 7,
+    "monetary": 3794.98,
+    "cluster": 2
+  },
+  "34": {
+    "persona": "New/Occasional Donors",
+    "recency": 338,
+    "frequency": 7,
+    "monetary": 2428.81,
+    "cluster": 2
+  },
+  "35": {
+    "persona": "Champions",
+    "recency": 110,
+    "frequency": 10,
+    "monetary": 8547.74,
+    "cluster": 1
+  },
+  "36": {
+    "persona": "New/Occasional Donors",
+    "recency": 664,
+    "frequency": 6,
+    "monetary": 4060.64,
+    "cluster": 2
+  },
+  "37": {
+    "persona": "New/Occasional Donors",
+    "recency": 453,
+    "frequency": 5,
+    "monetary": 1992.44,
+    "cluster": 2
+  },
+  "38": {
+    "persona": "Champions",
+    "recency": 88,
+    "frequency": 9,
+    "monetary": 6792.7,
+    "cluster": 1
+  },
+  "39": {
+    "persona": "At-Risk Donors",
+    "recency": 299,
+    "frequency": 5,
+    "monetary": 1943.22,
+    "cluster": 0
+  },
+  "40": {
+    "persona": "At-Risk Donors",
+    "recency": 262,
+    "frequency": 2,
+    "monetary": 1646.05,
+    "cluster": 0
+  },
+  "41": {
+    "persona": "New/Occasional Donors",
+    "recency": 442,
+    "frequency": 4,
+    "monetary": 2166.7,
+    "cluster": 2
+  },
+  "42": {
+    "persona": "At-Risk Donors",
+    "recency": 100,
+    "frequency": 5,
+    "monetary": 2146.77,
+    "cluster": 0
+  },
+  "43": {
+    "persona": "At-Risk Donors",
+    "recency": 169,
+    "frequency": 6,
+    "monetary": 3280.16,
+    "cluster": 0
+  },
+  "44": {
+    "persona": "Champions",
+    "recency": 114,
+    "frequency": 7,
+    "monetary": 6064.91,
+    "cluster": 1
+  },
+  "45": {
+    "persona": "Champions",
+    "recency": 134,
+    "frequency": 11,
+    "monetary": 11184.74,
+    "cluster": 1
+  },
+  "46": {
+    "persona": "At-Risk Donors",
+    "recency": 220,
+    "frequency": 5,
+    "monetary": 2048.05,
+    "cluster": 0
+  },
+  "47": {
+    "persona": "At-Risk Donors",
+    "recency": 185,
+    "frequency": 6,
+    "monetary": 7264.21,
+    "cluster": 0
+  },
+  "48": {
+    "persona": "Champions",
+    "recency": 141,
+    "frequency": 4,
+    "monetary": 2257.28,
+    "cluster": 1
+  },
+  "49": {
+    "persona": "At-Risk Donors",
+    "recency": 78,
+    "frequency": 4,
+    "monetary": 1952.98,
+    "cluster": 0
+  },
+  "50": {
+    "persona": "At-Risk Donors",
+    "recency": 276,
+    "frequency": 4,
+    "monetary": 3201.4,
+    "cluster": 0
+  },
+  "51": {
+    "persona": "At-Risk Donors",
+    "recency": 42,
+    "frequency": 6,
+    "monetary": 2653.68,
+    "cluster": 0
+  },
+  "52": {
+    "persona": "New/Occasional Donors",
+    "recency": 570,
+    "frequency": 6,
+    "monetary": 4305.91,
+    "cluster": 2
+  },
+  "53": {
+    "persona": "New/Occasional Donors",
+    "recency": 517,
+    "frequency": 2,
+    "monetary": 2271.28,
+    "cluster": 2
+  },
+  "54": {
+    "persona": "Champions",
+    "recency": 138,
+    "frequency": 23,
+    "monetary": 11932.35,
+    "cluster": 1
+  },
+  "55": {
+    "persona": "Champions",
+    "recency": 298,
+    "frequency": 6,
+    "monetary": 12074.79,
+    "cluster": 1
+  },
+  "56": {
+    "persona": "At-Risk Donors",
+    "recency": 95,
+    "frequency": 4,
+    "monetary": 1581.93,
+    "cluster": 0
+  },
+  "57": {
+    "persona": "At-Risk Donors",
+    "recency": 125,
+    "frequency": 2,
+    "monetary": 1731.43,
+    "cluster": 0
+  },
+  "58": {
+    "persona": "New/Occasional Donors",
+    "recency": 814,
+    "frequency": 3,
+    "monetary": 870.43,
+    "cluster": 2
+  },
+  "59": {
+    "persona": "At-Risk Donors",
+    "recency": 190,
+    "frequency": 4,
+    "monetary": 1368.02,
+    "cluster": 0
+  },
+  "60": {
+    "persona": "Champions",
+    "recency": 316,
+    "frequency": 6,
+    "monetary": 3976.01,
+    "cluster": 1
+  },
+  "61": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 1,
+    "monetary": 15.75,
+    "cluster": 0
+  },
+  "62": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 1,
+    "monetary": 22.5,
+    "cluster": 0
+  },
+  "63": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 1,
+    "monetary": 11.5,
+    "cluster": 0
+  },
+  "64": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 1,
+    "monetary": 9.99,
+    "cluster": 0
+  },
+  "65": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 1,
+    "monetary": 6.66,
+    "cluster": 0
+  },
+  "66": {
+    "persona": "At-Risk Donors",
+    "recency": 0,
+    "frequency": 2,
+    "monetary": 62.0,
+    "cluster": 0
+  },
+  "67": {
+    "persona": "At-Risk Donors",
+    "recency": 1,
+    "frequency": 2,
+    "monetary": 1300.0,
+    "cluster": 0
+  },
+  "68": {
+    "persona": "At-Risk Donors",
+    "recency": 0,
+    "frequency": 6,
+    "monetary": 300.0,
+    "cluster": 0
+  },
+  "69": {
+    "persona": "At-Risk Donors",
+    "recency": 0,
+    "frequency": 6,
+    "monetary": 825.0,
+    "cluster": 0
+  },
+  "70": {
+    "persona": "At-Risk Donors",
+    "recency": 0,
+    "frequency": 1,
+    "monetary": 10.0,
+    "cluster": 0
+  }
+}
