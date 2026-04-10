@@ -93,9 +93,18 @@ def _get_engine():
             "in the repo-root .env file or as environment variables."
         )
 
-    driver = "{ODBC Driver 18 for SQL Server}"
+    import pyodbc
+
+    preferred = [
+        "ODBC Driver 18 for SQL Server",
+        "ODBC Driver 17 for SQL Server",
+        "SQL Server",
+    ]
+    available = pyodbc.drivers()
+    driver = next((d for d in preferred if d in available), preferred[0])
+
     params = urllib.parse.quote_plus(
-        f"Driver={driver};Server=tcp:{server},1433;Database={database};"
+        f"Driver={{{driver}}};Server=tcp:{server},1433;Database={database};"
         f"Uid={user};Pwd={password};Encrypt=yes;"
         f"TrustServerCertificate=no;Connection Timeout=60;"
     )
